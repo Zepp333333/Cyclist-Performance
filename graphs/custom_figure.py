@@ -2,6 +2,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from middleware import Interval
 
 
 class CustomFigure:
@@ -14,7 +15,8 @@ class CustomFigure:
             chart_type: str = 'Scatter',
             data_frame: pd.DataFrame = pd.DataFrame([]),
             index_col: str = '',
-            data_series: list[str] = []
+            data_series: list[str] = [],
+            intervals: list[Interval] = [],
     ) -> None:
         """
         Initialize instance of CustomFigure
@@ -27,6 +29,7 @@ class CustomFigure:
         self.data_frame = data_frame
         self.index_col = index_col
         self.data_series = data_series
+        self.intervals = intervals
 
         self.number_of_charts = len(data_series)
         self.num_columns = 1
@@ -40,15 +43,66 @@ class CustomFigure:
         if not self.check_fields_complete():
             raise ValueError(f'{self.__class__.__name__} fields incomplete')
 
-        self.figure = make_subplots(self.number_of_charts, self.num_columns)
-        for column, n in zip(self.data_series, list(range(1, self.number_of_charts + 1))):
+        # todo - replace hardcoded row_width!
+        self.figure = make_subplots(rows=self.number_of_charts + 1, cols=self.num_columns,
+                                    shared_xaxes=True, vertical_spacing=0.05, row_width=[0.17, 0.17, 0.17, 0.3])
+        self.figure.update_layout(showlegend=False, template='simple_white')
+
+        # Create traces for each data_stream in provided data_series
+        for data_stream, n in zip(self.data_series, list(range(2, self.number_of_charts + 2))):
             self.figure.add_trace(go.Scatter(
                 x=self.data_frame[self.index_col],
-                y=self.data_frame[column]
+                y=self.data_frame[data_stream]
             ), n, 1)
 
-        self.figure.update_xaxes(matches='x')
+        # add empty chart on top for interval data presentation
+        self.figure.add_trace(go.Scatter(
+            x=[1],
+            y=[1],
+            visible=False
+        ), 1, 1)
+
+        # configure axis on top chart
+        self.figure.get_subplot(1, 1).yaxis.update({'autorange': False, 'visible': False, 'fixedrange': True})
+        self.figure.get_subplot(1, 1).xaxis.update({'visible': False})
+
+        # fixing y-axis on rest of the charts
+        for subplot in range(1, self.number_of_charts + 1):
+            self.figure.get_subplot(subplot, 1).yaxis.update({'fixedrange': True})
+
+        self.draw_intervals()
         return self.figure
+
+    def add_intervals(self, new_intervals: list[Interval]) -> None:
+        self.intervals.extend(new_intervals)
+
+    def draw_intervals(self) -> None:
+
+
+
+        if self.intervals:
+            for interval in self.intervals:
+                self.figure.add_vrect(
+                    x0=interval.start,
+                    x1=interval.end,
+                    row="all",
+                    col="all",
+                    fillcolor="green",
+                    opacity=0.25,
+                    line_width=0,
+                    # editable=True,
+                    # edits=edits,
+                )
+                self.figure.add_annotation(
+                    x=interval.start,
+                    y=4,
+                    valign="top",
+                    xanchor="left",
+                    yanchor="top",
+                    xref="x",
+                    yref="y",
+                    text=f"{interval.title} <br>string2 <br>string3  <br>string4  <br>string5",
+                    showarrow=False)
 
     def check_fields_complete(self) -> bool:
         """

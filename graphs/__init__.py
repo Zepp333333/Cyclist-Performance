@@ -1,3 +1,3 @@
 #  Copyright (c) 2021. Sergei Sazonov. Some Rights Reserved
 
-from Graphs.custom_figure import CustomFigure
+from graphs.custom_figure import CustomFigure
