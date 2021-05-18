@@ -39,6 +39,7 @@ class CustomFigure:
         """
         if not self.check_fields_complete():
             raise ValueError(f'{self.__class__.__name__} fields incomplete')
+
         self.figure = make_subplots(self.number_of_charts, self.num_columns)
         for column, n in zip(self.data_series, list(range(1, self.number_of_charts + 1))):
             self.figure.add_trace(go.Scatter(
