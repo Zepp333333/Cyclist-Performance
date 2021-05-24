@@ -1,4 +1,4 @@
-#  Copyright (c) 2021. Sergei Sazonov. Some Rights Reserved
+#  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import plotly.express as px
 import pandas as pd
 

@@ -1,8 +1,8 @@
-#  Copyright (c) 2021. Sergei Sazonov. Some Rights Reserved
+#  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from middleware import Interval
+from middleware import Interval, Activity
 
 
 class CustomFigure:
@@ -12,24 +12,23 @@ class CustomFigure:
 
     def __init__(
             self,
+            activity: Activity,
             chart_type: str = 'Scatter',
-            data_frame: pd.DataFrame = pd.DataFrame([]),
             index_col: str = '',
-            data_series: list[str] = [],
-            intervals: list[Interval] = [],
+            data_series: list[str] = None
     ) -> None:
         """
         Initialize instance of CustomFigure
+        :param activity - activity to plot
         :param chart_type: str - type of plotly.graph_object chart
-        :param data_frame: pd.DataFrame containing data to plot
         :param index_col: str - name of DataFrame column containing index (x-axis)
         :param data_series: list[str] - name of DataFrame columns to plot
         """
         self.chart_type = chart_type
-        self.data_frame = data_frame
+        self.data_frame = activity.df
         self.index_col = index_col
         self.data_series = data_series
-        self.intervals = intervals
+        self.intervals = activity.intervals[1:]
 
         self.number_of_charts = len(data_series)
         self.num_columns = 1
@@ -73,12 +72,10 @@ class CustomFigure:
         self.draw_intervals()
         return self.figure
 
-    def add_intervals(self, new_intervals: list[Interval]) -> None:
-        self.intervals.extend(new_intervals)
+    def refresh(self):
+        return self.get_fig()
 
     def draw_intervals(self) -> None:
-
-
 
         if self.intervals:
             for interval in self.intervals:
