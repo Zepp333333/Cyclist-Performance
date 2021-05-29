@@ -1,3 +1,5 @@
+#  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -8,7 +10,7 @@ from app import app
 from app import server
 
 # Connect to your app pages
-from apps import activity_main
+from apps import activity_main, calendar
 
 # Styling the sidebar:
 SIDEBAR_STYLE = {
@@ -64,6 +66,7 @@ def render_page_content(pathname):
     if pathname == "/":
         return [
             html.H1("Home page", style={"textAlign": "center"}),
+            calendar.layout
         ]
     elif pathname == "/activity":
         return [

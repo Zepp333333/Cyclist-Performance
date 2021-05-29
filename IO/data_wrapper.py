@@ -1,4 +1,4 @@
-#  Copyright (c) 2021. Sergei Sazonov. Some Rights Reserved
+#  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import pathlib
 import pandas as pd
 
@@ -6,7 +6,7 @@ import pandas as pd
 class DataWrapper:
     # get relative data folder
     PATH = pathlib.Path(__file__).parent.parent
-    DATA_PATH = PATH.joinpath("Data").resolve()
+    DATA_PATH = PATH.joinpath("IO").resolve()
 
     def __init__(self):
         pass
