@@ -1,3 +1,5 @@
+#  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+
 import dash
 import dash_bootstrap_components as dbc
 
