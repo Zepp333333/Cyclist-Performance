@@ -6,6 +6,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
 # Connect to main app.py file
+import IO.strava
 from app import app
 from app import server
 
@@ -38,6 +39,7 @@ sidebar = html.Div(
         dbc.Nav(
             [
                 dbc.NavLink("Home", href="/", active="exact"),
+                dbc.NavLink("Strava Login", href="/login", active="exact"),
                 dbc.NavLink("Activity", href="/activity", active="exact"),
                 dbc.NavLink("Something else", href="/else", active="exact"),
             ],
@@ -67,6 +69,11 @@ def render_page_content(pathname):
         return [
             html.H1("Home page", style={"textAlign": "center"}),
             calendar.layout
+        ]
+    elif pathname == "/login":
+        return [
+            html.H1("Login page", style={"textAlign": "center"}),
+            IO.strava.layout
         ]
     elif pathname == "/activity":
         return [
