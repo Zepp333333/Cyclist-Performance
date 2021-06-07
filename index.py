@@ -6,7 +6,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
 # Connect to main app.py file
-import IO.strava
+import IO.strava, IO.strava2
 from app import app
 from app import server
 
@@ -73,7 +73,7 @@ def render_page_content(pathname):
     elif pathname == "/login":
         return [
             html.H1("Login page", style={"textAlign": "center"}),
-            IO.strava.layout
+            IO.strava2.r
         ]
     elif pathname == "/activity":
         return [
