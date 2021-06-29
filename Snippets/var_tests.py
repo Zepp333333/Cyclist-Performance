@@ -1,3 +1,5 @@
+#  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+
 import plotly.graph_objects as go
 import pandas as pd
 
