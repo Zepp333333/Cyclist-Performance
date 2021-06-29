@@ -1,5 +1,7 @@
 # coding: utf-8
 
+#  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+
 # flake8: noqa
 """
     Strava API v3
