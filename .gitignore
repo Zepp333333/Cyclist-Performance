@@ -1,3 +1,7 @@
+# my igonres
+site.db
+/static/profile_pics/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -129,3 +133,4 @@ dmypy.json
 .pyre/
 
 .idea
+

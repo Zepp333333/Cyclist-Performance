@@ -1,3 +1,5 @@
+#  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+
 from __future__ import absolute_import
 
 # flake8: noqa
