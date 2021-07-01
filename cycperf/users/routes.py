@@ -1,12 +1,14 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-from flask import render_template, url_for, flash, redirect, request, Blueprint
+from flask import (render_template, url_for, flash,
+                   redirect, request, Blueprint, request)
 from cycperf import db, bcrypt
 from cycperf.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from cycperf.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                  RequestResetForm, ResetPasswordForm)
 from cycperf.users.utils import save_picture, send_reset_email
+import IO.strava as strava
 
 users = Blueprint('users', __name__)
 
@@ -107,3 +109,19 @@ def reset_token(token):
         flash('Your password has been updated! You are now able to log in.', 'success')
         return redirect(url_for('users.login'))
     return render_template('reset_token.html', title='Reset Password', form=form)
+
+
+@users.route("/strava_login")
+@login_required
+def strava_login():
+    return redirect(strava.prep_app_auth_url())
+
+
+@users.route("/exchange_token")
+@login_required
+def strava_return():
+    if strava.check_auth_return(request.args):
+        athlete = strava.get_athlete(auth_code=request.args['code'])
+        return redirect(url_for('/application/'))
+    else:
+        return redirect(url_for('users.strava_login'))
