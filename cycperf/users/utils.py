@@ -6,7 +6,11 @@ import secrets
 from flask import url_for, current_app
 from cycperf import mail
 from flask_mail import Message
+from flask_login import current_user
 
+
+def get_current_user_name():
+    return current_user
 
 
 def save_picture(form_picture):

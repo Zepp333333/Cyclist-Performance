@@ -11,7 +11,7 @@ from flask_login import login_required
 
 import dash_bootstrap_components as dbc
 
-from cycperf.config import Config
+from config import Config
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -65,7 +65,7 @@ def register_dash(app):
         dash_app.layout = layout
         register_callbacks(dash_app)
 
-    # _protect_dashviews(dashapp1)
+    _protect_dashviews(dash_app)
 
 
 def _protect_dashviews(dashapp):
