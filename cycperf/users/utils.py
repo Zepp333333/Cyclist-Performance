@@ -10,7 +10,8 @@ from flask_login import current_user
 
 
 def get_current_user_name():
-    return current_user
+    return current_user.username
+
 
 
 def save_picture(form_picture):

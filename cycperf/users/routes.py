@@ -122,6 +122,9 @@ def strava_login():
 def strava_return():
     if strava.check_auth_return(request.args):
         athlete = strava.get_athlete(auth_code=request.args['code'])
+        current_user.strava_id = athlete['id']
+
+        db.session.commit()
         return redirect(url_for('/application/'))
     else:
         return redirect(url_for('users.strava_login'))

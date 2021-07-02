@@ -5,6 +5,9 @@
 import requests
 from config import Config
 from IO.strava_auth import BearerAuth
+from flask_login import current_user
+from cycperf import db
+from datetime import datetime
 
 
 def prep_app_auth_url():
@@ -54,6 +57,12 @@ def exchange_auth_code_for_token(auth_code):
 
 def get_first_time_coming_athlete(auth_code):
     token = exchange_auth_code_for_token(auth_code)
+
+    current_user.strava_access_token = token['access_token']
+    current_user.strava_token_expires_at = datetime.fromtimestamp(token['expires_at'])
+    current_user.strava_refresh_token = token['refresh_token']
+    db.session.commit()
+
     return get_known_athlete(token['access_token'])
 
 
