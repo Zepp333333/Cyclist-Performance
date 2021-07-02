@@ -52,5 +52,3 @@ layout = html.Div(
         content
     ]
 )
-
-

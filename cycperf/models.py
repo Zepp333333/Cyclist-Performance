@@ -17,6 +17,12 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
+    strava_id = db.Column(db.Integer, unique=True)
+    strava_scope = db.Column(db.Text)
+    strava_access_token = db.Column(db.String(40))
+    strava_token_expires_at = db.Column(db.DateTime(timezone=False))
+    strava_refresh_token = db.Column(db.String(40))
+
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
@@ -33,3 +39,4 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+

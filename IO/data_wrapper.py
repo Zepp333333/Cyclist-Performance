@@ -1,6 +1,9 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import pathlib
+
+import flask_login
 import pandas as pd
+from cycperf import db
 
 
 class DataWrapper:
@@ -14,3 +17,5 @@ class DataWrapper:
     def get_activity(self, activity_id: str, method: str = 'csv') -> pd.DataFrame:
         if method == 'csv':
             return pd.read_csv(self.DATA_PATH.joinpath(activity_id))
+
+

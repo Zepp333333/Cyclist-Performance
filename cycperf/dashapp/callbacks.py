@@ -28,8 +28,8 @@ def register_callbacks(dashapp):
         elif pathname == "/application/activity":
             return [
                 html.H1("Activity page", style={"textAlign": "center"}),
-                html.H2(str(current_user.username)),
-                activity_main.layout
+                html.H2(current_user.id),
+                activity_main.make_layout(current_user.id)
             ], [current_user.username]
         elif pathname == "/application/else":
             return [
