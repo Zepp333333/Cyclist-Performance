@@ -3,7 +3,6 @@
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from flask_login import current_user
 
 
 # Styling the sidebar:
@@ -49,6 +48,7 @@ layout = html.Div(
     [
         dcc.Location(id="url"),
         sidebar,
-        content
+        content,
+        dcc.Store(id="ride_object")
     ]
 )
