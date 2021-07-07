@@ -1,8 +1,8 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-import dash
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+import pandas as pd
 from dash.dependencies import Input, Output, State
 
 from cycperf.dashapp import activity_main, calendar
@@ -46,28 +46,40 @@ def register_callbacks(dashapp):
         )
 
     @dashapp.callback(
-        Output(component_id='my-fig', component_property='figure'),
+        Output(component_id='ride_object', component_property='data'),
         [Input(component_id='create_interval', component_property='n_clicks')],
         [State(component_id='my-fig', component_property='relayoutData')],
         prevent_initial_call=True
     )
-    def create_interval(n_clicks, relayout_data):
+    def get_ride(n_clicks, relayout_data):
+        ctx = dashapp.callback_context
+        if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
+            return ride_object.to_json()
 
-        from .activity_main import ride
+
+
+    @dashapp.callback(
+        Output(component_id='my-fig', component_property='figure'),
+        [Input(component_id='ride_object', component_property='data')],
+        [State(component_id='my-fig', component_property='relayoutData')],
+    )
+    def create_interval(ride_object, relayout_data):
+
+        ride = pd.read_json(ride_object)
         from .utils.scatter_drawer import ScatterDrawer
 
-        ctx = dash.callback_context
-        if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
-            interval_range = relayout_data_to_range(relayout_data)
-            if interval_range:
-                ride.make_interval(*interval_range)
+        # ctx = dashapp.callback_context
+        # if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
+        #     interval_range = relayout_data_to_range(relayout_data)
+        #     if interval_range:
+        #         ride.make_interval(*interval_range)
 
-            new_fig = ScatterDrawer(
-                activity=ride,
-                index_col='time',
-                series_to_plot=['watts', 'heartrate', 'cadence'],
-            )
-            return new_fig.get_fig()
+        new_fig = ScatterDrawer(
+            activity=ride,
+            index_col='time',
+            series_to_plot=['watts', 'heartrate', 'cadence'],
+        )
+        return new_fig.get_fig()
 
     def relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
         try:
@@ -78,3 +90,39 @@ def register_callbacks(dashapp):
                 return result[0], result[1]
         except KeyError:
             return tuple()
+
+
+
+        # @dashapp.callback(
+        #        Output(component_id='my-fig', component_property='figure'),
+        #        [Input(component_id='create_interval', component_property='n_clicks')],
+        #        [State(component_id='my-fig', component_property='relayoutData')],
+        #        prevent_initial_call=True
+        #    )
+        #    def create_interval(n_clicks, relayout_data):
+        #
+        #        from .activity_main import ride
+        #        from .utils.scatter_drawer import ScatterDrawer
+        #
+        #        ctx = dashapp.callback_context
+        #        if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
+        #            interval_range = relayout_data_to_range(relayout_data)
+        #            if interval_range:
+        #                ride.make_interval(*interval_range)
+        #
+        #            new_fig = ScatterDrawer(
+        #                activity=ride,
+        #                index_col='time',
+        #                series_to_plot=['watts', 'heartrate', 'cadence'],
+        #            )
+        #            return new_fig.get_fig()
+        #
+        #    def relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
+        #        try:
+        #            if len(relayout_data) == 1:
+        #                return int(relayout_data['xaxis.range'][0]), int(relayout_data['xaxis.range'][1])
+        #            else:
+        #                result = [int(v) for v in relayout_data.values()]
+        #                return result[0], result[1]
+        #        except KeyError:
+        #            return tuple()

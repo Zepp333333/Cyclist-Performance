@@ -8,6 +8,7 @@ from IO import DataWrapper
 from middleware import activity_wrapper
 from .utils.scatter_drawer import ScatterDrawer
 
+
 dw = DataWrapper()
 df = dw.get_activity(activity_id='ride.csv')
 mock_up_ride = Activity(name='My ride', df=df)
@@ -24,7 +25,6 @@ def _make_layout(activity):
         html.Button('Create Interval', id='create_interval', n_clicks=0, className="btn btn-primary"),
         dcc.Graph(id='my-fig', figure=fig.get_fig()),
     ])
-
     return layout
 
 
@@ -33,4 +33,5 @@ def make_layout(user_id=None):
         return _make_layout(mock_up_ride)
     return _make_layout(activity_wrapper.get_users_last_activity(user_id))
 
-# todo find a way to refresh callbacks in alignment with layout
+
+
