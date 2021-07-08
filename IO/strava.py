@@ -84,6 +84,18 @@ def get_athlete_last_activity(token):
     return response.json()
 
 
+def get_athlete_activities(token):
+    params = {
+        # "before": "",
+        # "after": "",
+        "page": 1,
+        "per_page": 10
+    }
+    base_url = "https://www.strava.com/api/v3/athlete/activities"
+    response = requests.get(base_url, params=params, auth=BearerAuth(token))
+    return response.json()
+
+
 def get_activity_by_id(activity_id, token):
     params = {
         'include_all_efforts': ''
