@@ -17,24 +17,31 @@ def register_callbacks(dashapp):
     def render_page_content(pathname):
         if pathname == "/application/":
             return [
-                html.H1("Home page", style={"textAlign": "center"}),
-                calendar.layout
-            ], [current_user.username]
+                       html.H1("Home page", style={"textAlign": "center"}),
+                       calendar.layout
+                   ], [current_user.username]
         # elif pathname == "/login":
         #     return [
         #         html.H1("Login page", style={"textAlign": "center"}),
         #         IO.strava2.r
         #     ]
-        elif pathname == "/application/activity":
+        elif "/application/activity" in pathname:
+            activity_id = pathname.split("/")[-1]
             return [
-                html.H1("Activity page", style={"textAlign": "center"}),
-                html.H2(current_user.id),
-                activity_main.make_layout(current_user.id)
-            ], [current_user.username]
+                       html.H1("Activity page", style={"textAlign": "center"}),
+                       html.H2(current_user.id),
+                       activity_main.make_layout(current_user.id, activity_id)
+                   ], [current_user.username]
         elif pathname == "/application/else":
             return [
-                html.H1("Something Else page", style={"textAlign": "center"}),
-            ], [current_user.username]
+                       html.H1("Something Else page", style={"textAlign": "center"}),
+                   ], [current_user.username]
+        elif "/application/test" in pathname:
+            activity_id = pathname.split("/")[-1]
+            return [
+                       html.H1("test page", style={"textAlign": "center"}),
+                       html.H2(activity_id)
+                   ], [current_user.username]
 
         # If the user tries to reach a different page, return a 404 message
         return dbc.Jumbotron(
@@ -55,8 +62,6 @@ def register_callbacks(dashapp):
         ctx = dashapp.callback_context
         if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
             return ride_object.to_json()
-
-
 
     @dashapp.callback(
         Output(component_id='my-fig', component_property='figure'),
@@ -90,8 +95,6 @@ def register_callbacks(dashapp):
                 return result[0], result[1]
         except KeyError:
             return tuple()
-
-
 
         # @dashapp.callback(
         #        Output(component_id='my-fig', component_property='figure'),

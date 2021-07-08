@@ -1,4 +1,5 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+import json
 
 import IO.strava as strava
 import IO.data_wrapper as dw
@@ -16,5 +17,18 @@ def get_users_last_activity(user_id) -> Activity:
         df[stream['type']] = stream['data']
 
     activity = Activity(last_activity[0]['name'], df=df)
+
+    return activity
+
+
+def get_and_store_users_activities(user_id) -> Activity:
+    token = current_user.strava_access_token
+    activities = strava.get_athlete_activities(token)
+    for activity in activities:
+        streams = strava.get_activity_streams(last_activity[0]['id'], token)
+        df = pd.DataFrame()
+        for stream in streams:
+            df[stream['type']] = stream['data']
+        activity = Activity(activity['id'], df=df)
 
     return activity
