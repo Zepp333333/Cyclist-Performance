@@ -35,7 +35,7 @@ class UploadsApi(object):
         self.api_client = api_client
 
     def create_upload(self, **kwargs):  # noqa: E501
-        """Upload Activity  # noqa: E501
+        """Upload DBActivity  # noqa: E501
 
         Uploads a new data file to create an activity from. Requires activity:write scope.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -63,7 +63,7 @@ class UploadsApi(object):
             return data
 
     def create_upload_with_http_info(self, **kwargs):  # noqa: E501
-        """Upload Activity  # noqa: E501
+        """Upload DBActivity  # noqa: E501
 
         Uploads a new data file to create an activity from. Requires activity:write scope.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an

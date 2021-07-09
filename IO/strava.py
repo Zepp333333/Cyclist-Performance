@@ -1,7 +1,5 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-# import IO.swagger_client
-# import IO.swagger_client.rest
 import requests
 from config import Config
 from IO.strava_auth import BearerAuth
@@ -22,7 +20,7 @@ def prep_app_auth_url():
     return requests.Request('GET', base_url, params=params).prepare().url
 
 
-def check_auth_code(args):
+def check_strava_auth_code(args):
     return 'code' in args and len(args['code']) == 40
 
 
@@ -33,11 +31,11 @@ def check_auth_scopes(args):
     return sorted(scope) == sorted(Config.STRAVA_REQUIRED_SCOPES)
 
 
-def check_auth_return(args):
-    return check_auth_code(args) and check_auth_scopes(args)
+def check_strava_auth_return(args):
+    return check_strava_auth_code(args) and check_auth_scopes(args)
 
 
-def get_known_athlete(token):
+def retrieve_known_athlete(token):
     base_url = 'https://www.strava.com/api/v3/athlete'  #todo = move to config
     response = requests.get(base_url, auth=BearerAuth(token))   # todo - add try/except
     return response.json()
@@ -55,7 +53,7 @@ def exchange_auth_code_for_token(auth_code):
     return response.json()
 
 
-def get_first_time_coming_athlete(auth_code):
+def retrieve_first_time_coming_athlete(auth_code):
     token = exchange_auth_code_for_token(auth_code)
 
     current_user.strava_access_token = token['access_token']
@@ -63,16 +61,16 @@ def get_first_time_coming_athlete(auth_code):
     current_user.strava_refresh_token = token['refresh_token']
     db.session.commit()
 
-    return get_known_athlete(token['access_token'])
+    return retrieve_known_athlete(token['access_token'])
 
 
-def get_athlete(auth_code, token=None):
+def retrieve_strava_athlete(auth_code, token=None):
     if token:
-        return get_known_athlete(token)
-    return get_first_time_coming_athlete(auth_code)
+        return retrieve_known_athlete(token)
+    return retrieve_first_time_coming_athlete(auth_code)
 
 
-def get_athlete_last_activity(token):
+def retrieve_athlete_last_activity(token):
     params = {
         # "before": "",
         # "after": "",
@@ -84,7 +82,7 @@ def get_athlete_last_activity(token):
     return response.json()
 
 
-def get_athlete_activities(token):
+def retrieve_athlete_activities(token):
     params = {
         # "before": "",
         # "after": "",
@@ -96,7 +94,7 @@ def get_athlete_activities(token):
     return response.json()
 
 
-def get_activity_by_id(activity_id, token):
+def retrieve_activity_by_id(activity_id, token):
     params = {
         'include_all_efforts': ''
     }
@@ -106,7 +104,7 @@ def get_activity_by_id(activity_id, token):
     return response.json()
 
 
-def get_laps_by_activity_id(activity_id, token):
+def retrieve_laps_by_activity_id(activity_id, token):
     params = {
         'include_all_efforts': ''
     }
@@ -116,7 +114,7 @@ def get_laps_by_activity_id(activity_id, token):
     return response.json()
 
 
-def get_activity_streams(activity_id, token):
+def retrieve_activity_streams(activity_id, token):
     params = {
         'keys': 'time,distance,altitude,latlng,velocity_smooth,heartrate,cadence,watts,temp,moving,grade_smooth',
         'key_by_type': ''

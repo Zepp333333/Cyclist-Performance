@@ -35,12 +35,12 @@ class StreamsApi(object):
         self.api_client = api_client
 
     def get_activity_streams(self, id, keys, key_by_type, **kwargs):  # noqa: E501
-        """Get Activity Streams  # noqa: E501
+        """Get DBActivity Streams  # noqa: E501
 
         Returns the given activity's streams. Requires activity:read scope. Requires activity:read_all scope for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_activity_streams(id, keys, key_by_type, async_req=True)
+        >>> thread = api.retrieve_activity_streams(id, keys, key_by_type, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -59,7 +59,7 @@ class StreamsApi(object):
             return data
 
     def get_activity_streams_with_http_info(self, id, keys, key_by_type, **kwargs):  # noqa: E501
-        """Get Activity Streams  # noqa: E501
+        """Get DBActivity Streams  # noqa: E501
 
         Returns the given activity's streams. Requires activity:read scope. Requires activity:read_all scope for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -87,22 +87,22 @@ class StreamsApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_activity_streams" % key
+                    " to method retrieve_activity_streams" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id' is set
         if ('id' not in params or
                 params['id'] is None):
-            raise ValueError("Missing the required parameter `id` when calling `get_activity_streams`")  # noqa: E501
+            raise ValueError("Missing the required parameter `id` when calling `retrieve_activity_streams`")  # noqa: E501
         # verify the required parameter 'keys' is set
         if ('keys' not in params or
                 params['keys'] is None):
-            raise ValueError("Missing the required parameter `keys` when calling `get_activity_streams`")  # noqa: E501
+            raise ValueError("Missing the required parameter `keys` when calling `retrieve_activity_streams`")  # noqa: E501
         # verify the required parameter 'key_by_type' is set
         if ('key_by_type' not in params or
                 params['key_by_type'] is None):
-            raise ValueError("Missing the required parameter `key_by_type` when calling `get_activity_streams`")  # noqa: E501
+            raise ValueError("Missing the required parameter `key_by_type` when calling `retrieve_activity_streams`")  # noqa: E501
 
         collection_formats = {}
 

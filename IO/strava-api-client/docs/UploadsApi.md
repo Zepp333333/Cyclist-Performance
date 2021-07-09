@@ -37,7 +37,7 @@ data_type = 'data_type_example' # str |  (optional)
 external_id = 'external_id_example' # str |  (optional)
 
 try:
-    # Upload Activity
+    # Upload DBActivity
     api_response = api_instance.create_upload(file=file, name=name, description=description, trainer=trainer, commute=commute, data_type=data_type, external_id=external_id)
     pprint(api_response)
 except ApiException as e:

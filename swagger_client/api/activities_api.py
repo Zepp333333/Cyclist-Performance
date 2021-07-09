@@ -35,7 +35,7 @@ class ActivitiesApi(object):
         self.api_client = api_client
 
     def create_activity(self, name, type, start_date_local, elapsed_time, description, distance, trainer, commute, **kwargs):  # noqa: E501
-        """Create an Activity  # noqa: E501
+        """Create an DBActivity  # noqa: E501
 
         Creates a manual activity for an athlete, requires activity:write scope.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -64,7 +64,7 @@ class ActivitiesApi(object):
             return data
 
     def create_activity_with_http_info(self, name, type, start_date_local, elapsed_time, description, distance, trainer, commute, **kwargs):  # noqa: E501
-        """Create an Activity  # noqa: E501
+        """Create an DBActivity  # noqa: E501
 
         Creates a manual activity for an athlete, requires activity:write scope.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -190,12 +190,12 @@ class ActivitiesApi(object):
             collection_formats=collection_formats)
 
     def get_activity_by_id(self, id, **kwargs):  # noqa: E501
-        """Get Activity  # noqa: E501
+        """Get DBActivity  # noqa: E501
 
         Returns the given activity that is owned by the authenticated athlete. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_activity_by_id(id, async_req=True)
+        >>> thread = api.retrieve_activity_by_id(id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -213,7 +213,7 @@ class ActivitiesApi(object):
             return data
 
     def get_activity_by_id_with_http_info(self, id, **kwargs):  # noqa: E501
-        """Get Activity  # noqa: E501
+        """Get DBActivity  # noqa: E501
 
         Returns the given activity that is owned by the authenticated athlete. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -240,14 +240,14 @@ class ActivitiesApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_activity_by_id" % key
+                    " to method retrieve_activity_by_id" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id' is set
         if ('id' not in params or
                 params['id'] is None):
-            raise ValueError("Missing the required parameter `id` when calling `get_activity_by_id`")  # noqa: E501
+            raise ValueError("Missing the required parameter `id` when calling `retrieve_activity_by_id`")  # noqa: E501
 
         collection_formats = {}
 
@@ -289,7 +289,7 @@ class ActivitiesApi(object):
             collection_formats=collection_formats)
 
     def get_comments_by_activity_id(self, id, **kwargs):  # noqa: E501
-        """List Activity Comments  # noqa: E501
+        """List DBActivity Comments  # noqa: E501
 
         Returns the comments on the given activity. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -313,7 +313,7 @@ class ActivitiesApi(object):
             return data
 
     def get_comments_by_activity_id_with_http_info(self, id, **kwargs):  # noqa: E501
-        """List Activity Comments  # noqa: E501
+        """List DBActivity Comments  # noqa: E501
 
         Returns the comments on the given activity. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -392,7 +392,7 @@ class ActivitiesApi(object):
             collection_formats=collection_formats)
 
     def get_kudoers_by_activity_id(self, id, **kwargs):  # noqa: E501
-        """List Activity Kudoers  # noqa: E501
+        """List DBActivity Kudoers  # noqa: E501
 
         Returns the athletes who kudoed an activity identified by an identifier. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -416,7 +416,7 @@ class ActivitiesApi(object):
             return data
 
     def get_kudoers_by_activity_id_with_http_info(self, id, **kwargs):  # noqa: E501
-        """List Activity Kudoers  # noqa: E501
+        """List DBActivity Kudoers  # noqa: E501
 
         Returns the athletes who kudoed an activity identified by an identifier. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -495,12 +495,12 @@ class ActivitiesApi(object):
             collection_formats=collection_formats)
 
     def get_laps_by_activity_id(self, id, **kwargs):  # noqa: E501
-        """List Activity Laps  # noqa: E501
+        """List DBActivity Laps  # noqa: E501
 
         Returns the laps of an activity identified by an identifier. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_laps_by_activity_id(id, async_req=True)
+        >>> thread = api.retrieve_laps_by_activity_id(id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -517,7 +517,7 @@ class ActivitiesApi(object):
             return data
 
     def get_laps_by_activity_id_with_http_info(self, id, **kwargs):  # noqa: E501
-        """List Activity Laps  # noqa: E501
+        """List DBActivity Laps  # noqa: E501
 
         Returns the laps of an activity identified by an identifier. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -543,14 +543,14 @@ class ActivitiesApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_laps_by_activity_id" % key
+                    " to method retrieve_laps_by_activity_id" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id' is set
         if ('id' not in params or
                 params['id'] is None):
-            raise ValueError("Missing the required parameter `id` when calling `get_laps_by_activity_id`")  # noqa: E501
+            raise ValueError("Missing the required parameter `id` when calling `retrieve_laps_by_activity_id`")  # noqa: E501
 
         collection_formats = {}
 
@@ -693,7 +693,7 @@ class ActivitiesApi(object):
             collection_formats=collection_formats)
 
     def get_zones_by_activity_id(self, id, **kwargs):  # noqa: E501
-        """Get Activity Zones  # noqa: E501
+        """Get DBActivity Zones  # noqa: E501
 
         Summit Feature. Returns the zones of a given activity. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -715,7 +715,7 @@ class ActivitiesApi(object):
             return data
 
     def get_zones_by_activity_id_with_http_info(self, id, **kwargs):  # noqa: E501
-        """Get Activity Zones  # noqa: E501
+        """Get DBActivity Zones  # noqa: E501
 
         Summit Feature. Returns the zones of a given activity. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -788,7 +788,7 @@ class ActivitiesApi(object):
             collection_formats=collection_formats)
 
     def update_activity_by_id(self, id, **kwargs):  # noqa: E501
-        """Update Activity  # noqa: E501
+        """Update DBActivity  # noqa: E501
 
         Updates the given activity that is owned by the authenticated athlete. Requires activity:write. Also requires activity:read_all in order to update Only Me activities  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -811,7 +811,7 @@ class ActivitiesApi(object):
             return data
 
     def update_activity_by_id_with_http_info(self, id, **kwargs):  # noqa: E501
-        """Update Activity  # noqa: E501
+        """Update DBActivity  # noqa: E501
 
         Updates the given activity that is owned by the authenticated athlete. Requires activity:write. Also requires activity:read_all in order to update Only Me activities  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an

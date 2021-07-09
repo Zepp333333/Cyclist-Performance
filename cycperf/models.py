@@ -22,7 +22,7 @@ class User(db.Model, UserMixin):
     strava_access_token = db.Column(db.String(40))
     strava_token_expires_at = db.Column(db.DateTime(timezone=False))
     strava_refresh_token = db.Column(db.String(40))
-
+    strava_athlete_info = db.Column(db.JSON)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
@@ -39,4 +39,17 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+
+
+class DBActivity(db.Model):
+    activity_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    athlete_id = db.Column(db.Integer, db.ForeignKey('user.strava_id'), nullable=False)
+    json = db.Column(db.JSON)
+    laps = db.Column(db.JSON)
+    streams = db.Column(db.JSON)
+    df = db.Column(db.JSON)
+    intervals = db.Column(db.JSON)
+    blob = db.Column(db.BLOB)
+
 

@@ -28,7 +28,7 @@ def register_callbacks(dashapp):
         elif "/application/activity" in pathname:
             activity_id = pathname.split("/")[-1]
             return [
-                       html.H1("Activity page", style={"textAlign": "center"}),
+                       html.H1("DBActivity page", style={"textAlign": "center"}),
                        html.H2(current_user.id),
                        activity_main.make_layout(current_user.id, activity_id)
                    ], [current_user.username]

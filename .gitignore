@@ -1,5 +1,8 @@
 # my igonres
-/cycperf/site.db.old
+cycperf/site.db
+cycperf/site.db.old
+site.db
+
 /static/profile_pics/
 
 # Byte-compiled / optimized / DLL files

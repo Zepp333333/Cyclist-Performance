@@ -4,6 +4,7 @@ import pathlib
 import flask_login
 import pandas as pd
 from cycperf import db
+from cycperf.models import DBActivity
 
 
 class DataWrapper:
@@ -18,4 +19,16 @@ class DataWrapper:
         if method == 'csv':
             return pd.read_csv(self.DATA_PATH.joinpath(activity_id))
 
+    def save_activity(self, activity):
+        try:
+            db_activity = DBActivity.query.filter_by(activity_id=activity.activity_id).first()
+        except:
+            db_activity = None
 
+        if db_activity:
+            db_activity.intervals = activity.intervals
+        else:
+            self.create_new_activity(activity)
+
+    def create_new_activity(self, activity):
+        pass

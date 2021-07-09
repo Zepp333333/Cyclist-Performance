@@ -5,10 +5,10 @@ All URIs are relative to *https://www.strava.com/api/v3*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**create_activity**](ActivitiesApi.md#create_activity) | **POST** /activities | Create an Activity
-[**get_activity_by_id**](ActivitiesApi.md#get_activity_by_id) | **GET** /activities/{id} | Get Activity
+[**retrieve_activity_by_id**](ActivitiesApi.md#get_activity_by_id) | **GET** /activities/{id} | Get Activity
 [**get_comments_by_activity_id**](ActivitiesApi.md#get_comments_by_activity_id) | **GET** /activities/{id}/comments | List Activity Comments
 [**get_kudoers_by_activity_id**](ActivitiesApi.md#get_kudoers_by_activity_id) | **GET** /activities/{id}/kudos | List Activity Kudoers
-[**get_laps_by_activity_id**](ActivitiesApi.md#get_laps_by_activity_id) | **GET** /activities/{id}/laps | List Activity Laps
+[**retrieve_laps_by_activity_id**](ActivitiesApi.md#get_laps_by_activity_id) | **GET** /activities/{id}/laps | List Activity Laps
 [**get_logged_in_athlete_activities**](ActivitiesApi.md#get_logged_in_athlete_activities) | **GET** /athlete/activities | List Athlete Activities
 [**get_zones_by_activity_id**](ActivitiesApi.md#get_zones_by_activity_id) | **GET** /activities/{id}/zones | Get Activity Zones
 [**update_activity_by_id**](ActivitiesApi.md#update_activity_by_id) | **PUT** /activities/{id} | Update Activity
@@ -44,7 +44,7 @@ trainer = 56 # int |
 commute = 56 # int | 
 
 try:
-    # Create an Activity
+    # Create an DBActivity
     api_response = api_instance.create_activity(name, type, start_date_local, elapsed_time, description, distance, trainer, commute)
     pprint(api_response)
 except ApiException as e:
@@ -79,8 +79,8 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **get_activity_by_id**
-> DetailedActivity get_activity_by_id(id, include_all_efforts=include_all_efforts)
+# **retrieve_activity_by_id**
+> DetailedActivity retrieve_activity_by_id(id, include_all_efforts=include_all_efforts)
 
 Get Activity
 
@@ -104,11 +104,11 @@ id = 789 # int | The identifier of the activity.
 include_all_efforts = true # bool | To include all segments efforts. (optional)
 
 try:
-    # Get Activity
-    api_response = api_instance.get_activity_by_id(id, include_all_efforts=include_all_efforts)
+    # Get DBActivity
+    api_response = api_instance.retrieve_activity_by_id(id, include_all_efforts=include_all_efforts)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling ActivitiesApi->get_activity_by_id: %s\n" % e)
+    print("Exception when calling ActivitiesApi->retrieve_activity_by_id: %s\n" % e)
 ```
 
 ### Parameters
@@ -159,7 +159,7 @@ page = 56 # int | Page number. Defaults to 1. (optional)
 per_page = 30 # int | Number of items per page. Defaults to 30. (optional) (default to 30)
 
 try:
-    # List Activity Comments
+    # List DBActivity Comments
     api_response = api_instance.get_comments_by_activity_id(id, page=page, per_page=per_page)
     pprint(api_response)
 except ApiException as e:
@@ -215,7 +215,7 @@ page = 56 # int | Page number. Defaults to 1. (optional)
 per_page = 30 # int | Number of items per page. Defaults to 30. (optional) (default to 30)
 
 try:
-    # List Activity Kudoers
+    # List DBActivity Kudoers
     api_response = api_instance.get_kudoers_by_activity_id(id, page=page, per_page=per_page)
     pprint(api_response)
 except ApiException as e:
@@ -245,8 +245,8 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **get_laps_by_activity_id**
-> list[Lap] get_laps_by_activity_id(id)
+# **retrieve_laps_by_activity_id**
+> list[Lap] retrieve_laps_by_activity_id(id)
 
 List Activity Laps
 
@@ -269,11 +269,11 @@ api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configurati
 id = 789 # int | The identifier of the activity.
 
 try:
-    # List Activity Laps
-    api_response = api_instance.get_laps_by_activity_id(id)
+    # List DBActivity Laps
+    api_response = api_instance.retrieve_laps_by_activity_id(id)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling ActivitiesApi->get_laps_by_activity_id: %s\n" % e)
+    print("Exception when calling ActivitiesApi->retrieve_laps_by_activity_id: %s\n" % e)
 ```
 
 ### Parameters
@@ -379,7 +379,7 @@ api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configurati
 id = 789 # int | The identifier of the activity.
 
 try:
-    # Get Activity Zones
+    # Get DBActivity Zones
     api_response = api_instance.get_zones_by_activity_id(id)
     pprint(api_response)
 except ApiException as e:
@@ -432,7 +432,7 @@ id = 789 # int | The identifier of the activity.
 body = swagger_client.UpdatableActivity() # UpdatableActivity |  (optional)
 
 try:
-    # Update Activity
+    # Update DBActivity
     api_response = api_instance.update_activity_by_id(id, body=body)
     pprint(api_response)
 except ApiException as e:

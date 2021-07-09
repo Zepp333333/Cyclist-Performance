@@ -31,9 +31,9 @@ class TestStreamsApi(unittest.TestCase):
         pass
 
     def test_get_activity_streams(self):
-        """Test case for get_activity_streams
+        """Test case for retrieve_activity_streams
 
-        Get Activity Streams  # noqa: E501
+        Get DBActivity Streams  # noqa: E501
         """
         pass
 

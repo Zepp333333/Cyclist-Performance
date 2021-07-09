@@ -209,7 +209,7 @@ class ScatterDrawer:
             #     yanchor="top",
             #     xref="x",
             #     yref="y",
-            #     text=f"{interval.title} <br>string2 <br>string3  <br>string4  <br>string5",
+            #     text=f"{interval.name} <br>string2 <br>string3  <br>string4  <br>string5",
             #     showarrow=False)
 
     def check_fields_complete(self) -> bool:
