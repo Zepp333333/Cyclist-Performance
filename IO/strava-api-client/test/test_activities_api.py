@@ -33,35 +33,35 @@ class TestActivitiesApi(unittest.TestCase):
     def test_create_activity(self):
         """Test case for create_activity
 
-        Create an Activity  # noqa: E501
+        Create an DBActivity  # noqa: E501
         """
         pass
 
     def test_get_activity_by_id(self):
-        """Test case for get_activity_by_id
+        """Test case for retrieve_activity_by_id
 
-        Get Activity  # noqa: E501
+        Get DBActivity  # noqa: E501
         """
         pass
 
     def test_get_comments_by_activity_id(self):
         """Test case for get_comments_by_activity_id
 
-        List Activity Comments  # noqa: E501
+        List DBActivity Comments  # noqa: E501
         """
         pass
 
     def test_get_kudoers_by_activity_id(self):
         """Test case for get_kudoers_by_activity_id
 
-        List Activity Kudoers  # noqa: E501
+        List DBActivity Kudoers  # noqa: E501
         """
         pass
 
     def test_get_laps_by_activity_id(self):
-        """Test case for get_laps_by_activity_id
+        """Test case for retrieve_laps_by_activity_id
 
-        List Activity Laps  # noqa: E501
+        List DBActivity Laps  # noqa: E501
         """
         pass
 
@@ -75,14 +75,14 @@ class TestActivitiesApi(unittest.TestCase):
     def test_get_zones_by_activity_id(self):
         """Test case for get_zones_by_activity_id
 
-        Get Activity Zones  # noqa: E501
+        Get DBActivity Zones  # noqa: E501
         """
         pass
 
     def test_update_activity_by_id(self):
         """Test case for update_activity_by_id
 
-        Update Activity  # noqa: E501
+        Update DBActivity  # noqa: E501
         """
         pass
 

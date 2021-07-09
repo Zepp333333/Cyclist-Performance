@@ -4,13 +4,13 @@ All URIs are relative to *https://www.strava.com/api/v3*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**get_activity_streams**](StreamsApi.md#get_activity_streams) | **GET** /activities/{id}/streams | Get Activity Streams
+[**retrieve_activity_streams**](StreamsApi.md#get_activity_streams) | **GET** /activities/{id}/streams | Get Activity Streams
 [**get_route_streams**](StreamsApi.md#get_route_streams) | **GET** /routes/{id}/streams | Get Route Streams
 [**get_segment_effort_streams**](StreamsApi.md#get_segment_effort_streams) | **GET** /segment_efforts/{id}/streams | Get Segment Effort Streams
 [**get_segment_streams**](StreamsApi.md#get_segment_streams) | **GET** /segments/{id}/streams | Get Segment Streams
 
-# **get_activity_streams**
-> StreamSet get_activity_streams(id, keys, key_by_type)
+# **retrieve_activity_streams**
+> StreamSet retrieve_activity_streams(id, keys, key_by_type)
 
 Get Activity Streams
 
@@ -35,11 +35,11 @@ keys = ['keys_example'] # list[str] | Desired stream types.
 key_by_type = true # bool | Must be true. (default to true)
 
 try:
-    # Get Activity Streams
-    api_response = api_instance.get_activity_streams(id, keys, key_by_type)
+    # Get DBActivity Streams
+    api_response = api_instance.retrieve_activity_streams(id, keys, key_by_type)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling StreamsApi->get_activity_streams: %s\n" % e)
+    print("Exception when calling StreamsApi->retrieve_activity_streams: %s\n" % e)
 ```
 
 ### Parameters

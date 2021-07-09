@@ -67,7 +67,7 @@ trainer = 56 # int |
 commute = 56 # int | 
 
 try:
-    # Create an Activity
+    # Create an DBActivity
     api_response = api_instance.create_activity(name, type, start_date_local, elapsed_time, description, distance, trainer, commute)
     pprint(api_response)
 except ApiException as e:
@@ -83,11 +83,11 @@ id = 789 # int | The identifier of the activity.
 include_all_efforts = true # bool | To include all segments efforts. (optional)
 
 try:
-    # Get Activity
-    api_response = api_instance.get_activity_by_id(id, include_all_efforts=include_all_efforts)
+    # Get DBActivity
+    api_response = api_instance.retrieve_activity_by_id(id, include_all_efforts=include_all_efforts)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling ActivitiesApi->get_activity_by_id: %s\n" % e)
+    print("Exception when calling ActivitiesApi->retrieve_activity_by_id: %s\n" % e)
 
 # Configure OAuth2 access token for authorization: strava_oauth
 configuration = swagger_client.Configuration()
@@ -100,7 +100,7 @@ page = 56 # int | Page number. Defaults to 1. (optional)
 per_page = 30 # int | Number of items per page. Defaults to 30. (optional) (default to 30)
 
 try:
-    # List Activity Comments
+    # List DBActivity Comments
     api_response = api_instance.get_comments_by_activity_id(id, page=page, per_page=per_page)
     pprint(api_response)
 except ApiException as e:
@@ -117,7 +117,7 @@ page = 56 # int | Page number. Defaults to 1. (optional)
 per_page = 30 # int | Number of items per page. Defaults to 30. (optional) (default to 30)
 
 try:
-    # List Activity Kudoers
+    # List DBActivity Kudoers
     api_response = api_instance.get_kudoers_by_activity_id(id, page=page, per_page=per_page)
     pprint(api_response)
 except ApiException as e:
@@ -132,11 +132,11 @@ api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configurati
 id = 789 # int | The identifier of the activity.
 
 try:
-    # List Activity Laps
-    api_response = api_instance.get_laps_by_activity_id(id)
+    # List DBActivity Laps
+    api_response = api_instance.retrieve_laps_by_activity_id(id)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling ActivitiesApi->get_laps_by_activity_id: %s\n" % e)
+    print("Exception when calling ActivitiesApi->retrieve_laps_by_activity_id: %s\n" % e)
 
 # Configure OAuth2 access token for authorization: strava_oauth
 configuration = swagger_client.Configuration()
@@ -165,7 +165,7 @@ api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configurati
 id = 789 # int | The identifier of the activity.
 
 try:
-    # Get Activity Zones
+    # Get DBActivity Zones
     api_response = api_instance.get_zones_by_activity_id(id)
     pprint(api_response)
 except ApiException as e:
@@ -181,7 +181,7 @@ id = 789 # int | The identifier of the activity.
 body = swagger_client.UpdatableActivity() # UpdatableActivity |  (optional)
 
 try:
-    # Update Activity
+    # Update DBActivity
     api_response = api_instance.update_activity_by_id(id, body=body)
     pprint(api_response)
 except ApiException as e:
@@ -195,10 +195,10 @@ All URIs are relative to *https://www.strava.com/api/v3*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *ActivitiesApi* | [**create_activity**](docs/ActivitiesApi.md#create_activity) | **POST** /activities | Create an Activity
-*ActivitiesApi* | [**get_activity_by_id**](docs/ActivitiesApi.md#get_activity_by_id) | **GET** /activities/{id} | Get Activity
+*ActivitiesApi* | [**retrieve_activity_by_id**](docs/ActivitiesApi.md#get_activity_by_id) | **GET** /activities/{id} | Get Activity
 *ActivitiesApi* | [**get_comments_by_activity_id**](docs/ActivitiesApi.md#get_comments_by_activity_id) | **GET** /activities/{id}/comments | List Activity Comments
 *ActivitiesApi* | [**get_kudoers_by_activity_id**](docs/ActivitiesApi.md#get_kudoers_by_activity_id) | **GET** /activities/{id}/kudos | List Activity Kudoers
-*ActivitiesApi* | [**get_laps_by_activity_id**](docs/ActivitiesApi.md#get_laps_by_activity_id) | **GET** /activities/{id}/laps | List Activity Laps
+*ActivitiesApi* | [**retrieve_laps_by_activity_id**](docs/ActivitiesApi.md#get_laps_by_activity_id) | **GET** /activities/{id}/laps | List Activity Laps
 *ActivitiesApi* | [**get_logged_in_athlete_activities**](docs/ActivitiesApi.md#get_logged_in_athlete_activities) | **GET** /athlete/activities | List Athlete Activities
 *ActivitiesApi* | [**get_zones_by_activity_id**](docs/ActivitiesApi.md#get_zones_by_activity_id) | **GET** /activities/{id}/zones | Get Activity Zones
 *ActivitiesApi* | [**update_activity_by_id**](docs/ActivitiesApi.md#update_activity_by_id) | **PUT** /activities/{id} | Update Activity
@@ -224,7 +224,7 @@ Class | Method | HTTP request | Description
 *SegmentsApi* | [**get_logged_in_athlete_starred_segments**](docs/SegmentsApi.md#get_logged_in_athlete_starred_segments) | **GET** /segments/starred | List Starred Segments
 *SegmentsApi* | [**get_segment_by_id**](docs/SegmentsApi.md#get_segment_by_id) | **GET** /segments/{id} | Get Segment
 *SegmentsApi* | [**star_segment**](docs/SegmentsApi.md#star_segment) | **PUT** /segments/{id}/starred | Star Segment
-*StreamsApi* | [**get_activity_streams**](docs/StreamsApi.md#get_activity_streams) | **GET** /activities/{id}/streams | Get Activity Streams
+*StreamsApi* | [**retrieve_activity_streams**](docs/StreamsApi.md#get_activity_streams) | **GET** /activities/{id}/streams | Get Activity Streams
 *StreamsApi* | [**get_route_streams**](docs/StreamsApi.md#get_route_streams) | **GET** /routes/{id}/streams | Get Route Streams
 *StreamsApi* | [**get_segment_effort_streams**](docs/StreamsApi.md#get_segment_effort_streams) | **GET** /segment_efforts/{id}/streams | Get Segment Effort Streams
 *StreamsApi* | [**get_segment_streams**](docs/StreamsApi.md#get_segment_streams) | **GET** /segments/{id}/streams | Get Segment Streams

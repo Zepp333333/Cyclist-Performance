@@ -11,7 +11,7 @@ from .utils.scatter_drawer import ScatterDrawer
 
 dw = DataWrapper()
 df = dw.get_activity(activity_id='ride.csv')
-mock_up_ride = Activity(name='My ride', df=df)
+mock_up_ride = Activity(activity_id=1, name='My ride', df=df)
 
 
 def _make_layout(activity):

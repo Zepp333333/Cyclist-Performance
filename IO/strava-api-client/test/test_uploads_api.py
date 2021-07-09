@@ -33,7 +33,7 @@ class TestUploadsApi(unittest.TestCase):
     def test_create_upload(self):
         """Test case for create_upload
 
-        Upload Activity  # noqa: E501
+        Upload DBActivity  # noqa: E501
         """
         pass
 

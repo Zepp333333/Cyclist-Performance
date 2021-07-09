@@ -120,8 +120,8 @@ def strava_login():
 @users.route("/exchange_token")
 @login_required
 def strava_return():
-    if strava.check_auth_return(request.args):
-        athlete = strava.get_athlete(auth_code=request.args['code'])
+    if strava.check_strava_auth_return(request.args):
+        athlete = strava.retrieve_strava_athlete(auth_code=request.args['code'])
         current_user.strava_id = athlete['id']
 
         db.session.commit()
