@@ -9,6 +9,7 @@ from cycperf.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                  RequestResetForm, ResetPasswordForm)
 from cycperf.users.utils import save_picture, send_reset_email
 import IO.strava as strava
+from middleware import activity_wrapper
 
 users = Blueprint('users', __name__)
 
@@ -123,8 +124,8 @@ def strava_return():
     if strava.check_strava_auth_return(request.args):
         athlete = strava.retrieve_strava_athlete(auth_code=request.args['code'])
         current_user.strava_id = athlete['id']
-
         db.session.commit()
+        activity_wrapper.retrieve_and_store_users_activities(current_user.id)
         return redirect(url_for('/application/'))
     else:
         return redirect(url_for('users.strava_login'))

@@ -8,6 +8,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask.helpers import get_root_path
 from flask_login import login_required
+from flask_migrate import Migrate
 
 import dash_bootstrap_components as dbc
 
@@ -19,6 +20,7 @@ login_manager = LoginManager()
 login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
 mail = Mail()
+migrate = Migrate()
 
 
 def create_app(config_class=Config):
@@ -29,6 +31,7 @@ def create_app(config_class=Config):
     bcrypt.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    migrate.init_app(app, db)
 
     from cycperf.main.routes import main
     from cycperf.users.routes import users

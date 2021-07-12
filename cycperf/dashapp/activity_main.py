@@ -29,9 +29,11 @@ def _make_layout(activity):
 
 
 def make_layout(user_id=None, activity_id=None):
-    if not user_id or not activity_id:
+    if not user_id:
         return _make_layout(mock_up_ride)
-    return _make_layout(activity_wrapper.get_users_last_activity(user_id))
+    if not activity_id:
+        return _make_layout(activity_wrapper.get_users_last_activity(user_id))
+    return _make_layout(activity_wrapper.get_activity_by_id(activity_id))
 
 
 
