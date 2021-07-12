@@ -1,6 +1,8 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import json
 
+import pandas
+
 import IO.strava as strava
 import IO.data_wrapper as dw
 from middleware import Activity
@@ -19,7 +21,7 @@ def get_users_last_activity(user_id) -> Activity:
     for stream in streams:
         df[stream['type']] = stream['data']
 
-    activity = Activity(last_activity[0]['name'], df=df)
+    activity = Activity(last_activity[0]['id'], last_activity[0]['name'], df=df)
 
     return activity
 
@@ -53,3 +55,16 @@ def get_token_by_user_id(user_id) -> str:
 def get_strava_id_by_user_id(user_id) -> str:
     user = User.query.filter_by(id=user_id).first()
     return user.strava_id
+
+
+def get_activity_by_id(activity_id):
+    # todo: add: perform check that activity belongs to user otherwise return None
+    token = get_token_by_user_id(current_user.id)
+    db_activity = strava.retrieve_activity_by_id(activity_id, token)
+    streams = strava.retrieve_activity_streams(activity_id, token)
+    df = pd.DataFrame()
+    for stream in streams:
+        df[stream['type']] = stream['data']
+    activity = Activity(db_activity['id'], db_activity['name'],
+                        df=df)
+    return activity

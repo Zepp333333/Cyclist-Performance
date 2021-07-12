@@ -51,5 +51,6 @@ class DBActivity(db.Model):
     df = db.Column(db.JSON)
     intervals = db.Column(db.JSON)
     blob = db.Column(db.BLOB)
+    comment = db.Column(db.Text)
 
 

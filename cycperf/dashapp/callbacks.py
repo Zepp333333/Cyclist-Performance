@@ -25,10 +25,17 @@ def register_callbacks(dashapp):
         #         html.H1("Login page", style={"textAlign": "center"}),
         #         IO.strava2.r
         #     ]
-        elif "/application/activity" in pathname:
+        elif pathname == "/application/activity":
             activity_id = pathname.split("/")[-1]
             return [
-                       html.H1("DBActivity page", style={"textAlign": "center"}),
+                       html.H1("Activity", style={"textAlign": "center"}),
+                       html.H2(current_user.id),
+                       activity_main.make_layout(current_user.id, None)
+                   ], [current_user.username]
+        elif "/application/activity/" in pathname:
+            activity_id = pathname.split("/")[-1]
+            return [
+                       html.H1("Activity", style={"textAlign": "center"}),
                        html.H2(current_user.id),
                        activity_main.make_layout(current_user.id, activity_id)
                    ], [current_user.username]

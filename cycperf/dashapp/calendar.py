@@ -4,7 +4,6 @@ import calendar
 
 from dash_table import DataTable, FormatTemplate, Format
 import pandas as pd
-from app import app
 from IO import DataWrapper
 import dash_bootstrap_components as dbc
 from datetime import date, timedelta
