@@ -1,11 +1,9 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
-import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from middleware import Activity
 
-from IO import DataWrapper
-from middleware import activity_wrapper
+from IO import DataWrapper, strava
 from .utils.scatter_drawer import ScatterDrawer
 
 
@@ -32,8 +30,8 @@ def make_layout(user_id=None, activity_id=None):
     if not user_id:
         return _make_layout(mock_up_ride)
     if not activity_id:
-        return _make_layout(activity_wrapper.get_users_last_activity(user_id))
-    return _make_layout(activity_wrapper.get_activity_by_id(activity_id))
+        return _make_layout(strava.get_users_last_activity(user_id))
+    return _make_layout(strava.get_activity_by_id(activity_id))
 
 
 
