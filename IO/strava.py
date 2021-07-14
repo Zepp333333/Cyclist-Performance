@@ -3,7 +3,7 @@ import json
 
 import pandas
 
-import IO.strava as strava
+import IO.strava_io as strava_io
 import IO.data_wrapper as dw
 from middleware import Activity
 from flask_login import current_user
@@ -15,8 +15,8 @@ from cycperf import db
 
 def get_users_last_activity(user_id) -> Activity:
     token = get_token_by_user_id(user_id)
-    last_activity = strava.retrieve_athlete_last_activity(token)
-    streams = strava.retrieve_activity_streams(last_activity[0]['id'], token)
+    last_activity = strava_io.retrieve_athlete_last_activity(token)
+    streams = strava_io.retrieve_activity_streams(last_activity[0]['id'], token)
     df = pd.DataFrame()
     for stream in streams:
         df[stream['type']] = stream['data']
@@ -28,10 +28,10 @@ def get_users_last_activity(user_id) -> Activity:
 
 def retrieve_and_store_users_activities(user_id) -> None:
     token = get_token_by_user_id(user_id)
-    activities = strava.retrieve_athlete_activities(token)
+    activities = strava_io.retrieve_athlete_activities(token)
     for activity in activities:
-        streams = strava.retrieve_activity_streams(activity['id'], token)
-        laps = strava.retrieve_laps_by_activity_id(activity['id'], token)
+        streams = strava_io.retrieve_activity_streams(activity['id'], token)
+        laps = strava_io.retrieve_laps_by_activity_id(activity['id'], token)
         df = pd.DataFrame()
         for stream in streams:
             df[stream['type']] = stream['data']
@@ -60,8 +60,8 @@ def get_strava_id_by_user_id(user_id) -> str:
 def get_activity_by_id(activity_id):
     # todo: add: perform check that activity belongs to user otherwise return None
     token = get_token_by_user_id(current_user.id)
-    db_activity = strava.retrieve_activity_by_id(activity_id, token)
-    streams = strava.retrieve_activity_streams(activity_id, token)
+    db_activity = strava_io.retrieve_activity_by_id(activity_id, token)
+    streams = strava_io.retrieve_activity_streams(activity_id, token)
     df = pd.DataFrame()
     for stream in streams:
         df[stream['type']] = stream['data']

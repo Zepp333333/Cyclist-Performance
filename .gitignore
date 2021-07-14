@@ -1,5 +1,6 @@
 # my igonres
 cycperf/site.db
+cycperf/site.db*
 cycperf/site.db.old
 site.db
 
