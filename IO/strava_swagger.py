@@ -1,14 +1,82 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
-import time
 
-from swagger import swagger_client
-from swagger.swagger_client.rest import ApiException
-from pprint import pprint
+import swagger_client
+from swagger_client.rest import ApiException
+from flask_login import current_user
+from flask import redirect, url_for
+import IO.dbutil as dbutil
+from cycperf.users import routes
+import json
+from middleware import Activity
 
-# Configure OAuth2 access token for authorization: strava_oauth
+
+def swagger_get_athlete(token):
+    configuration = swagger_client.Configuration()
+    configuration.access_token = token
+    api_instance = swagger_client.AthletesApi(swagger_client.ApiClient(configuration))
+    try:
+        # Get Authenticated Athlete
+        api_response = api_instance.get_logged_in_athlete()
+        return api_response
+    except ApiException as e:
+        print("Exception when calling AthletesApi->getLoggedInAthlete: %s\n" % e) # todo - handle the exception
+
+
+def swagger_get_activity(token, activity_id):
+    configuration = swagger_client.Configuration()
+    configuration.access_token = token
+    api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configuration))
+    try:
+        # Get Authenticated Athlete
+        api_response = api_instance.get_activity_by_id(activity_id)
+        return api_response
+    except ApiException as e:
+        print("Exception when calling AthletesApi->getLoggedInAthlete: %s\n" % e)  # todo - handle the exception
+
+
+def get_athlete() -> str:
+    user_id = current_user.id
+    athlete_id, token = dbutil.get_strava_athlete_id_and_token(user_id)
+    if not athlete_id:
+        return ''
+    # Attempt to load athlete from db
+    athlete_info = dbutil.get_athlete_info(athlete_id)
+    # if not in db -> get from strava API and store in db
+    if not athlete_info:
+        athlete_info = swagger_get_athlete(token).to_dict()
+        dbutil.update_user(user_id=user_id, update={'strava_athlete_info': athlete_info})
+    return json.dumps(athlete_info)
+
+
+
+
+def get_activity_by_id(activity_id) -> Activity:
+    user_id = 1  # current_user.id
+    athlete_id, token = dbutil.get_strava_athlete_id_and_token(user_id)
+    if not athlete_id:
+        return None
+    # Attempt to load athlete from db
+    strava_activity = dbutil.get_activity(activity_id)
+    # if not in db -> get from strava API and store in db
+    if not strava_activity:
+        strava_activity = swagger_get_activity(token, activity_id)
+        # dbutil.store_activity(activitystrava_activity=strava_activity)
+    return strava_activity
+
+
+
+
+
+
+
+
+
+
+
+'''# Configure OAuth2 access token for authorization: strava_oauth
 configuration = swagger_client.Configuration()
 swagger_client.Configuration.debug = False
-configuration.access_token = 'af9670711e08c62d375ec9b7713ad6ed3722b345'
+configuration.access_token = 'ebf0136139e9554f1aeeb8335776bf4601b17d2a'
 
 # create an instance of the API class
 api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configuration))
@@ -36,4 +104,16 @@ try:
     # pprint(api_response)
 except ApiException as e:
     print("Exception when calling ActivitiesApi->get_logged_in_athlete_activities: %s\n" % e)
+
+
+api_instance = swagger_client.AthletesApi(swagger_client.ApiClient(configuration))
+try:
+    # Get Authenticated Athlete
+    user = api_instance.get_logged_in_athlete()
+
+except ApiException as e:
+    print("Exception when calling AthletesApi->getLoggedInAthlete: %s\n" % e) # todo - handle the exception
+
+'''
+
 

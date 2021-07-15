@@ -4,7 +4,7 @@ import json
 import pandas
 
 import IO.strava_io as strava_io
-import IO.data_wrapper as dw
+import IO.dbutil as dw
 from middleware import Activity
 from flask_login import current_user
 import pandas as pd
