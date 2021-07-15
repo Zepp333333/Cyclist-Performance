@@ -1,12 +1,17 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
+import dash
 import dash_html_components as html
+import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash.dependencies import Input, Output, State
 
-from cycperf.dashapp import activity_main, calendar
+from cycperf.dashapp import activity_main, calendar, test_strava, dash_external_redirect
 from flask_login import current_user
+from flask import url_for
+
+from IO import strava_swagger, dbutil
 
 
 def register_callbacks(dashapp):
@@ -28,20 +33,22 @@ def register_callbacks(dashapp):
         elif pathname == "/application/activity":
             activity_id = pathname.split("/")[-1]
             return [
-                       html.H1("Activity", style={"textAlign": "center"}),
-                       html.H2(current_user.id),
                        activity_main.make_layout(current_user.id, None)
                    ], [current_user.username]
         elif "/application/activity/" in pathname:
             activity_id = pathname.split("/")[-1]
             return [
-                       html.H1("Activity", style={"textAlign": "center"}),
-                       html.H2(current_user.id),
                        activity_main.make_layout(current_user.id, activity_id)
                    ], [current_user.username]
         elif pathname == "/application/else":
             return [
                        html.H1("Something Else page", style={"textAlign": "center"}),
+                   ], [current_user.username]
+        elif pathname == "/application/test_strava":
+            return [
+                       html.H1("Activity", style={"textAlign": "center"}),
+                       html.H2(current_user.id),
+                       test_strava.make_layout()
                    ], [current_user.username]
         elif "/application/test" in pathname:
             activity_id = pathname.split("/")[-1]
@@ -49,6 +56,7 @@ def register_callbacks(dashapp):
                        html.H1("test page", style={"textAlign": "center"}),
                        html.H2(activity_id)
                    ], [current_user.username]
+
 
         # If the user tries to reach a different page, return a 404 message
         return dbc.Jumbotron(
@@ -59,26 +67,34 @@ def register_callbacks(dashapp):
             ]
         )
 
-    @dashapp.callback(
-        Output(component_id='ride_object', component_property='data'),
-        [Input(component_id='create_interval', component_property='n_clicks')],
-        [State(component_id='my-fig', component_property='relayoutData')],
-        prevent_initial_call=True
-    )
-    def get_ride(n_clicks, relayout_data):
-        ctx = dashapp.callback_context
-        if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
-            return ride_object.to_json()
+    # @dashapp.callback(
+    #     Output(component_id='current_activity', component_property='data'),
+    #     [Input(component_id='create_interval', component_property='n_clicks')],
+    #     [State(component_id='my-fig', component_property='relayoutData')],
+    #     prevent_initial_call=True
+    # )
+    # def get_ride(n_clicks, relayout_data):
+    #
+    #     ctx = dash.callback_context
+    #     if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
+    #         return ride_object.to_json()
 
     @dashapp.callback(
         Output(component_id='my-fig', component_property='figure'),
-        [Input(component_id='ride_object', component_property='data')],
+        [Input(component_id='create_interval', component_property='n_clicks'),
+         Input(component_id='current_activity_id', component_property='data')],
         [State(component_id='my-fig', component_property='relayoutData')],
+        prevent_initial_call=True
     )
-    def create_interval(ride_object, relayout_data):
+    def create_interval(n_clicks, current_activity_id, relayout_data):
+        ctx = dash.callback_context
+        if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
+            interval_range = relayout_data_to_range(relayout_data)
+            if interval_range:
+                activity = dbutil.get_activity_by_id(current_activity_id)
+                activity.make_interval(*interval_range)
 
-        ride = pd.read_json(ride_object)
-        from .utils.scatter_drawer import ScatterDrawer
+            from .utils.scatter_drawer import ScatterDrawer
 
         # ctx = dashapp.callback_context
         # if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
@@ -86,12 +102,13 @@ def register_callbacks(dashapp):
         #     if interval_range:
         #         ride.make_interval(*interval_range)
 
-        new_fig = ScatterDrawer(
-            activity=ride,
-            index_col='time',
-            series_to_plot=['watts', 'heartrate', 'cadence'],
-        )
-        return new_fig.get_fig()
+            new_fig = ScatterDrawer(
+                activity=activity,
+                index_col='time',
+                series_to_plot=['watts', 'heartrate', 'cadence'],
+            )
+            return new_fig.get_fig()
+        return dash.no_update
 
     def relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
         try:
@@ -102,6 +119,26 @@ def register_callbacks(dashapp):
                 return result[0], result[1]
         except KeyError:
             return tuple()
+
+    @dashapp.callback(
+        Output(component_id='get_athlete_output', component_property='children'),
+        Output('confirm', 'displayed'),
+        [Input(component_id='btn_get_athlete', component_property='n_clicks')],
+        prevent_initial_call=True
+    )
+    def get_athlete(_):
+        athlete = strava_swagger.get_athlete()
+        if athlete:
+            return strava_swagger.get_athlete(), False
+        else:
+            return dash_external_redirect.redirect(url_for('users.strava_login')), True
+
+    # def get_athlete(_):
+    #         athlete = strava_swagger.get_athlete()
+    #         if athlete:
+    #             return strava_swagger.get_athlete(), False
+    #         else:
+#             return '', True
 
         # @dashapp.callback(
         #        Output(component_id='my-fig', component_property='figure'),

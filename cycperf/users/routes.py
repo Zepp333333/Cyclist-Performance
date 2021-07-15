@@ -125,7 +125,7 @@ def strava_return():
         athlete = strava_io.retrieve_strava_athlete(auth_code=request.args['code'])
         current_user.strava_id = athlete['id']
         db.session.commit()
-        strava.retrieve_and_store_users_activities(current_user.id)
+        # strava.retrieve_and_store_users_activities(current_user.id)
         return redirect(url_for('/application/'))
     else:
         return redirect(url_for('users.strava_login'))
