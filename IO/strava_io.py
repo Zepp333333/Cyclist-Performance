@@ -35,9 +35,17 @@ def check_strava_auth_return(args):
     return check_strava_auth_code(args) and check_auth_scopes(args)
 
 
-def retrieve_known_athlete(token):
+def store_athlete_access_token(auth_response):
+    current_user.strava_access_token = auth_response['access_token']
+    current_user.strava_token_expires_at = datetime.fromtimestamp(auth_response['expires_at'])
+    current_user.strava_refresh_token = auth_response['refresh_token']
+    db.session.commit()
+
+
+def retrieve_known_athlete(auth_response):
     base_url = 'https://www.strava.com/api/v3/athlete'  #todo = move to config
-    response = requests.get(base_url, auth=BearerAuth(token))   # todo - add try/except
+    response = requests.get(base_url, auth=BearerAuth(auth_response['access_token']))   # todo - add try/except
+    store_athlete_access_token(auth_response)
     return response.json()
 
 
@@ -54,14 +62,9 @@ def exchange_auth_code_for_token(auth_code):
 
 
 def retrieve_first_time_coming_athlete(auth_code):
-    token = exchange_auth_code_for_token(auth_code)
-
-    current_user.strava_access_token = token['access_token']
-    current_user.strava_token_expires_at = datetime.fromtimestamp(token['expires_at'])
-    current_user.strava_refresh_token = token['refresh_token']
-    db.session.commit()
-
-    return retrieve_known_athlete(token['access_token'])
+    auth_response = exchange_auth_code_for_token(auth_code)
+    store_athlete_access_token(auth_response)
+    return retrieve_known_athlete(auth_response)
 
 
 def retrieve_strava_athlete(auth_code, token=None):
