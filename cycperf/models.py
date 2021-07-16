@@ -48,9 +48,11 @@ class DBActivity(db.Model):
     json = db.Column(db.JSON)
     laps = db.Column(db.JSON)
     streams = db.Column(db.JSON)
-    df = db.Column(db.JSON)
+    df_json = db.Column(db.JSON)
     intervals = db.Column(db.JSON)
     blob = db.Column(db.BLOB)
     comment = db.Column(db.Text)
 
+    def __init__(self):
+        print("DBActivity __init__")
 

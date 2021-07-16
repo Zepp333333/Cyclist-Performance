@@ -5,6 +5,7 @@ from config import Config
 from IO.strava_auth import BearerAuth
 from flask_login import current_user
 from cycperf import db
+from cycperf.models import User
 from datetime import datetime
 
 
@@ -35,11 +36,32 @@ def check_strava_auth_return(args):
     return check_strava_auth_code(args) and check_auth_scopes(args)
 
 
-def store_athlete_access_token(auth_response):
-    current_user.strava_access_token = auth_response['access_token']
-    current_user.strava_token_expires_at = datetime.fromtimestamp(auth_response['expires_at'])
-    current_user.strava_refresh_token = auth_response['refresh_token']
+def store_athlete_access_token(auth_response, user: User = None):
+    if not user:
+        user = current_user
+    user.strava_access_token = auth_response['access_token']
+    user.strava_token_expires_at = datetime.fromtimestamp(auth_response['expires_at'])
+    user.strava_refresh_token = auth_response['refresh_token']
     db.session.commit()
+
+
+def refresh_access_token(token: str) -> None:
+    user = User.query.filter_by(strava_access_token=token).first()
+    if check_token_expired(user.strava_token_expires_at):
+        print("token expired, let's refresh it")
+        params = {
+            "client_id": Config.STRAVA_APP_CLIENT_ID,
+            "client_secret": Config.STRAVA_APP_CLIENT_SECRET,
+            "grant_type": "refresh_token",
+            "refresh_token": user.strava_refresh_token
+        }
+        base_url = 'https://www.strava.com/api/v3/oauth/token'
+        response = requests.post(base_url, params=params).json()
+        store_athlete_access_token(response, user=user)
+
+
+def check_token_expired(expiration: datetime):
+    return expiration < datetime.now()
 
 
 def retrieve_known_athlete(auth_response):

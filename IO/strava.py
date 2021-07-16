@@ -41,7 +41,7 @@ def retrieve_and_store_users_activities(user_id) -> None:
                                  json=activity,
                                  laps=laps,
                                  streams=streams,
-                                 df=df.to_json(),
+                                 df_json=df.to_json(),
                                  )
         db.session.add(db_activity)
         db.session.commit()

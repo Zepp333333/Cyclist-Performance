@@ -1,5 +1,6 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
+
 import swagger_client
 from swagger_client.rest import ApiException
 from flask_login import current_user
@@ -9,8 +10,10 @@ from cycperf.users import routes
 import json
 from middleware import Activity
 
+from datetime import datetime
 
-def swagger_get_athlete(token):
+
+def swagger_get_athlete(token: str) -> swagger_client.models.detailed_athlete:
     configuration = swagger_client.Configuration()
     configuration.access_token = token
     api_instance = swagger_client.AthletesApi(swagger_client.ApiClient(configuration))
@@ -22,7 +25,7 @@ def swagger_get_athlete(token):
         print("Exception when calling AthletesApi->getLoggedInAthlete: %s\n" % e) # todo - handle the exception
 
 
-def swagger_get_activity(token, activity_id):
+def swagger_get_activity(token: str, activity_id: int) -> swagger_client.models.detailed_activity:
     configuration = swagger_client.Configuration()
     configuration.access_token = token
     api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configuration))
@@ -33,6 +36,24 @@ def swagger_get_activity(token, activity_id):
     except ApiException as e:
         print("Exception when calling AthletesApi->getLoggedInAthlete: %s\n" % e)  # todo - handle the exception
 
+
+def swagger_get_activities(token: str,
+                           before: int = datetime.now().timestamp(),
+                           after: int = 0, page: int = 1, per_page: int = 30):
+    configuration = swagger_client.Configuration()
+    configuration.access_token = token
+    api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configuration))
+    try:
+        # List Athlete Activities
+        api_response = api_instance.get_logged_in_athlete_activities(
+            before=before,
+            after=after,
+            page=page,
+            per_page=per_page
+        )
+        return api_response
+    except ApiException as e:
+        print("Exception when calling ActivitiesApi->getLoggedInAthleteActivities: %s\n" % e)
 
 def get_athlete() -> str:
     user_id = current_user.id
@@ -62,6 +83,7 @@ def get_activity_by_id(activity_id) -> Activity:
         strava_activity = swagger_get_activity(token, activity_id)
         # dbutil.store_activity(activitystrava_activity=strava_activity)
     return strava_activity
+
 
 
 
