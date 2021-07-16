@@ -25,7 +25,7 @@ class Activity:
                                      df=self.df,
                                      name="all activity",
                                      start=0,
-                                     end=df.last_valid_index())
+                                     end=self.df.last_valid_index())
         self.add_intervals([self.all_activity])
         self.changed = False
 
@@ -68,21 +68,21 @@ class Activity:
 # class Activity:
 #     def __init__(self,
 #                  name: str,
-#                  df: pd.DataFrame,
+#                  df_json: pd.DataFrame,
 #                  intervals: list[Interval] = None,
 #                  activity_type: str = 'Bike'
 #                  ):
 #         if intervals is None:
 #             intervals = []
 #         self.name = name
-#         self.df = df
+#         self.df_json = df_json
 #         self.intervals = intervals
 #         self.activity_type = activity_type
 #
 #         self.all_activity = Interval(activity=self,
 #                                      name="all activity",
 #                                      start=0,
-#                                      end=df.last_valid_index())
+#                                      end=df_json.last_valid_index())
 #         self.add_intervals([self.all_activity])
 #
 #     def add_intervals(self, new_intervals: list[Interval]) -> None:
@@ -112,10 +112,10 @@ class Activity:
 
 #
 # dw = DataWrapper()
-# df = dw.get_activity(activity_id='ride.csv')
+# df_json = dw.get_activity(activity_id='ride.csv')
 #
-# a = Activity(1, 'test-ride', df)
+# a = Activity(1, 'test-ride', df_json)
 #
 # print('A interval = ', a.intervals, a.activity_id)
-# b = Activity(2, 'test-ride2', df)
+# b = Activity(2, 'test-ride2', df_json)
 # print('B interval = ', b.intervals, b.activity_id)

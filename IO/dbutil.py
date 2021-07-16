@@ -72,7 +72,7 @@ def store_activity(strava_activity: swagger_client.DetailedActivity):
                              json=activity,
                              laps=laps,
                              streams=streams,
-                             df=df.to_json(),
+                             df_json=df.to_json(),
                              )
     db.session.add(db_activity)
     db.session.commit()

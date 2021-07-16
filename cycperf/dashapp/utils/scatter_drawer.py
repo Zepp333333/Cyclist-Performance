@@ -291,7 +291,7 @@ class ScatterDrawer:
 # TEST CODE
 
 # Test ScatterDrawer.check_fields_complete
-# df = pd.read_csv('../Snippets/ride.csv')
+# df_json = pd.read_csv('../Snippets/ride.csv')
 # f1 = ScatterDrawer(
 #     chart_type='Scatter',
 # )
@@ -306,24 +306,24 @@ class ScatterDrawer:
 # f3 = ScatterDrawer(
 #     chart_type='Scatter',
 #     index_col='something',
-#     data_frame=df
+#     data_frame=df_json
 # )
 # print(f3.check_fields_complete())
 #
 # f4 = ScatterDrawer(
 #     chart_type='Scatter',
 #     index_col='something',
-#     data_frame=df,
+#     data_frame=df_json,
 #     series_to_plot=['something']
 # )
 # print(f4.check_fields_complete())
 
 
 # Test ScatterDrawer.get_figure
-# df = pd.read_csv('../Snippets/ride.csv')
+# df_json = pd.read_csv('../Snippets/ride.csv')
 # c_figure = ScatterDrawer(
 #     chart_type='Scatter',
-#     data_frame=df,
+#     data_frame=df_json,
 #     index_col='time',
 #     series_to_plot=['watts', 'heartrate', 'cadence']
 # )
