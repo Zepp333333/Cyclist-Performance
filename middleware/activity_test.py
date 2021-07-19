@@ -2,15 +2,16 @@
 
 import json
 import pandas as pd
+from sqlalchemy.orm import reconstructor
+
 from cycperf.models import DBActivity
 from middleware import Interval
 
 
 class Activity(DBActivity):
-    def __init__(self):
-        super().__init__()
-        print('just returned from super().__init__')
-        print('running Activity.__init__')
+    @reconstructor
+    def init_on_load(self):
+        print('running reconstructor' )
         if not self.intervals:
             print("self.intervals = ", self.intervals)
             self.intervals = []
@@ -23,6 +24,8 @@ class Activity(DBActivity):
             print(whole_activity)
             self.add_intervals([whole_activity])
             print("self.intervals = ", self.intervals)
+        print('finished reconstructor')
+
     @property
     def df(self):
         return pd.read_json(self.df_json)
