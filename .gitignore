@@ -3,6 +3,8 @@ cycperf/site.db
 cycperf/site.db*
 cycperf/site.db.old
 site.db
+app_test.db
+tests/app_test.db
 
 /static/profile_pics/
 
