@@ -7,6 +7,7 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 from dash.dependencies import Input, Output, State
 
+import middleware.activity_test
 from cycperf.dashapp import activity_main, calendar, test_strava, dash_external_redirect
 from flask_login import current_user
 from flask import url_for
@@ -31,7 +32,6 @@ def register_callbacks(dashapp):
         #         IO.strava2.r
         #     ]
         elif pathname == "/application/activity":
-            activity_id = pathname.split("/")[-1]
             return [
                        activity_main.make_layout(current_user.id, None)
                    ], [current_user.username]
@@ -91,7 +91,8 @@ def register_callbacks(dashapp):
         if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
             interval_range = relayout_data_to_range(relayout_data)
             if interval_range:
-                activity = dbutil.get_activity_by_id(current_activity_id)
+                # activity = dbutil.get_activity_by_id(current_activity_id)
+                activity = middleware.activity_test.Activity()
                 activity.make_interval(*interval_range)
 
             from .utils.scatter_drawer import ScatterDrawer
@@ -129,9 +130,26 @@ def register_callbacks(dashapp):
     def get_athlete(_):
         athlete = strava_swagger.get_athlete()
         if athlete:
-            return strava_swagger.get_athlete(), False
+            return athlete, False
         else:
             return dash_external_redirect.redirect(url_for('users.strava_login')), True
+
+    @dashapp.callback(
+        Output(component_id='get_activities_output', component_property='children'),
+        # Output('confirm', 'displayed'),
+        [Input(component_id='btn_get_activities', component_property='n_clicks')],
+        prevent_initial_call=True
+    )
+    def get_activities(_):
+        activities = strava_swagger.get_activities()
+        if activities:
+            return test_strava.make_table(activities), False
+        else:
+            return dash_external_redirect.redirect(url_for('users.strava_login')), True
+
+
+
+
 
     # def get_athlete(_):
     #         athlete = strava_swagger.get_athlete()

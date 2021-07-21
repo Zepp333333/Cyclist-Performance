@@ -34,6 +34,10 @@ class Activity(DBActivity):
     def name(self):
         return self.json['name']
 
+    @property
+    def type(self):
+        return self.json['type']
+
     def add_intervals(self, new_intervals: list[Interval]) -> None:
         self.intervals.extend(new_intervals)
 
@@ -55,3 +59,6 @@ class Activity(DBActivity):
 
     def check_if_interval_exit(self, interval_to_check: Interval) -> bool:
         return interval_to_check in self.intervals
+
+    def __str__(self):
+        return f"Activity: {self.activity_id}, {self.name}"

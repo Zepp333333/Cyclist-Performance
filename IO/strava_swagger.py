@@ -55,6 +55,7 @@ def swagger_get_activities(token: str,
     except ApiException as e:
         print("Exception when calling ActivitiesApi->getLoggedInAthleteActivities: %s\n" % e)
 
+
 def get_athlete() -> str:
     user_id = current_user.id
     athlete_id, token = dbutil.get_strava_athlete_id_and_token(user_id)
@@ -69,6 +70,10 @@ def get_athlete() -> str:
     return json.dumps(athlete_info)
 
 
+def get_activities() -> list:
+    user_id = current_user.id
+    _, token = dbutil.get_strava_athlete_id_and_token(user_id)
+    return swagger_get_activities(token=token)
 
 
 def get_activity_by_id(activity_id) -> Activity:
