@@ -75,7 +75,7 @@ def make_table(data):
         id="data",
         columns=[{'id':'activity', 'name':'name'}],
         data=json_to_list(data),
-        page_size=3,
+        page_size=10,
         page_current=0,
         virtualization=True,
         fixed_rows={'headers': True},
