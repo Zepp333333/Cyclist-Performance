@@ -14,7 +14,7 @@ def prep_app_auth_url():
         "client_id": Config.STRAVA_APP_CLIENT_ID,
         "redirect_uri": Config.STRAVA_APP_REDIRECT_URI,
         "response_type": "code",
-        "scope": "read,profile:read_all,activity:read_all",
+        "scope": "read_all,profile:read_all,activity:read_all",
         "approval_prompt": "force"
     }
     base_url = Config.STRAVA_AUTH_URL
@@ -33,7 +33,9 @@ def check_auth_scopes(args):
 
 
 def check_strava_auth_return(args):
-    return check_strava_auth_code(args) and check_auth_scopes(args)
+    result = check_strava_auth_code(args) and check_auth_scopes(args)
+    print(result)
+    return result
 
 
 def store_athlete_access_token(auth_response, user: User = None):

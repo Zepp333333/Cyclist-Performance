@@ -39,7 +39,9 @@ def swagger_get_activity(token: str, activity_id: int) -> swagger_client.models.
 
 def swagger_get_activities(token: str,
                            before: int = datetime.now().timestamp(),
-                           after: int = 0, page: int = 1, per_page: int = 30):
+                           after: int = 0,
+                           page: int = 1,
+                           per_page: int = 30) -> list[swagger_client.models.summary_activity.SummaryActivity]:
     configuration = swagger_client.Configuration()
     configuration.access_token = token
     api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configuration))
@@ -56,8 +58,9 @@ def swagger_get_activities(token: str,
         print("Exception when calling ActivitiesApi->getLoggedInAthleteActivities: %s\n" % e)
 
 
-def get_athlete() -> str:
-    user_id = current_user.id
+def get_athlete(user_id: int = None) -> str:
+    if not user_id:
+        user_id = current_user.id
     athlete_id, token = dbutil.get_strava_athlete_id_and_token(user_id)
     if not athlete_id:
         return ''
@@ -66,9 +69,8 @@ def get_athlete() -> str:
     # if not in db -> get from strava API and store in db
     if not athlete_info:
         athlete_info = swagger_get_athlete(token).to_dict()
-        dbutil.update_user(user_id=user_id, update={'strava_athlete_info': athlete_info})
-    return json.dumps(athlete_info)
-
+        dbutil.update_user(user_id=user_id, update={'strava_athlete_info': json.dumps(athlete_info, default=str)})
+    return json.dumps(athlete_info, default=str)
 
 def get_activities() -> list:
     user_id = current_user.id
