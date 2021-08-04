@@ -58,6 +58,20 @@ def swagger_get_activities(token: str,
         print("Exception when calling ActivitiesApi->getLoggedInAthleteActivities: %s\n" % e)
 
 
+def swagger_get_activity_streams(token: str, activity_id: int) -> swagger_client.models.stream_set.StreamSet:
+    configuration = swagger_client.Configuration()
+    configuration.access_token = token
+    api_instance = swagger_client.StreamsApi(swagger_client.ApiClient(configuration))
+    try:
+        keys = ['time', 'distance', 'altitude', 'latlng',
+                'velocity_smooth', 'heartrate', 'cadence', 'watts', 'temp',
+                'moving', 'grade_smooth']
+        api_response = api_instance.get_activity_streams(id=activity_id, keys=keys, key_by_type=True)
+        return api_response
+    except ApiException as e:
+        print("Exception when calling AthletesApi->getLoggedInAthlete: %s\n" % e)  # todo - handle the exception
+
+
 def get_athlete(user_id: int = None) -> str:
     if not user_id:
         user_id = current_user.id
@@ -72,14 +86,16 @@ def get_athlete(user_id: int = None) -> str:
         dbutil.update_user(user_id=user_id, update={'strava_athlete_info': json.dumps(athlete_info, default=str)})
     return json.dumps(athlete_info, default=str)
 
+
 def get_activities() -> list:
     user_id = current_user.id
     _, token = dbutil.get_strava_athlete_id_and_token(user_id)
     return swagger_get_activities(token=token)
 
 
-def get_activity_by_id(activity_id) -> Activity:
-    user_id = 1  # current_user.id
+def get_activity_by_id(activity_id: int, user_id: int = None) -> Activity:
+    if not user_id:
+        user_id = current_user.id
     athlete_id, token = dbutil.get_strava_athlete_id_and_token(user_id)
     if not athlete_id:
         return None
@@ -88,7 +104,7 @@ def get_activity_by_id(activity_id) -> Activity:
     # if not in db -> get from strava API and store in db
     if not strava_activity:
         strava_activity = swagger_get_activity(token, activity_id)
-        # dbutil.store_activity(activitystrava_activity=strava_activity)
+        dbutil.store_activity(strava_activity=strava_activity, user_id=user_id, athlete_id=athlete_id)
     return strava_activity
 
 
