@@ -53,6 +53,6 @@ class DBActivity(db.Model):
     blob = db.Column(db.BLOB)
     comment = db.Column(db.Text)
 
-    def __init__(self):
-        print("DBActivity __init__")
+    # def __init__(self):
+    #     print("DBActivity __init__")
 

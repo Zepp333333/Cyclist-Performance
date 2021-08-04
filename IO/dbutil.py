@@ -1,4 +1,5 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+import json
 import pathlib
 
 import flask_login
@@ -65,14 +66,16 @@ def get_activity(activity_id):
     return None
 
 
-def store_activity(strava_activity: swagger_client.DetailedActivity):
+def store_activity(strava_activity: swagger_client.DetailedActivity,
+                   user_id: int,
+                   athlete_id: int,
+                   ):
+    laps = [lap.to_dict() for lap in strava_activity.laps]
     db_activity = DBActivity(activity_id=strava_activity.id,
                              user_id=user_id,
-                             athlete_id=get_strava_id_by_user_id(user_id),
-                             json=activity,
-                             laps=laps,
-                             streams=streams,
-                             df_json=df.to_json(),
+                             athlete_id=athlete_id,
+                             json=json.dumps(strava_activity, default=str),
+                             laps=json.dumps(laps, default=str)
                              )
     db.session.add(db_activity)
     db.session.commit()
