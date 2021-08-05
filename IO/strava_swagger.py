@@ -11,7 +11,7 @@ import json
 from middleware import Activity
 
 from datetime import datetime
-
+from typing import Optional
 
 def swagger_get_athlete(token: str) -> swagger_client.models.detailed_athlete:
     configuration = swagger_client.Configuration()
@@ -93,7 +93,7 @@ def get_activities() -> list:
     return swagger_get_activities(token=token)
 
 
-def get_activity_by_id(activity_id: int, user_id: int = None) -> Activity:
+def get_activity_by_id(activity_id: int, user_id: int = None) -> Optional[Activity]:
     if not user_id:
         user_id = current_user.id
     athlete_id, token = dbutil.get_strava_athlete_id_and_token(user_id)
