@@ -1,4 +1,6 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+import pandas as pd
+
 from middleware.activity_test import Activity
 from flask_login import current_user
 import json
@@ -26,6 +28,11 @@ class IO:
         # if not in db -> get from Strava
         # else raise exception
         return Activity()
+
+
+def get_dataframe(activity_id: int) -> pd.DataFrame:
+    """todo Implement"""
+    return pd.DataFrame()
 
 
 
