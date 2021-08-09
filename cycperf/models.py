@@ -53,6 +53,7 @@ class DBActivity(db.Model):
     blob = db.Column(db.BLOB)
     comment = db.Column(db.Text)
 
-    # def __init__(self):
-    #     print("DBActivity __init__")
 
+class DBDataFrame(db.Model):
+    activity_id = db.Column(db.Integer, db.ForeignKey('db_activity.activity_id'), primary_key=True, nullable=False)
+    df_json = db.Column(db.JSON)

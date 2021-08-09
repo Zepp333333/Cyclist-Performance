@@ -6,9 +6,12 @@ from typing import List
 
 import pandas as pd
 
+from interval_new import Interval, CyclingInterval
+
 
 class IntervalDoNotExit(Exception):
     """Custom error in case accessing non-existent interval"""
+
     def __init__(self, name: str, id: int, message: str) -> None:
         self.name = name
         self.id = id
@@ -19,14 +22,23 @@ class IntervalDoNotExit(Exception):
 @dataclass
 class Activity(ABC):
     """Represents basic activity"""
+    interval: Interval
+    id: int
     name: str
-    id: str
-    type: str
-    intervals: List[Interval] = field(default_factory=list)
-    df: pd.DataFrame = None
+    df: pd.DataFrame
+    intervals: List[Interval] = field(default_factory=list[Interval])
+    type: str = 'bike'
 
-    def __post_init__(self):
-        self.intervals: List[Interval] =
+    def __post_init__(self) -> None:
+        self.add_intervals([self.make_whole_activity_interval()])
+
+
+    def make_whole_activity_interval(self) -> Interval:
+        return self.interval.create(id=0,
+                                    activity_id=self.id,
+                                    name='Whole Activity',
+                                    start=0,
+                                    end=self.df.last_valid_index())
 
     def add_intervals(self, new_intervals: List[Interval]) -> None:
         self.intervals.extend(new_intervals)
@@ -41,4 +53,11 @@ class Activity(ABC):
 
     def check_if_interval_exit(self, interval_to_check: Interval) -> bool:
         return interval_to_check in self.intervals
+
+
+@dataclass
+class CyclingActivity(Activity):
+    pass
+
+
 
