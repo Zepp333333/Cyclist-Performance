@@ -1,7 +1,7 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import dash_core_components as dcc
 import dash_html_components as html
-from middleware import Activity
+from middleware import Activity, BikeActivityFactory
 
 
 from IO import DataWrapper, strava
@@ -10,7 +10,8 @@ from cycperf.dashapp.utils.scatter_drawer import ScatterDrawer
 
 dw = DataWrapper()
 df = dw.get_activity(activity_id='ride.csv')
-mock_up_ride = Activity(activity_id=1, name='My ride', df=df)
+factory = BikeActivityFactory()
+mock_up_ride = factory.get_activity(id=1, athlete_id=0, name='My ride', dataframe=df)
 
 
 def _make_layout(user_id: int, activity: Activity) -> 'dash.Dash.layout':

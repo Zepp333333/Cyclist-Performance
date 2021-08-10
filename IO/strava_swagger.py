@@ -1,17 +1,17 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
 
-import swagger_client
-from swagger_client.rest import ApiException
-from flask_login import current_user
-from flask import redirect, url_for
-import IO.dbutil as dbutil
-from cycperf.users import routes
 import json
-from middleware import Activity
-
 from datetime import datetime
 from typing import Optional
+
+import swagger_client
+from flask_login import current_user
+from swagger_client.rest import ApiException
+
+from IO import dbutil
+from middleware import Activity
+
 
 def swagger_get_athlete(token: str) -> swagger_client.models.detailed_athlete:
     configuration = swagger_client.Configuration()
@@ -100,11 +100,11 @@ def get_activity_by_id(activity_id: int, user_id: int = None) -> Optional[Activi
     if not athlete_id:
         return None
     # Attempt to load athlete from db
-    strava_activity = dbutil.get_activity(activity_id)
+    strava_activity = dbutil.get_activity_from_db(activity_id)
     # if not in db -> get from strava API and store in db
     if not strava_activity:
         strava_activity = swagger_get_activity(token, activity_id)
-        dbutil.store_activity(strava_activity=strava_activity, user_id=user_id, athlete_id=athlete_id)
+        dbutil.store_strava_activity(strava_activity=strava_activity, user_id=user_id, athlete_id=athlete_id)
     return strava_activity
 
 

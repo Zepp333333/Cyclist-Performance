@@ -5,7 +5,7 @@ import pandas as pd
 from sqlalchemy.orm import reconstructor
 
 from cycperf.models import DBActivity
-from middleware import Interval
+from .interval_new import Interval
 
 
 class Activity(DBActivity):

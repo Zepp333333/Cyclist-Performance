@@ -50,7 +50,7 @@ class DBActivity(db.Model):
     streams = db.Column(db.JSON)
     df_json = db.Column(db.JSON)
     intervals = db.Column(db.JSON)
-    blob = db.Column(db.BLOB)
+    pickle = db.Column(db.BLOB)
     comment = db.Column(db.Text)
 
 
