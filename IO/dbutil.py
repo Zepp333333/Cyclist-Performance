@@ -1,11 +1,11 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import json
 import pathlib
+from typing import Optional
 
-import flask_login
 import pandas as pd
-
 import swagger_client
+
 from cycperf import db
 from cycperf.models import User, DBActivity
 
@@ -62,14 +62,19 @@ def update_user(user_id: int, update: dict = None):
         db.session.commit()
 
 
-def get_activity(activity_id):
-    return None
+def get_activity_from_db(activity_id) -> Optional[bytes]:
+    try:
+        db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
+        return db_activity.pickle
+    except Exception as e:
+        #todo implement SQLAlchemy error handling
+        return None
 
 
-def store_activity(strava_activity: swagger_client.DetailedActivity,
-                   user_id: int,
-                   athlete_id: int,
-                   ):
+def store_strava_activity(strava_activity: swagger_client.DetailedActivity,
+                          user_id: int,
+                          athlete_id: int,
+                          ):
     laps = [lap.to_dict() for lap in strava_activity.laps]
     db_activity = DBActivity(activity_id=strava_activity.id,
                              user_id=user_id,
@@ -79,3 +84,40 @@ def store_activity(strava_activity: swagger_client.DetailedActivity,
                              )
     db.session.add(db_activity)
     db.session.commit()
+
+
+def create_new_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes):
+    # db_activity = DBActivity(activity_id=activity_id,
+    #                          user_id=user_id,
+    #                          athlete_id=athlete_id,
+    #                          pickle=pickle)
+    db_activity = DBActivity()
+    db_activity.user_id = user_id
+    db_activity.athlete_id = athlete_id
+    db_activity.activity_id = activity_id
+    db_activity.pickle = pickle
+    db.session.add(db_activity)
+    db.session.commit()
+
+
+def store_cycperf_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes):
+    db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
+    if db_activity:
+        db_activity.pickle = pickle
+        db.session.commit()
+    else:
+        create_new_activity(user_id, athlete_id, activity_id, pickle)
+
+
+def delete_activity(user_id: int, activity_id: int) -> None:
+    db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
+    db.session.delete(db_activity)
+    db.session.commit()
+
+def get_user_id_by_activity_id(activity_id: int) -> Optional[int]:
+    """Returns user_id associated to an activity in db"""
+    db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
+    if db_activity:
+        return db_activity.user_id
+    else:
+        return None

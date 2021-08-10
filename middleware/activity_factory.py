@@ -1,8 +1,8 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from activity_new import Activity, CyclingActivity
-from interval_new import Interval, CyclingInterval
+from .activity_new import Activity, CyclingActivity
+from .interval_factory import IntervalFactory, CyclingIntervalFactory
 
 
 class ActivityFactory(ABC):
@@ -14,14 +14,20 @@ class ActivityFactory(ABC):
         """Returns activity belonging to this factory"""
 
     @abstractmethod
-    def get_interval(self) -> Interval:
+    def get_interval_factory(self) -> IntervalFactory:
         """Returns interval belonging to this factory"""
 
 
+# todo rename to cycling activity factory
 class BikeActivityFactory(ActivityFactory):
     def get_activity(self, **kwargs) -> Activity:
-        return CyclingActivity(**kwargs, interval=self.get_interval())
+        return CyclingActivity(interval_factory=self.get_interval_factory(), **kwargs)
 
-    def get_interval(self):
-        return CyclingInterval()
+    def get_interval_factory(self, *args, **kwargs) -> IntervalFactory:
+        return CyclingIntervalFactory()
 
+# todo remove testing code
+# import pandas as pd
+# df = pd.read_csv('../IO/ride.csv')
+# f = BikeActivityFactory()
+# a = f.get_activity(id=1, name='activity1', dataframe=df)

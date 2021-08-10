@@ -1,6 +1,10 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-from middleware.interval import Interval
-from middleware.activity import Activity
+from .interval_new import Interval, CyclingInterval
+from .activity_new import Activity, CyclingActivity
+from .activity_factory import ActivityFactory, BikeActivityFactory
+
+
+
 
 
