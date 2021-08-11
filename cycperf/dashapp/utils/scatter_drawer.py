@@ -17,7 +17,7 @@ class ScatterDrawer:
         :param index_col: str - name of DataFrame column that contains index (x-axis)
         :param series_to_plot: list[str] - name(s) of DataFrame columns to plot in order of plotting
         """
-        self.data_frame = activity.df
+        self.data_frame = activity.dataframe
         self.index_col = index_col
         self.series_to_plot = series_to_plot
         self.series_to_plot.reverse()  # reverse as plotly would render traces in reverse order
@@ -180,7 +180,7 @@ class ScatterDrawer:
                     # ax=0,
                     # ay=30,
                     showarrow=False,
-                    text=interval.title,
+                    text=interval.name,
                     xref="x",
                     xanchor="left",
                     yanchor="top",

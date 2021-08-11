@@ -34,7 +34,6 @@ def check_auth_scopes(args):
 
 def check_strava_auth_return(args):
     result = check_strava_auth_code(args) and check_auth_scopes(args)
-    print(result)
     return result
 
 

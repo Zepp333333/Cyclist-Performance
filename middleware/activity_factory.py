@@ -6,7 +6,7 @@ from .interval_factory import IntervalFactory, CyclingIntervalFactory
 
 
 class ActivityFactory(ABC):
-    """Factory that represents combination of Activity an Interval.
+    """Factory that represents combination of Activity and Interval.
     Doesn't maintain any of the instances it creates"""
 
     @abstractmethod
@@ -20,7 +20,21 @@ class ActivityFactory(ABC):
 
 # todo rename to cycling activity factory
 class BikeActivityFactory(ActivityFactory):
+    """Factory that represents combination of Cycling Activity and Cycling Interval.
+       Doesn't maintain any of the instances it creates
+       """
+
     def get_activity(self, **kwargs) -> Activity:
+        """
+        Constructs CyclingActivity together with CyclingInterval
+        :param id: int - activity id
+        :param name: str - activity name
+        :param athlete_id: int - athlete id
+        :param dataframe: pd.DataFrame - dataframe
+        :param [optional] intervals: list[Interval] = field(default_factory=list[Interval])
+        :param [optional] type: str = 'bike'
+        """
+
         return CyclingActivity(interval_factory=self.get_interval_factory(), **kwargs)
 
     def get_interval_factory(self, *args, **kwargs) -> IntervalFactory:

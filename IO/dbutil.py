@@ -62,7 +62,7 @@ def update_user(user_id: int, update: dict = None):
         db.session.commit()
 
 
-def get_activity_from_db(activity_id) -> Optional[bytes]:
+def get_activity_from_db(activity_id: int) -> Optional[bytes]:
     try:
         db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
         return db_activity.pickle

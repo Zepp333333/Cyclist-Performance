@@ -5,13 +5,21 @@ from middleware import Activity, BikeActivityFactory
 
 
 from IO import DataWrapper, strava
+from IO.iowrapper import IO
 from cycperf.dashapp.utils.scatter_drawer import ScatterDrawer
+
+import base64
 
 
 dw = DataWrapper()
 df = dw.get_activity(activity_id='ride.csv')
 factory = BikeActivityFactory()
 mock_up_ride = factory.get_activity(id=1, athlete_id=0, name='My ride', dataframe=df)
+
+
+def prepare_activity_for_dcc_store(activity: Activity):
+    pickle = activity.pickle()
+    return pickle
 
 
 def _make_layout(user_id: int, activity: Activity) -> 'dash.Dash.layout':
@@ -27,7 +35,7 @@ def _make_layout(user_id: int, activity: Activity) -> 'dash.Dash.layout':
         dcc.Graph(id='my-fig', figure=fig.get_fig()),
 
         # dcc.Store inside the app that stores the intermediate value
-        dcc.Store(id='current_activity_id', data=activity.activity_id)
+        dcc.Store(id='current_activity', data=activity.id)  # prepare_activity_for_dcc_store(activity))
     ])
     return layout
 
@@ -37,7 +45,7 @@ def make_layout(user_id=None, activity_id=None):
         return _make_layout(mock_up_ride)
     if not activity_id:
         return _make_layout(user_id, strava.get_users_last_activity(user_id))
-    return _make_layout(user_id, strava.get_activity_by_id(activity_id))
+    return _make_layout(user_id, IO().get_activity_by_id(int(activity_id)))
 
 
 

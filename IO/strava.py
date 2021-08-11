@@ -6,6 +6,7 @@ import pandas
 import IO.strava_io as strava_io
 import IO.dbutil as dw
 from middleware.activity_new import Activity
+from middleware import ActivityFactory, BikeActivityFactory
 from flask_login import current_user
 import pandas as pd
 from cycperf.models import User
@@ -20,9 +21,11 @@ def get_users_last_activity(user_id) -> Activity:
     df = pd.DataFrame()
     for stream in streams:
         df[stream['type']] = stream['data']
-
-    activity = Activity(last_activity[0]['id'], last_activity[0]['name'], df=df)
-
+    factory = BikeActivityFactory()
+    activity = factory.get_activity(id=last_activity[0]['id'],
+                                    name=last_activity[0]['name'],
+                                    athlete_id=last_activity[0]['athlete']['id'],
+                                    dataframe=df)
     return activity
 
 

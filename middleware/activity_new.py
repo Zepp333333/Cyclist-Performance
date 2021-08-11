@@ -79,7 +79,7 @@ class Activity(ABC):
         return interval_to_check in self.intervals
 
     def pickle(self) -> bytes:
-        return pickle.dumps(self)
+        return pickle.dumps(self, protocol=0)
 
     @classmethod
     def from_pickle(cls, pickle_str) -> Activity:
