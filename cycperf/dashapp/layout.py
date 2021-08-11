@@ -51,6 +51,6 @@ layout = html.Div(
         dcc.Location(id="url"),
         sidebar,
         content,
-        dcc.Store(id="ride_object")
+        dcc.Store(id="current_activity")
     ]
 )

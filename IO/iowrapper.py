@@ -4,10 +4,14 @@
 import json
 from datetime import datetime
 
+import pandas as pd
+import swagger_client.models
 from flask_login import current_user
 
 from IO import dbutil
-from middleware.activity_new import Activity
+from IO import strava_swagger
+from middleware import Activity
+from middleware import ActivityFactory, BikeActivityFactory
 
 
 class ActivityNotFoundInDB(Exception):
@@ -18,6 +22,14 @@ class ActivityNotFoundInDB(Exception):
         self.id = id
         self.message = message
         super().__init__(message)
+
+
+def make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:
+    df = pd.DataFrame()
+    streams_dict = streams.to_dict()
+    for key in streams_dict.keys():
+        df[key] = streams_dict[key]['data']
+    return df
 
 
 class IO:
@@ -55,3 +67,18 @@ class IO:
             dbutil.delete_activity(user_id=self.user_id, activity_id=activity_id)
         else:
             raise  # todo implement exception
+
+    def get_strava_activity_by_id(self, activity_id: int) -> Activity:
+
+        strava_activity = strava_swagger.get_activity_by_id(activity_id=int(activity_id),
+                                                            user_id=self.user_id)
+        streams = strava_swagger.get_activity_streams(activity_id=int(activity_id),
+                                                      user_id=self.user_id)
+        df = make_df(streams)
+        activity = BikeActivityFactory().get_activity(
+            id=activity_id,
+            athlete_id=strava_activity.athlete.id,
+            name=strava_activity.name,
+            dataframe=df
+        )
+        return activity

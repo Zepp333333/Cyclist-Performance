@@ -58,7 +58,8 @@ def swagger_get_activities(token: str,
         print("Exception when calling ActivitiesApi->getLoggedInAthleteActivities: %s\n" % e)
 
 
-def swagger_get_activity_streams(token: str, activity_id: int) -> swagger_client.models.stream_set.StreamSet:
+def swagger_get_activity_streams(token: str, activity_id: int) -> Optional[swagger_client.models.stream_set.StreamSet]:
+
     configuration = swagger_client.Configuration()
     configuration.access_token = token
     api_instance = swagger_client.StreamsApi(swagger_client.ApiClient(configuration))
@@ -93,19 +94,26 @@ def get_activities() -> list:
     return swagger_get_activities(token=token)
 
 
-def get_activity_by_id(activity_id: int, user_id: int = None) -> Optional[Activity]:
+def get_activity_by_id(activity_id: int, user_id: int = None) -> Optional[swagger_client.models.DetailedAthlete]:
     if not user_id:
         user_id = current_user.id
     athlete_id, token = dbutil.get_strava_athlete_id_and_token(user_id)
     if not athlete_id:
         return None
-    # Attempt to load athlete from db
-    strava_activity = dbutil.get_activity_from_db(activity_id)
-    # if not in db -> get from strava API and store in db
-    if not strava_activity:
-        strava_activity = swagger_get_activity(token, activity_id)
-        dbutil.store_strava_activity(strava_activity=strava_activity, user_id=user_id, athlete_id=athlete_id)
+    strava_activity = swagger_get_activity(token, activity_id)
+    # dbutil.store_strava_activity(strava_activity=strava_activity, user_id=user_id, athlete_id=athlete_id)
     return strava_activity
+
+
+def get_activity_streams(activity_id: int, user_id: int = None) -> Optional[swagger_client.models.stream_set.StreamSet]:
+    if not user_id:
+        user_id = current_user.id
+    athlete_id, token = dbutil.get_strava_athlete_id_and_token(user_id)
+    if not athlete_id:
+        return None
+    streams = swagger_get_activity_streams(token=token, activity_id=activity_id)
+    return streams
+
 
 
 

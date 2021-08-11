@@ -1,18 +1,16 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
 import dash
-import dash_html_components as html
-import dash_core_components as dcc
 import dash_bootstrap_components as dbc
-import pandas as pd
+import dash_html_components as html
 from dash.dependencies import Input, Output, State
-
-import middleware.activity_test
-from cycperf.dashapp import activity_main, calendar, test_strava, dash_external_redirect
-from flask_login import current_user
 from flask import url_for
+from flask_login import current_user
 
-from IO import strava_swagger, dbutil
+from IO import strava_swagger
+from IO.iowrapper import IO
+from cycperf.dashapp import activity_main, calendar, test_strava, dash_external_redirect
+from middleware import Activity
 
 
 def register_callbacks(dashapp):
@@ -33,7 +31,7 @@ def register_callbacks(dashapp):
         #     ]
         elif pathname == "/application/activity":
             return [
-                       activity_main.make_layout(current_user.id, None)
+                       activity_main.make_layout(user_id=current_user.id, activity_id=None)
                    ], [current_user.username]
         elif "/application/activity/" in pathname:
             activity_id = pathname.split("/")[-1]
@@ -67,35 +65,24 @@ def register_callbacks(dashapp):
             ]
         )
 
-    # @dashapp.callback(
-    #     Output(component_id='current_activity', component_property='data'),
-    #     [Input(component_id='create_interval', component_property='n_clicks')],
-    #     [State(component_id='my-fig', component_property='relayoutData')],
-    #     prevent_initial_call=True
-    # )
-    # def get_ride(n_clicks, relayout_data):
-    #
-    #     ctx = dash.callback_context
-    #     if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
-    #         return ride_object.to_json()
-
     @dashapp.callback(
         Output(component_id='my-fig', component_property='figure'),
         [Input(component_id='create_interval', component_property='n_clicks'),
-         Input(component_id='current_activity_id', component_property='data')],
+         Input(component_id='current_activity', component_property='data')],
         [State(component_id='my-fig', component_property='relayoutData')],
         prevent_initial_call=True
     )
-    def create_interval(n_clicks, current_activity_id, relayout_data):
+    def create_interval(n_clicks, data, relayout_data):
         ctx = dash.callback_context
         if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
             interval_range = relayout_data_to_range(relayout_data)
             if interval_range:
-                # activity = dbutil.get_activity_by_id(current_activity_id)
-                activity = middleware.activity_test.Activity()
-                activity.make_interval(*interval_range)
+                io_wrapper = IO()
+                activity = io_wrapper.get_activity_by_id(int(data))
+                activity.new_interval(*interval_range)
+                io_wrapper.save_activity(activity)
 
-            from .utils.scatter_drawer import ScatterDrawer
+                from .utils.scatter_drawer import ScatterDrawer
 
         # ctx = dashapp.callback_context
         # if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
@@ -103,12 +90,12 @@ def register_callbacks(dashapp):
         #     if interval_range:
         #         ride.make_interval(*interval_range)
 
-            new_fig = ScatterDrawer(
-                activity=activity,
-                index_col='time',
-                series_to_plot=['watts', 'heartrate', 'cadence'],
-            )
-            return new_fig.get_fig()
+                new_fig = ScatterDrawer(
+                    activity=activity,
+                    index_col='time',
+                    series_to_plot=['watts', 'heartrate', 'cadence'],
+                )
+                return new_fig.get_fig()
         return dash.no_update
 
     def relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
