@@ -1,121 +1,92 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
+from __future__ import annotations
+
+import pickle
+from abc import ABC
+from dataclasses import dataclass, field
+
 import pandas as pd
-from middleware import Interval
-from IO import DataWrapper
+
+from .interval_factory import IntervalFactory
+from .interval import Interval
 
 
-class Activity:
-    def __init__(self,
-                 activity_id: int,
-                 name: str,
-                 df: pd.DataFrame,
-                 intervals: list[Interval] = None,
-                 activity_type: str = 'Bike'
-                 ):
-        if intervals is None:
-            intervals = []
-        self.activity_id = activity_id
+class IntervalDoNotExit(Exception):
+    """Custom error in case accessing non-existent interval"""
+    # todo consider moving to exceptions package
+    def __init__(self, name: str, id: int, message: str) -> None:
         self.name = name
-        self.df = df
-        self.intervals = intervals
-        self.activity_type = activity_type
+        self.id = id
+        self.message = message
+        super().__init__(message)
 
-        self.all_activity = Interval(activity_id=self.activity_id,
-                                     df=self.df,
-                                     name="all activity",
-                                     start=0,
-                                     end=self.df.last_valid_index())
-        self.add_intervals([self.all_activity])
-        self.changed = False
+
+@dataclass
+class Activity(ABC):
+    """Represents basic activity interface"""
+    interval_factory: IntervalFactory
+    id: int
+    name: str
+    athlete_id: int
+    dataframe: pd.DataFrame
+    intervals: list[Interval] = field(default_factory=list[Interval])
+    type: str = 'bike'
+
+    def __post_init__(self) -> None:
+        self.add_intervals([self.make_whole_activity_interval()])
+
+    def make_whole_activity_interval(self) -> Interval:
+        interval = self.interval_factory.get_interval()
+        return interval.create(id=0,
+                               activity_id=self.id,
+                               name='Whole Activity',
+                               start=0,
+                               end=self.dataframe.last_valid_index(),
+                               dataframe=self.dataframe)
+
+    def new_interval(self, start: int, end: int, name: str = None) -> None:
+        # todo: add code to check correctness of interval range
+        if not name:
+            name = self.generate_interval_name()
+        self.add_intervals([self.make_interval(start, end, name)])
 
     def add_intervals(self, new_intervals: list[Interval]) -> None:
         self.intervals.extend(new_intervals)
-        self.changed = True
 
-    def make_interval(self, start, end):
+    def make_interval(self, start: int, end: int, name: str = None) -> Interval:
         # todo: add code to check correctness of interval range
-        new_interval = Interval(activity_id=self.activity_id,
-                                df=self.df,
-                                name=f"Interval {len(self.intervals)}",
-                                start=start,
-                                end=end)
-        self.add_intervals([new_interval])
+        interval = self.interval_factory.get_interval()
+        return interval.create(id=len(self.intervals),
+                               activity_id=self.id,
+                               name=name,
+                               start=start,
+                               end=end,
+                               dataframe=self.dataframe)
 
-    def remove_intervals(self, intervals: list[Interval]) -> None:
-        for interval in intervals:
-            try:
-                self.intervals.remove(interval)
-            except ValueError:
-                # Todo replace with logging
-                print(f"Interval {interval} not in list of intervals for activity {self.name}")
-        self.changed = True
+    def generate_interval_name(self) -> str:
+        proposed_name = f"Interval {len(self.intervals)}"
+        return proposed_name
+
+    def remove_intervals(self, intervals_to_remove: list[Interval]) -> None:
+        for interval in intervals_to_remove:
+            if interval not in self.intervals:
+                raise IntervalDoNotExit(name=interval.name,
+                                        id=interval.id,
+                                        message="Interval doesn't exist in list of intervals.")
+            self.intervals.remove(interval)
 
     def check_if_interval_exit(self, interval_to_check: Interval) -> bool:
         return interval_to_check in self.intervals
 
-    def save(self):
-        DataWrapper.save_activity(self)
+    def pickle(self) -> bytes:
+        return pickle.dumps(self, protocol=0)
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.save()
-
-
-
+    @classmethod
+    def from_pickle(cls, pickle_str) -> Activity:
+        return pickle.loads(pickle_str)
 
 
-
-# class Activity:
-#     def __init__(self,
-#                  name: str,
-#                  df_json: pd.DataFrame,
-#                  intervals: list[Interval] = None,
-#                  activity_type: str = 'Bike'
-#                  ):
-#         if intervals is None:
-#             intervals = []
-#         self.name = name
-#         self.df_json = df_json
-#         self.intervals = intervals
-#         self.activity_type = activity_type
-#
-#         self.all_activity = Interval(activity=self,
-#                                      name="all activity",
-#                                      start=0,
-#                                      end=df_json.last_valid_index())
-#         self.add_intervals([self.all_activity])
-#
-#     def add_intervals(self, new_intervals: list[Interval]) -> None:
-#         self.intervals.extend(new_intervals)
-#
-#     def make_interval(self, start, end):
-#         # todo: add code to check correctness of interval range
-#         new_interval = Interval(activity=self,
-#                                 name=f"Interval {len(self.intervals)}",
-#                                 start=start,
-#                                 end=end)
-#         self.add_intervals([new_interval])
-#
-#     def remove_intervals(self, intervals: list[Interval]) -> None:
-#         for interval in intervals:
-#             try:
-#                 self.intervals.remove(interval)
-#             except ValueError:
-#                 # Todo replace with logging
-#                 print(f"Interval {interval} not in list of intervals for activity {self.name}")
-#
-#     def check_if_interval_exit(self, interval_to_check: Interval) -> bool:
-#         return interval_to_check in self.intervals
-#
-#     def store(self, ):
-#         pass
-
-#
-# dw = DataWrapper()
-# df_json = dw.get_activity(activity_id='ride.csv')
-#
-# a = Activity(1, 'test-ride', df_json)
-#
-# print('A interval = ', a.intervals, a.activity_id)
-# b = Activity(2, 'test-ride2', df_json)
-# print('B interval = ', b.intervals, b.activity_id)
+@dataclass
+class CyclingActivity(Activity):
+    """Represents Cycling Activity"""

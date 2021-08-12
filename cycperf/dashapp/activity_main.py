@@ -1,28 +1,15 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+
+import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from middleware import Activity, BikeActivityFactory
+
+from iobrocker import IO
+from middleware import Activity
+from .utils import ScatterDrawer
 
 
-from IO import DataWrapper, strava
-from IO.iowrapper import IO
-from cycperf.dashapp.utils.scatter_drawer import ScatterDrawer
-
-import base64
-
-
-dw = DataWrapper()
-df = dw.get_activity(activity_id='ride.csv')
-factory = BikeActivityFactory()
-mock_up_ride = factory.get_activity(id=1, athlete_id=0, name='My ride', dataframe=df)
-
-
-def prepare_activity_for_dcc_store(activity: Activity):
-    pickle = activity.pickle()
-    return pickle
-
-
-def _make_layout(user_id: int, activity: Activity) -> 'dash.Dash.layout':
+def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
     fig = ScatterDrawer(
         activity=activity,
         index_col='time',
@@ -40,11 +27,11 @@ def _make_layout(user_id: int, activity: Activity) -> 'dash.Dash.layout':
     return layout
 
 
-def make_layout(user_id=None, activity_id=None):
+def make_layout(user_id=None, activity_id=None) -> dash.Dash.layout:
     if not user_id:
-        return _make_layout(mock_up_ride)
+        return _make_layout(user_id=0, activity=IO(0).get_mock_up_ride())
     if not activity_id:
-        return _make_layout(user_id, strava.get_users_last_activity(user_id))
+        return _make_layout(user_id, IO(user_id=user_id).get_last_activity())
     return _make_layout(user_id, IO().get_activity_by_id(int(activity_id)))
 
 

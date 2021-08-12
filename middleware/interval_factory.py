@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from .interval_new import Interval, CyclingInterval
+from .interval import Interval, CyclingInterval
 
 
 class IntervalFactory(ABC):

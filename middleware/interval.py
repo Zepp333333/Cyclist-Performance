@@ -1,39 +1,80 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
-import pandas
-import json
+from __future__ import annotations
+from dataclasses import dataclass
+from abc import ABC, abstractmethod
+import pandas as pd
+import pickle
 
 
-class Interval:
-    def __init__(self,
-                 activity_id: int,
-                 df: pandas.DataFrame,
-                 name: str,
-                 start: int,
-                 end: int,
-                 ):
+@dataclass()
+class Interval(ABC):
+    """ Represents basic interval of an activity
+        Use Interval.create method to populate factory instantiated instances"""
+    id: int = None
+    activity_id: int = None
+    name: str = None
+    start: int = None
+    end: int = None
+    dataframe: pd.DataFrame = pd.DataFrame()
 
+    def __post_init__(self) -> None:
+        """Populate post-init fields and metrics"""
+        self.sort_index = self.id
+        self.populate_metrics(self.dataframe)
+        del self.dataframe
+
+    def create(self, id, activity_id, name, start, end, dataframe) -> Interval:
+        """Return populated interval. Use for factory instantiated instances"""
+        self.id = id
         self.activity_id = activity_id
         self.name = name
         self.start = start
         self.end = end
+        self.populate_metrics(dataframe)
+        return self
 
-        self.range = self.start, self.end
+    @abstractmethod
+    def populate_metrics(self, dataframe: pd.DataFrame) -> None:
+        """Compute and populate interval metrics"""
 
-        self.avg_power: int = 0
-        self.max_power: int = 0
-        self.min_power: int = 0
+    def change_interval(self,
+                        new_start: int, new_end: int,
+                        dataframe: pd.DataFrame, new_name: str = None):
+        """Changes interval range and name, initiates recalculation of metrics
+        based on provided activity dataframe"""
+        self.start, self.end = new_start, new_end
+        if new_name:
+            self.name = new_name
+        self.populate_metrics(dataframe)
 
-        self.avg_hr: int = 0
-        self.max_hr: int = 0
-        self.min_hr: int = 0
+    def pickle(self):
+        return pickle.dumps(self)
 
-        self.avg_cad: int = 0
-        self.max_cad: int = 0
-        self.min_cad: int = 0
+    @classmethod
+    def from_pickle(cls, pickle_str):
+        return pickle.loads(pickle_str)
 
-        self.populate_metrics(df.iloc[self.start:self.end])
 
-    def populate_metrics(self, df) -> None:
+@dataclass()
+class CyclingInterval(Interval):
+    """ Represents basic interval of an activity
+        Use Interval.create method to populate factory instantiated instances"""
+
+    avg_power: int = 0
+    max_power: int = 0
+    min_power: int = 0
+
+    avg_hr: int = 0
+    max_hr: int = 0
+    min_hr: int = 0
+
+    avg_cad: int = 0
+    max_cad: int = 0
+    min_cad: int = 0
+
+    def populate_metrics(self, dataframe: pd.DataFrame) -> None:
+        """Compute and populate interval metrics"""
+        df = dataframe.iloc[self.start:self.end]
         if 'watts' in df:
             self.populate_watts(df)
         if 'heartrate' in df:
@@ -56,9 +97,6 @@ class Interval:
         self.max_cad = df.cadence.max()
         self.min_cad = df.cadence.min()
 
-    def __eq__(self, other) -> bool:
-        return self.range == other.range
-
-    def to_json(self) -> json:
-        return json.dumps(vars(self), indent=4)
-
+#todo remove testing code
+# df = pd.read_csv('../iobrocker/ride.csv')
+# c = CyclingInterval(id=1, activity_id=1, name='something', start=250, end=2500, dataframe=df)

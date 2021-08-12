@@ -9,8 +9,8 @@ import swagger_client
 from flask_login import current_user
 from swagger_client.rest import ApiException
 
-from IO import dbutil
-from middleware import Activity
+from iobrocker import dbutil
+
 
 
 def swagger_get_athlete(token: str) -> swagger_client.models.detailed_athlete:
@@ -88,10 +88,10 @@ def get_athlete(user_id: int = None) -> str:
     return json.dumps(athlete_info, default=str)
 
 
-def get_activities() -> list:
-    user_id = current_user.id
+def get_activities(user_id: int = None, **kwargs) -> list:
+    user_id = user_id if user_id else current_user.id
     _, token = dbutil.get_strava_athlete_id_and_token(user_id)
-    return swagger_get_activities(token=token)
+    return swagger_get_activities(token=token, **kwargs)
 
 
 def get_activity_by_id(activity_id: int, user_id: int = None) -> Optional[swagger_client.models.DetailedAthlete]:
@@ -114,6 +114,10 @@ def get_activity_streams(activity_id: int, user_id: int = None) -> Optional[swag
     streams = swagger_get_activity_streams(token=token, activity_id=activity_id)
     return streams
 
+
+def get_last_activity_id(user_id: int = None) -> Optional[int]:
+    activities = get_activities(user_id=user_id, page=1, per_page=1)
+    return activities[0].id
 
 
 

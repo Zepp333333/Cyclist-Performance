@@ -1,5 +1,4 @@
-from flask import render_template, request, Blueprint
-from cycperf.models import User
+from flask import render_template, Blueprint
 
 main = Blueprint('main', __name__)
 
@@ -8,7 +7,6 @@ main = Blueprint('main', __name__)
 @main.route("/home")
 @main.route("/index")
 def home():
-    page = request.args.get('page', 1, type=int)
     content = []
     return render_template('index.html', content=content)
 
