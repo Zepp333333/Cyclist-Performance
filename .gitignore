@@ -1,4 +1,6 @@
 cycperf/site.db
+site.db
+site.db.old
 *.db*
 *.env
 
