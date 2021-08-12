@@ -1,17 +1,21 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+"""
+Cycling Performance (cycperf) application lets you connecto to your profile at
+Strava.com, download activities and perform extensive analysis with emphasis on
+cycling activities and unique intent to enable post-interval recovery analysis on similar
+workouts.
+"""
 
 import dash
+import dash_bootstrap_components as dbc
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask.helpers import get_root_path
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
-from flask_mail import Mail
-from flask.helpers import get_root_path
 from flask_login import login_required
+from flask_mail import Mail
 from flask_migrate import Migrate
-
-
-import dash_bootstrap_components as dbc
+from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
 
@@ -37,17 +41,13 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     mail.init_app(app)
 
-
     from cycperf.main.routes import main
     from cycperf.users.routes import users
-    # from flaskblog.posts.routes import posts
-    # from flaskblog.errors.handlers import errors
+    # todo import errors.handlers
 
     app.register_blueprint(main)
     app.register_blueprint(users)
-    # app.register_blueprint(posts)
-    # app.register_blueprint(errors)
-    # app.register_blueprint(simple_dash)
+    # todo app.register_blueprint(errors)
 
     register_dash(app)
 
@@ -80,4 +80,3 @@ def _protect_dashviews(dashapp):
     for view_func in dashapp.server.view_functions:
         if view_func.startswith(dashapp.config.url_base_pathname):
             dashapp.server.view_functions[view_func] = login_required(dashapp.server.view_functions[view_func])
-

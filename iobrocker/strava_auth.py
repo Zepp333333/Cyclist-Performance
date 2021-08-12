@@ -1,12 +1,22 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
+from datetime import datetime
+
 import requests
-from config import Config
-from IO.strava_auth import BearerAuth
 from flask_login import current_user
+
+from config import Config
 from cycperf import db
 from cycperf.models import User
-from datetime import datetime
+
+
+class BearerAuth(requests.auth.AuthBase):
+    def __init__(self, token):
+        self.token = token
+
+    def __call__(self, r):
+        r.headers["authorization"] = "Bearer " + self.token
+        return r
 
 
 def prep_app_auth_url():
@@ -66,7 +76,7 @@ def check_token_expired(expiration: datetime):
 
 
 def retrieve_known_athlete(auth_response):
-    base_url = 'https://www.strava.com/api/v3/athlete'  #todo = move to config
+    base_url = 'https://www.strava.com/api/v3/athlete'  # todo = move to config
     response = requests.get(base_url, auth=BearerAuth(auth_response['access_token']))   # todo - add try/except
     store_athlete_access_token(auth_response)
     return response.json()

@@ -1,12 +1,14 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-from PIL import Image
 import os
 import secrets
+
+from PIL import Image
 from flask import url_for, current_app
-from cycperf import mail
-from flask_mail import Message
 from flask_login import current_user
+from flask_mail import Message
+
+from cycperf import mail
 
 
 def get_current_user_name():

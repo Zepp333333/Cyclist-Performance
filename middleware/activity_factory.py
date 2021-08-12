@@ -1,7 +1,7 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from .activity_new import Activity, CyclingActivity
+from .activity import Activity, CyclingActivity
 from .interval_factory import IntervalFactory, CyclingIntervalFactory
 
 
@@ -18,8 +18,7 @@ class ActivityFactory(ABC):
         """Returns interval belonging to this factory"""
 
 
-# todo rename to cycling activity factory
-class BikeActivityFactory(ActivityFactory):
+class CyclingActivityFactory(ActivityFactory):
     """Factory that represents combination of Cycling Activity and Cycling Interval.
        Doesn't maintain any of the instances it creates
        """
@@ -42,6 +41,6 @@ class BikeActivityFactory(ActivityFactory):
 
 # todo remove testing code
 # import pandas as pd
-# df = pd.read_csv('../IO/ride.csv')
-# f = BikeActivityFactory()
+# df = pd.read_csv('../iobrocker/ride.csv')
+# f = CyclingActivityFactory()
 # a = f.get_activity(id=1, name='activity1', dataframe=df)

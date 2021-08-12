@@ -2,14 +2,14 @@
 
 from flask import (render_template, url_for, flash,
                    redirect, Blueprint, request)
+from flask_login import login_user, current_user, logout_user, login_required
+
+from iobrocker import strava_auth
 from cycperf import db, bcrypt
 from cycperf.models import User
-from flask_login import login_user, current_user, logout_user, login_required
 from cycperf.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                  RequestResetForm, ResetPasswordForm)
 from cycperf.users.utils import save_picture, send_reset_email
-import IO.strava_io as strava_io
-from IO import strava
 
 users = Blueprint('users', __name__)
 
@@ -115,14 +115,14 @@ def reset_token(token):
 @users.route("/strava_login")
 @login_required
 def strava_login():
-    return redirect(strava_io.prep_app_auth_url())
+    return redirect(strava_auth.prep_app_auth_url())
 
 
 @users.route("/exchange_token")
 @login_required
 def strava_return():
-    if strava_io.check_strava_auth_return(request.args):
-        athlete = strava_io.retrieve_strava_athlete(auth_code=request.args['code'])
+    if strava_auth.check_strava_auth_return(request.args):
+        athlete = strava_auth.retrieve_strava_athlete(auth_code=request.args['code'])
         current_user.strava_id = athlete['id']
         db.session.commit()
         # strava.retrieve_and_store_users_activities(current_user.id)

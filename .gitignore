@@ -3,6 +3,12 @@ site.db
 site.db.old
 *.db*
 *.env
+*.old
+
+
+# IDE:
+workspace.xml
+tasks.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -51,6 +57,7 @@ coverage.xml
 *,cover
 .hypothesis/
 venv/
+venv2/
 .python-version
 
 # Translations

@@ -1,5 +1,5 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-from cycperf import create_app
+from .iowrapper import IO
 
-server = create_app()
+

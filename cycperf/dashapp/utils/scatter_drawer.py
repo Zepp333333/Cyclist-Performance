@@ -1,7 +1,8 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import pandas as pd
 import plotly.graph_objects as go
-from middleware import Interval, Activity
+
+from middleware import Activity
 
 
 class ScatterDrawer:

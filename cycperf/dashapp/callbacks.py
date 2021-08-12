@@ -7,10 +7,9 @@ from dash.dependencies import Input, Output, State
 from flask import url_for
 from flask_login import current_user
 
-from IO import strava_swagger
-from IO.iowrapper import IO
-from cycperf.dashapp import activity_main, calendar, test_strava, dash_external_redirect
-from middleware import Activity
+from cycperf.dashapp import activity_main, calendar, test_strava_methods_page, dash_external_redirect
+from iobrocker import IO
+from iobrocker import strava_swagger
 
 
 def register_callbacks(dashapp):
@@ -18,17 +17,17 @@ def register_callbacks(dashapp):
                       Output(component_id="username_placeholder", component_property="children"),
                       Input(component_id="url", component_property="pathname")
                       )
-    def render_page_content(pathname):
+    def render_page_content(pathname) -> dash.Dash.layout:
+        """
+        Callback defines general structure of an multi-page Dash app.
+        :param pathname: string
+        :return: layout
+        """
         if pathname == "/application/":
             return [
                        html.H1("Home page", style={"textAlign": "center"}),
                        calendar.layout
                    ], [current_user.username]
-        # elif pathname == "/login":
-        #     return [
-        #         html.H1("Login page", style={"textAlign": "center"}),
-        #         IO.strava2.r
-        #     ]
         elif pathname == "/application/activity":
             return [
                        activity_main.make_layout(user_id=current_user.id, activity_id=None)
@@ -46,7 +45,7 @@ def register_callbacks(dashapp):
             return [
                        html.H1("Activity", style={"textAlign": "center"}),
                        html.H2(current_user.id),
-                       test_strava.make_layout()
+                       test_strava_methods_page.make_layout()
                    ], [current_user.username]
         elif "/application/test" in pathname:
             activity_id = pathname.split("/")[-1]
@@ -72,7 +71,14 @@ def register_callbacks(dashapp):
         [State(component_id='my-fig', component_property='relayoutData')],
         prevent_initial_call=True
     )
-    def create_interval(n_clicks, data, relayout_data):
+    def create_interval(n_clicks: int, data: int, relayout_data: dict):
+        """
+        Creates an interval in current activity based on relayoutData and button click"
+        :param n_clicks: number of create_interval button clicks
+        :param data: dcc.store containing integer id of current activity
+        :param relayout_data: dict containing ends of a range slider (or user selection on a graph)
+        :return: go.Figure
+        """
         ctx = dash.callback_context
         if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
             interval_range = relayout_data_to_range(relayout_data)
@@ -99,6 +105,7 @@ def register_callbacks(dashapp):
         return dash.no_update
 
     def relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
+        """Helper fuction converting relaout_daya dict to tuple"""
         try:
             if len(relayout_data) == 1:
                 return int(relayout_data['xaxis.range'][0]), int(relayout_data['xaxis.range'][1])
@@ -115,6 +122,7 @@ def register_callbacks(dashapp):
         prevent_initial_call=True
     )
     def get_athlete(_):
+        # todo add docstrings
         athlete = strava_swagger.get_athlete()
         if athlete:
             return athlete, False
@@ -128,9 +136,10 @@ def register_callbacks(dashapp):
         prevent_initial_call=True
     )
     def get_activities(_):
+        # todo add docstrings
         activities = strava_swagger.get_activities()
         if activities:
-            return test_strava.make_table(activities), False
+            return test_strava_methods_page.make_table(activities), False
         else:
             return dash_external_redirect.redirect(url_for('users.strava_login')), True
 

@@ -1,17 +1,17 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-
 import json
 from datetime import datetime
+from typing import Optional
 
 import pandas as pd
 import swagger_client.models
 from flask_login import current_user
 
-from IO import dbutil
-from IO import strava_swagger
+from iobrocker import dbutil
+from iobrocker import strava_swagger
 from middleware import Activity
-from middleware import ActivityFactory, BikeActivityFactory
+from middleware import CyclingActivityFactory
 
 
 class ActivityNotFoundInDB(Exception):
@@ -28,7 +28,8 @@ def make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:
     df = pd.DataFrame()
     streams_dict = streams.to_dict()
     for key in streams_dict.keys():
-        df[key] = streams_dict[key]['data']
+        if streams_dict[key]:
+            df[key] = streams_dict[key]['data']
     return df
 
 
@@ -36,7 +37,13 @@ class IO:
     def __init__(self, user_id: int = None):
         self.user_id = user_id if user_id else current_user.id
 
+    def get_mock_up_ride(self):
+        df = dbutil.read_dataframe_from_csv(activity_id='ride.csv')
+        factory = CyclingActivityFactory()
+        return factory.get_activity(id=1, athlete_id=0, name='My ride', dataframe=df)
+
     def get_athlete_info(self) -> json:
+        # todo implement
         pass
 
     def get_list_of_activities(self, start_date: datetime, end_date: datetime):
@@ -68,17 +75,24 @@ class IO:
         else:
             raise  # todo implement exception
 
-    def get_strava_activity_by_id(self, activity_id: int) -> Activity:
+    def get_strava_activity_by_id(self, activity_id: int) -> Optional[Activity]:
 
         strava_activity = strava_swagger.get_activity_by_id(activity_id=int(activity_id),
                                                             user_id=self.user_id)
-        streams = strava_swagger.get_activity_streams(activity_id=int(activity_id),
-                                                      user_id=self.user_id)
-        df = make_df(streams)
-        activity = BikeActivityFactory().get_activity(
-            id=activity_id,
-            athlete_id=strava_activity.athlete.id,
-            name=strava_activity.name,
-            dataframe=df
-        )
-        return activity
+        if strava_activity:
+            streams = strava_swagger.get_activity_streams(activity_id=int(activity_id),
+                                                          user_id=self.user_id)
+            df = make_df(streams)
+            activity = CyclingActivityFactory().get_activity(
+                id=activity_id,
+                athlete_id=strava_activity.athlete.id,
+                name=strava_activity.name,
+                dataframe=df
+            )
+            return activity
+        else:
+            return None
+
+    def get_last_activity(self) -> Optional[Activity]:
+        last_activity_id = strava_swagger.get_last_activity_id(user_id=self.user_id)
+        return self.get_strava_activity_by_id(last_activity_id)
