@@ -7,7 +7,7 @@ from flask_login import current_user
 
 from config import Config
 from cycperf import db
-from cycperf.models import User
+from cycperf.models import Users
 
 
 class BearerAuth(requests.auth.AuthBase):
@@ -47,7 +47,7 @@ def check_strava_auth_return(args):
     return result
 
 
-def store_athlete_access_token(auth_response, user: User = None):
+def store_athlete_access_token(auth_response, user: Users = None):
     if not user:
         user = current_user
     user.strava_access_token = auth_response['access_token']
@@ -57,7 +57,7 @@ def store_athlete_access_token(auth_response, user: User = None):
 
 
 def refresh_access_token(token: str) -> None:
-    user = User.query.filter_by(strava_access_token=token).first()
+    user = Users.query.filter_by(strava_access_token=token).first()
     if check_token_expired(user.strava_token_expires_at):
         print("token expired, let's refresh it")
         params = {

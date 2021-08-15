@@ -1,7 +1,7 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import flask_login
 import pytest
-from cycperf.models import User
+from cycperf.models import Users
 from config import ConfigTest
 from flask.testing import FlaskClient
 
@@ -39,7 +39,7 @@ def client(flask_app):
 # def test_with_authenticated_user(app):
 #     @login_manager.request_loader
 #     def load_user_from_request(request):
-#         return User.query.first()
+#         return Users.query.first()
 #
 #
 # @pytest.fixture(scope='module')
@@ -48,10 +48,10 @@ def client(flask_app):
 #     db.create_all()
 #
 #     # Insert user data
-#     user1 = User(username='pat',
+#     user1 = Users(username='pat',
 #                  email='patkennedy79@gmail.com',
 #                  password=bcrypt.generate_password_hash('FlaskIsAwesome').decode('utf-8'))
-#     user2 = User(username='fam', email='kennedyfamilyrecipes@gmail.com', password='PaSsWoRd')
+#     user2 = Users(username='fam', email='kennedyfamilyrecipes@gmail.com', password='PaSsWoRd')
 #     db.session.add(user1)
 #     db.session.add(user2)
 #
@@ -66,11 +66,11 @@ def client(flask_app):
 #
 # @pytest.fixture(scope='module')
 # def new_user():
-#     return User(username='Vasya', email='vasya@mail.ru', password='123456')
+#     return Users(username='Vasya', email='vasya@mail.ru', password='123456')
 
 
 
 # @pytest.fixture
 # def authenticated_request(app):
 #     with app.test_request_context():
-#         yield flask_login.login_user(User(email='Sergey@mail.ru'))
+#         yield flask_login.login_user(Users(email='Sergey@mail.ru'))

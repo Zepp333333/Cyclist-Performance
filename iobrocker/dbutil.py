@@ -6,12 +6,12 @@ from typing import Optional
 import pandas as pd
 
 from cycperf import db
-from cycperf.models import User, DBActivity
+from cycperf.models import Users, DBActivity
 
 
 def get_strava_athlete_id_and_token(user_id):
     try:
-        athlete = User.query.filter_by(id=user_id).first()
+        athlete = Users.query.filter_by(id=user_id).first()
         return athlete.strava_id, athlete.strava_access_token  # todo include check and if needed refresh of token
     except AttributeError:
         return None
@@ -19,7 +19,7 @@ def get_strava_athlete_id_and_token(user_id):
 
 def get_athlete_info(athlete_id):
     try:
-        athlete = User.query.filter_by(strava_id=athlete_id).first()
+        athlete = Users.query.filter_by(strava_id=athlete_id).first()
         return athlete.strava_athlete_info
     except AttributeError:
         return None
@@ -27,7 +27,7 @@ def get_athlete_info(athlete_id):
 
 def update_user(user_id: int, update: dict = None):
     if update is not None:
-        user = User.query.filter_by(id=user_id).first()
+        user = Users.query.filter_by(id=user_id).first()
         for k, v in update.items():
             setattr(user, k, v)
         db.session.commit()

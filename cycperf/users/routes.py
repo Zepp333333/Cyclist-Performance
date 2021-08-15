@@ -6,7 +6,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 
 from iobrocker import strava_auth
 from cycperf import db, bcrypt
-from cycperf.models import User
+from cycperf.models import Users
 from cycperf.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                  RequestResetForm, ResetPasswordForm)
 from cycperf.users.utils import save_picture, send_reset_email
@@ -21,7 +21,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        user = Users(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created. You are now able to log in.', 'success')
@@ -35,7 +35,7 @@ def login():
         return redirect(url_for('main.home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = Users.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
@@ -74,7 +74,7 @@ def account():
 # @users.route("/user/<string:username>")
 # def user_posts(username):
 #     page = request.args.get('page', 1, type=int)
-#     user = User.query.filter_by(username=username).first_or_404()
+#     user = Users.query.filter_by(username=username).first_or_404()
 #     posts = Post.query.filter_by(author=user) \
 #         .order_by(Post.date_posted.desc()) \
 #         .paginate(page=page, per_page=5)
@@ -87,7 +87,7 @@ def reset_request():
         return redirect(url_for('main.home'))
     form = RequestResetForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = Users.query.filter_by(email=form.email.data).first()
         send_reset_email(user)
         flash('An email has been sent with instruction to reset your password', 'info')
         return redirect(url_for('users.login'))
@@ -98,7 +98,7 @@ def reset_request():
 def reset_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
-    user = User.verify_reset_token(token)
+    user = Users.verify_reset_token(token)
     if not user:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('users.reset_request'))
