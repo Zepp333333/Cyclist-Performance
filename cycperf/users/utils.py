@@ -5,15 +5,9 @@ import secrets
 
 from PIL import Image
 from flask import url_for, current_app
-from flask_login import current_user
 from flask_mail import Message
 
 from cycperf import mail
-
-
-def get_current_user_name():
-    return current_user.username
-
 
 
 def save_picture(form_picture):
