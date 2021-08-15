@@ -44,7 +44,7 @@ def upgrade():
     sa.Column('streams', sa.JSON(), nullable=True),
     sa.Column('df', sa.JSON(), nullable=True),
     sa.Column('intervals', sa.JSON(), nullable=True),
-    sa.Column('blob', sa.BLOB(), nullable=True),
+    sa.Column('blob', sa.LargeBinary(), nullable=True),
     sa.Column('comment', sa.Text(), nullable=True),
     sa.ForeignKeyConstraint(['athlete_id'], ['user.strava_id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),

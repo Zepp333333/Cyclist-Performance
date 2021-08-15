@@ -18,7 +18,6 @@ def get_strava_athlete_id_and_token(user_id):
 
 
 def get_athlete_info(athlete_id):
-    print("dbutil.get_athlete_info fired")
     try:
         athlete = User.query.filter_by(strava_id=athlete_id).first()
         return athlete.strava_athlete_info
