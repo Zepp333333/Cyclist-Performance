@@ -41,18 +41,22 @@ def swagger_get_activities(token: str,
                            before: int = datetime.now().timestamp(),
                            after: int = 0,
                            page: int = 1,
-                           per_page: int = 30) -> list[swagger_client.models.summary_activity.SummaryActivity]:
+                           per_page: int = 30,
+                           async_req=True) -> list[swagger_client.models.summary_activity.SummaryActivity]:
+    # todo make possible syncronous requests. No asyc behaviour is hardcoded
     configuration = swagger_client.Configuration()
     configuration.access_token = token
     api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configuration))
     try:
         # List Athlete Activities
-        api_response = api_instance.get_logged_in_athlete_activities(
+        thread = api_instance.get_logged_in_athlete_activities(
+            async_req=async_req,
             before=before,
             after=after,
             page=page,
             per_page=per_page
         )
+        api_response = thread.get()
         return api_response
     except ApiException as e:
         print("Exception when calling ActivitiesApi->getLoggedInAthleteActivities: %s\n" % e)

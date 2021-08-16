@@ -57,19 +57,20 @@ def create_app(config_class=Config):
 def register_dash(app):
     from cycperf.dashapp.layout import layout
     from cycperf.dashapp.callbacks import register_callbacks
+    from cycperf.dashapp.dash_index import index_string
 
     # Meta tags for viewport responsiveness
     meta_viewport = {"name": "viewport", "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
 
     dash_app = dash.Dash(__name__,
                          server=app,
+                         title='Cyclist Performance',
                          url_base_pathname='/application/',
                          external_stylesheets=[dbc.themes.BOOTSTRAP],
                          assets_folder=get_root_path(__name__) + 'dashboard/assets/',
                          meta_tags=[meta_viewport])
 
     with app.app_context():
-        dash_app.title = 'application'
         dash_app.layout = layout
         register_callbacks(dash_app)
 

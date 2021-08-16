@@ -96,3 +96,7 @@ class IO:
     def get_last_activity(self) -> Optional[Activity]:
         last_activity_id = strava_swagger.get_last_activity_id(user_id=self.user_id)
         return self.get_strava_activity_by_id(last_activity_id)
+
+    def is_strava_authorized(self):
+        _, token = dbutil.get_strava_athlete_id_and_token(self.user_id)
+        return True if token else False

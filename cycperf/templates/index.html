@@ -1,17 +1,61 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% for post in content.items %}
+<!--    {% for post in content.items %}
         <article class="media content-section">
             <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
           <div class="media-body">
             <div class="article-metadata">
-<!--              <a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{ post.author.username }}</a>-->
-<!--              <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>-->
+&lt;!&ndash;              <a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{ post.author.username }}</a>&ndash;&gt;
+&lt;!&ndash;              <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>&ndash;&gt;
             </div>
             <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
             <p class="article-content">{{ post.content }}</p>
           </div>
         </article>
-    {% endfor %}
+    {% endfor %}-->
+
+<!-- todo remove code above -->
+
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="container-full-bg">
+                <header class="jumbotron jumbotron-fluid vertical-center">
+                    <div class="container-fluid text-center">
+                        <h1 class="display-4">Cyclist Performance Analyser</h1>
+                        <p class="lead pb-4">Free Performance Management tool for Cyclists with emphasis on analysing
+                            cardiovascular and metabolic effects of training with power.</p>
+
+                            {% if current_user.is_authenticated %}
+                                {% if strava_authorized %}
+                                     <p class="lead pb-4">Please <a href="{{ url_for('/application/') }}">proceed</a> to the Application </p>
+                                {% else %}
+                                     <p class="lead pb-4">Please <a href="{{ url_for('users.strava_login') }}">authorize</a>
+                                         Cycling Performance to read your ride data from Strava.</p>
+                                {% endif %}
+                            {% else %}
+                                <p class="lead pb-4">Please <a href="{{ url_for('users.login') }}">login</a>
+                            or <a href="{{ url_for('users.register') }}">register</a> to start.</p>
+                            {% endif %}
+
+
+
+                        <p><a href="#" class="btn btn-primary btn-lg" role="button">Learn More</a></p>
+                    </div>
+                </header>
+            </div>
+
+        </div>
+        <div class="col">
+            <div class="container-full-bg">
+                <div class="container-fluid text-center">
+                    <img src="{{ url_for('static', filename='image.jpg') }}" class="img-fluid" alt="Cycling Image">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 {% endblock content %}

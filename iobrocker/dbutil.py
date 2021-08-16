@@ -82,6 +82,7 @@ def get_user_id_by_activity_id(activity_id: int) -> Optional[int]:
         return None
 
 
+
 def read_dataframe_from_csv(activity_id):
     # get relative data folder
     path = pathlib.Path(__file__).parent.parent

@@ -38,7 +38,9 @@ class Users(db.Model, UserMixin):
         return Users.query.get(user_id)
 
     def __repr__(self):
-        return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+        return f"User('{self.id}, {self.username}', '{self.email}', '{self.image_file}', " \
+               f"{self.strava_id}, {self.strava_scope}, {self.strava_access_token}, " \
+               f"{self.strava_token_expires_at})"
 
 
 class DBActivity(db.Model):

@@ -80,6 +80,7 @@ def account():
 #         .paginate(page=page, per_page=5)
 #     return render_template('user_posts.html', posts=posts, user=user)
 
+# todo implement accout deleete
 
 @users.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
@@ -116,7 +117,8 @@ def reset_token(token):
 @login_required
 def strava_login():
     return redirect(strava_auth.prep_app_auth_url())
-
+# todo consider the scenario if user creates new account in CP and tries to authorize already authorized strava account
+    # currently it leads to sqlalchemy.exc.IntegrityError
 
 @users.route("/exchange_token")
 @login_required

@@ -105,57 +105,6 @@ def retrieve_strava_athlete(auth_code, token=None):
         return retrieve_known_athlete(token)
     return retrieve_first_time_coming_athlete(auth_code)
 
-
-def retrieve_athlete_last_activity(token):
-    params = {
-        # "before": "",
-        # "after": "",
-        "page": 1,
-        "per_page": 1
-    }
-    base_url = "https://www.strava.com/api/v3/athlete/activities"
-    response = requests.get(base_url, params=params, auth=BearerAuth(token))
-    return response.json()
+#todo implement strava de-authorize
 
 
-def retrieve_athlete_activities(token):
-    params = {
-        # "before": "",
-        # "after": "",
-        "page": 1,
-        "per_page": 10
-    }
-    base_url = "https://www.strava.com/api/v3/athlete/activities"
-    response = requests.get(base_url, params=params, auth=BearerAuth(token))
-    return response.json()
-
-
-def retrieve_activity_by_id(activity_id, token):
-    params = {
-        'include_all_efforts': ''
-    }
-    base_url = "https://www.strava.com/api/v3/activities"
-    url = f"{base_url}/{activity_id}"
-    response = requests.get(url, params=params, auth=BearerAuth(token))
-    return response.json()
-
-
-def retrieve_laps_by_activity_id(activity_id, token):
-    params = {
-        'include_all_efforts': ''
-    }
-    base_url = "https://www.strava.com/api/v3/activities"
-    url = f"{base_url}/{str(activity_id)}/laps"
-    response = requests.get(url, params=params, auth=BearerAuth(token))
-    return response.json()
-
-
-def retrieve_activity_streams(activity_id, token):
-    params = {
-        'keys': 'time,distance,altitude,latlng,velocity_smooth,heartrate,cadence,watts,temp,moving,grade_smooth',
-        'key_by_type': ''
-    }
-    base_url = "https://www.strava.com/api/v3/activities"
-    url = f"{base_url}/{str(activity_id)}/streams"
-    response = requests.get(url, params=params, auth=BearerAuth(token))
-    return response.json()
