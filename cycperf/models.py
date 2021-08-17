@@ -1,5 +1,9 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
-
+"""
+Models for Flask SQLAlchemy.
+User - represents application user for authorization purposes
+DBActivity - represents Sport Activity metaphor
+"""
 from cycperf import db, login_manager
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -34,6 +38,7 @@ class Users(db.Model, UserMixin):
         try:
             user_id = s.loads(token)['user_id']
         except:
+            # todo get more narrow exception
             return None
         return Users.query.get(user_id)
 
@@ -56,6 +61,7 @@ class DBActivity(db.Model):
     comment = db.Column(db.Text)
 
 
+# todo remove
 class DBDataFrame(db.Model):
     activity_id = db.Column(db.Integer, db.ForeignKey('db_activity.activity_id'), primary_key=True, nullable=False)
     df_json = db.Column(db.JSON)

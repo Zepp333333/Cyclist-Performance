@@ -1,21 +1,31 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
+"""
+Users blueprint for the application
+"""
+
+from typing import Union
+
 from flask import (render_template, url_for, flash,
                    redirect, Blueprint, request)
 from flask_login import login_user, current_user, logout_user, login_required
 
-from iobrocker import strava_auth
 from cycperf import db, bcrypt
 from cycperf.models import Users
 from cycperf.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                  RequestResetForm, ResetPasswordForm)
 from cycperf.users.utils import save_picture, send_reset_email
+from iobrocker import strava_auth
 
 users = Blueprint('users', __name__)
 
 
 @users.route("/register", methods=['GET', 'POST'])
-def register():
+def register() -> Union[str, redirect]:
+    """
+    Register route
+    :return: rendered registration template or redirect to login
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = RegistrationForm()
@@ -30,7 +40,11 @@ def register():
 
 
 @users.route("/login", methods=['GET', 'POST'])
-def login():
+def login() -> Union[str, redirect]:
+    """
+    Login route
+    :return: rendered login template or redirect next or home page
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = LoginForm()
@@ -46,14 +60,22 @@ def login():
 
 
 @users.route("/logout")
-def logout():
+def logout() -> redirect:
+    """
+    Logout route
+    :return: rendered home template
+    """
     logout_user()
     return redirect(url_for('main.home'))
 
 
 @users.route("/account", methods=['GET', 'POST'])
 @login_required
-def account():
+def account() -> Union[str, redirect]:
+    """
+    Account Route
+    :return: rendered account template or redirects to account_template in case of POST request (eventually modified)
+    """
     form = UpdateAccountForm()
     if form.validate_on_submit():
         if form.picture.data:
@@ -71,19 +93,14 @@ def account():
     return render_template('account.html', title='Account', image_file=image_file, form=form)
 
 
-# @users.route("/user/<string:username>")
-# def user_posts(username):
-#     page = request.args.get('page', 1, type=int)
-#     user = Users.query.filter_by(username=username).first_or_404()
-#     posts = Post.query.filter_by(author=user) \
-#         .order_by(Post.date_posted.desc()) \
-#         .paginate(page=page, per_page=5)
-#     return render_template('user_posts.html', posts=posts, user=user)
-
-# todo implement accout deleete
+# todo implement account delete
 
 @users.route("/reset_password", methods=['GET', 'POST'])
-def reset_request():
+def reset_request() -> Union[str, redirect]:
+    """
+    Password reset request route
+    :return: rendered reset_request template or login if user is not logged in
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = RequestResetForm()
@@ -96,7 +113,12 @@ def reset_request():
 
 
 @users.route("/reset_password/<token>", methods=['GET', 'POST'])
-def reset_token(token):
+def reset_token(token: str) -> Union[str, redirect]:
+    """
+    Password reset token verification route
+    :param token:
+    :return: rendered reset_token template or reset request template if token invalid
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     user = Users.verify_reset_token(token)
@@ -115,19 +137,27 @@ def reset_token(token):
 
 @users.route("/strava_login")
 @login_required
-def strava_login():
+def strava_login() -> redirect:
+    """
+    strava_login route
+    :return: redirects user to strava.com for app authorization
+    """
     return redirect(strava_auth.prep_app_auth_url())
 # todo consider the scenario if user creates new account in CP and tries to authorize already authorized strava account
     # currently it leads to sqlalchemy.exc.IntegrityError
 
+
 @users.route("/exchange_token")
 @login_required
-def strava_return():
+def strava_return() -> redirect:
+    """
+    Return route from strava.com authorization procedure. Intended to capture authorization results as scopes
+    :return: redirects to application if authorization successful or to strava_login if not
+    """
     if strava_auth.check_strava_auth_return(request.args):
         athlete = strava_auth.retrieve_strava_athlete(auth_code=request.args['code'])
         current_user.strava_id = athlete['id']
         db.session.commit()
-        # strava.retrieve_and_store_users_activities(current_user.id)
         return redirect(url_for('/application/'))
     else:
         return redirect(url_for('users.strava_login'))

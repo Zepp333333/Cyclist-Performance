@@ -1,4 +1,8 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+"""
+Provides High level interface to Strava API and Database requests
+"""
+# todo rename module
 
 import json
 from datetime import datetime
@@ -24,21 +28,15 @@ class ActivityNotFoundInDB(Exception):
         super().__init__(message)
 
 
-def make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:
-    df = pd.DataFrame()
-    streams_dict = streams.to_dict()
-    for key in streams_dict.keys():
-        if streams_dict[key]:
-            df[key] = streams_dict[key]['data']
-    return df
-
-
 class IO:
+    """
+    Provides High level interface to Strava API and Database requests
+    """
     def __init__(self, user_id: int = None):
         self.user_id = user_id if user_id else current_user.id
 
-    def get_mock_up_ride(self):
-        df = dbutil.read_dataframe_from_csv(activity_id='ride.csv')
+    def build_mock_up_ride(self):
+        df = dbutil.read_dataframe_from_csv(filename='ride.csv')
         factory = CyclingActivityFactory()
         return factory.get_activity(id=1, athlete_id=0, name='My ride', dataframe=df)
 
@@ -82,7 +80,7 @@ class IO:
         if strava_activity:
             streams = strava_swagger.get_activity_streams(activity_id=int(activity_id),
                                                           user_id=self.user_id)
-            df = make_df(streams)
+            df = _make_df(streams)
             activity = CyclingActivityFactory().get_activity(
                 id=activity_id,
                 athlete_id=strava_activity.athlete.id,
@@ -100,3 +98,17 @@ class IO:
     def is_strava_authorized(self):
         _, token = dbutil.get_strava_athlete_id_and_token(self.user_id)
         return True if token else False
+
+
+def _make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:
+    """
+    Helper function - builds DstaFrame out of strava StreamSet
+    :param streams: strava StreamSet
+    :return: DataFrame
+    """
+    df = pd.DataFrame()
+    streams_dict = streams.to_dict()
+    for key in streams_dict.keys():
+        if streams_dict[key]:
+            df[key] = streams_dict[key]['data']
+    return df

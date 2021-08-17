@@ -1,6 +1,11 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+"""
+Admin module providing simple interface to querying and manipulating data in database.
+Use for development and debug purpose only
+"""
+
 from cycperf import db
-from cycperf.models import Users, DBActivity
+from cycperf.models import Users
 
 
 def delete_user(user_id: int) -> None:
@@ -17,6 +22,7 @@ def delete_users_strava_auth_info(user_id: int) -> None:
     user.strava_token_expires_at = None
     user.strava_athlete_info = None
     db.session.commit()
+
 
 def list_users() -> str:
     users = Users.query.all()

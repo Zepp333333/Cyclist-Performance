@@ -1,9 +1,12 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 """
-Cycling Performance (cycperf) application lets you connecto to your profile at
+Cycling Performance (cycperf) application lets you connect to to your profile at
 Strava.com, download activities and perform extensive analysis with emphasis on
 cycling activities and unique intent to enable post-interval recovery analysis on similar
 workouts.
+
+Module utilises Flask to run application, enable user management and authorization, as well as
+app authorization with Strava. Plotly/Dash is run under Flask to enable authorized access.
 """
 
 import dash
@@ -29,7 +32,12 @@ login_manager.login_message_category = 'info'
 mail = Mail()
 
 
-def create_app(config_class=Config):
+def create_app() -> Flask:
+    """
+    Instantiates Flask app together with required objects (db, flask-migrate, login_manager etc). Registers routes and
+    Dash application.
+    :return: instance of Flask app including registered Dash app
+    """
     app = Flask(__name__)
     app.config.from_object(Config)
 
@@ -54,10 +62,14 @@ def create_app(config_class=Config):
     return app
 
 
-def register_dash(app):
+def register_dash(app: Flask) -> None:
+    """
+    Registers Dash application under provided Flask app.
+    :param app: Instance of Flask app
+    :return: None
+    """
     from cycperf.dashapp.layout import layout
     from cycperf.dashapp.callbacks import register_callbacks
-    from cycperf.dashapp.dash_index import index_string
 
     # Meta tags for viewport responsiveness
     meta_viewport = {"name": "viewport", "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
@@ -74,10 +86,15 @@ def register_dash(app):
         dash_app.layout = layout
         register_callbacks(dash_app)
 
-    _protect_dashviews(dash_app)
+    _protect_dash_views(dash_app)
 
 
-def _protect_dashviews(dashapp):
-    for view_func in dashapp.server.view_functions:
-        if view_func.startswith(dashapp.config.url_base_pathname):
-            dashapp.server.view_functions[view_func] = login_required(dashapp.server.view_functions[view_func])
+def _protect_dash_views(dash_app: dash.Dash) -> None:
+    """
+    Protects Dash application views byt requiring login
+    :param dash_app: instance of Dash app to protect views for
+    :return:
+    """
+    for view_func in dash_app.server.view_functions:
+        if view_func.startswith(dash_app.config.url_base_pathname):
+            dash_app.server.view_functions[view_func] = login_required(dash_app.server.view_functions[view_func])

@@ -10,7 +10,8 @@ from cycperf import create_app, db, bcrypt, login_manager
 
 @pytest.fixture(scope='module')
 def flask_app():
-    app = create_app(config_class=ConfigTest)
+    app = create_app()
+    app.config.from_object(ConfigTest)
     with app.app_context():
         yield app
 

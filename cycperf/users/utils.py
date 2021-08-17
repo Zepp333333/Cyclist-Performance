@@ -1,5 +1,10 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
+"""
+Utilities for main blueprint. Include:
+    - user picture management
+    - password reset mailing
+"""
 import os
 import secrets
 

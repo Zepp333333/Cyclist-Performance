@@ -29,7 +29,7 @@ def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
 
 def make_layout(user_id=None, activity_id=None) -> dash.Dash.layout:
     if not user_id:
-        return _make_layout(user_id=0, activity=IO(0).get_mock_up_ride())
+        return _make_layout(user_id=0, activity=IO(0).build_mock_up_ride())
     if not activity_id:
         return _make_layout(user_id, IO(user_id=user_id).get_last_activity())
     return _make_layout(user_id, IO().get_activity_by_id(int(activity_id)))

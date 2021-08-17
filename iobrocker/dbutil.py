@@ -1,5 +1,8 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
-
+"""
+Database utilities module for Cyclist Performance application
+Provides lower level interface to data manipulation in database (and file system for test purposes)
+"""
 import pathlib
 from typing import Optional
 
@@ -9,7 +12,12 @@ from cycperf import db
 from cycperf.models import Users, DBActivity
 
 
-def get_strava_athlete_id_and_token(user_id):
+def get_strava_athlete_id_and_token(user_id: int) -> Optional[tuple[int, str]]:
+    """
+    Looks up strava athlete_id and strava token for cycperf user in database
+    :param user_id: cycperf user id
+    :return: tuple[athlete_id, token]
+    """
     try:
         athlete = Users.query.filter_by(id=user_id).first()
         return athlete.strava_id, athlete.strava_access_token  # todo include check and if needed refresh of token
@@ -17,7 +25,12 @@ def get_strava_athlete_id_and_token(user_id):
         return None
 
 
-def get_athlete_info(athlete_id):
+def get_athlete_info(athlete_id: int) -> Optional[str]:
+    """
+        Looks up athlete info in database
+        :param user_id: cycperf user id
+        :return: strava athlete info (JSON string)
+        """
     try:
         athlete = Users.query.filter_by(strava_id=athlete_id).first()
         return athlete.strava_athlete_info
@@ -25,7 +38,13 @@ def get_athlete_info(athlete_id):
         return None
 
 
-def update_user(user_id: int, update: dict = None):
+def update_user(user_id: int, update: dict = None) -> None:
+    """
+    updates Cycperf user record in database
+    :param user_id: Cycperf user id
+    :param update: dict of filed:value to update
+    :return:
+    """
     if update is not None:
         user = Users.query.filter_by(id=user_id).first()
         for k, v in update.items():
@@ -34,6 +53,11 @@ def update_user(user_id: int, update: dict = None):
 
 
 def get_activity_from_db(activity_id: int) -> Optional[bytes]:
+    """
+        Looks up cycperf activity pickled object in database
+        :param activity_id: strava activity id
+        :return: cycperf activity pickled object (bytes)
+        """
     try:
         db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
         return db_activity.pickle
@@ -42,11 +66,15 @@ def get_activity_from_db(activity_id: int) -> Optional[bytes]:
         return None
 
 
-def create_new_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes):
-    # db_activity = DBActivity(activity_id=activity_id,
-    #                          user_id=user_id,
-    #                          athlete_id=athlete_id,
-    #                          pickle=pickle)
+def create_new_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes) -> None:
+    """
+    Creates new cycperf DBActivity object and stores it in database
+    :param user_id: cycperf user id
+    :param athlete_id: strava athlete id
+    :param activity_id: strava activity id
+    :param pickle: pickled Activity
+    :return: None
+    """
     db_activity = DBActivity()
     db_activity.user_id = user_id
     db_activity.athlete_id = athlete_id
@@ -56,7 +84,15 @@ def create_new_activity(user_id: int, athlete_id: int, activity_id: int, pickle:
     db.session.commit()
 
 
-def store_cycperf_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes):
+def store_cycperf_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes) -> None:
+    """
+    Stores Cycperf Activity in database
+    :param user_id: cycperf user id
+    :param athlete_id: strava athlete id
+    :param activity_id: strava activity id
+    :param pickle: pickled Activity
+    :return: None
+    """
     # todo rename
     db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
     if db_activity:
@@ -67,6 +103,12 @@ def store_cycperf_activity(user_id: int, athlete_id: int, activity_id: int, pick
 
 
 def delete_activity(user_id: int, activity_id: int) -> None:
+    """
+    Deletes stored Activity
+    :param user_id: Cycperf user id
+    :param activity_id: strava activity id
+    :return: None
+    """
     # todo implement: check if activity belongs to user_id
     db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
     db.session.delete(db_activity)
@@ -74,7 +116,11 @@ def delete_activity(user_id: int, activity_id: int) -> None:
 
 
 def get_user_id_by_activity_id(activity_id: int) -> Optional[int]:
-    """Returns user_id associated to an activity in db"""
+    """
+    Returns user_id associated to an activity in db
+    :param activity_id: strava activity id
+    :return: None
+    """
     db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
     if db_activity:
         return db_activity.user_id
@@ -82,9 +128,13 @@ def get_user_id_by_activity_id(activity_id: int) -> Optional[int]:
         return None
 
 
-
-def read_dataframe_from_csv(activity_id):
+def read_dataframe_from_csv(filename) -> pd.DataFrame:
+    """
+    Reads csv file containing activity streams and returns pd.DataFrame
+    :param filename: csv file name
+    :return: DataFrame with activity streams
+    """
     # get relative data folder
     path = pathlib.Path(__file__).parent.parent
     data_path = path.joinpath("iobrocker").resolve()
-    return pd.read_csv(data_path.joinpath(activity_id))
+    return pd.read_csv(data_path.joinpath(filename))

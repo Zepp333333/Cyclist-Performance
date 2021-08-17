@@ -1,5 +1,7 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
-
+"""
+Forms for users blueprint
+"""
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -10,6 +12,9 @@ from cycperf.models import Users
 
 
 class RegistrationForm(FlaskForm):
+    """
+    User Registration Form
+    """
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
@@ -31,6 +36,9 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
+    """
+    User Login Form
+    """
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -39,6 +47,9 @@ class LoginForm(FlaskForm):
 
 
 class UpdateAccountForm(FlaskForm):
+    """
+    Update Account Form
+    """
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
@@ -60,6 +71,9 @@ class UpdateAccountForm(FlaskForm):
 
 
 class RequestResetForm(FlaskForm):
+    """
+    Password Reset Request From
+    """
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
     submit = SubmitField('Request Password Reset')
@@ -71,6 +85,9 @@ class RequestResetForm(FlaskForm):
 
 
 class ResetPasswordForm(FlaskForm):
+    """
+    Password Reset Form
+    """
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
