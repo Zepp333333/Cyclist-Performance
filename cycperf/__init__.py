@@ -17,7 +17,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_login import login_required
 from flask_mail import Mail
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
@@ -32,18 +32,20 @@ login_manager.login_message_category = 'info'
 mail = Mail()
 
 
-def create_app() -> Flask:
+def create_app(config_class=Config) -> Flask:
     """
     Instantiates Flask app together with required objects (db, flask-migrate, login_manager etc). Registers routes and
     Dash application.
     :return: instance of Flask app including registered Dash app
     """
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config_class)
 
     db.init_app(app)
 
     migrate.init_app(app, db)
+    # with app.app_context():
+    #     upgrade()
 
     bcrypt.init_app(app)
     login_manager.init_app(app)

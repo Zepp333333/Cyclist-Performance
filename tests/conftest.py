@@ -1,31 +1,65 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
-import flask_login
 import pytest
-from cycperf.models import Users
+import sqlalchemy
+from sqlalchemy.orm import close_all_sessions
+from cycperf import create_app
+from flask_migrate import upgrade
+
 from config import ConfigTest
-from flask.testing import FlaskClient
+
+TEST_DB_NAME = ConfigTest.TEST_DB_NAME
 
 
-from cycperf import create_app, db, bcrypt, login_manager
+@pytest.fixture(scope='session')
+def create_test_db():
+    # todo add docstring
+    def _create_test_db():
+        with sqlalchemy.create_engine("postgresql://postgres@localhost",
+                                      isolation_level="AUTOCOMMIT").connect() as connection:
+            connection.execute(f'CREATE DATABASE {TEST_DB_NAME}')
 
-@pytest.fixture(scope='module')
-def flask_app():
-    app = create_app()
-    app.config.from_object(ConfigTest)
-    with app.app_context():
-        yield app
+    yield _create_test_db()
+
+    # Tear down
+    def _drop_test_db():
+        with sqlalchemy.create_engine("postgresql://postgres@localhost",
+                                      isolation_level="AUTOCOMMIT").connect() as connection:
+            close_all_sessions()
+            connection.execute(f'DROP DATABASE {TEST_DB_NAME} WITH (FORCE)')
 
 
-@pytest.fixture(scope='module')
-def client(flask_app):
-    app = flask_app
-    ctx = flask_app.test_request_context()
+@pytest.fixture(scope='session')
+def test_client(create_test_db):
+    # todo add docstring
+    _app = create_app(ConfigTest)
+    with _app.app_context():
+        upgrade()
+    testing_client = _app.test_client()
+    ctx = _app.app_context()
     ctx.push()
-    app.test_client_class = FlaskClient
-    return app.test_client()
+    yield testing_client
+    # Tear down
+    ctx.pop()
 
 
 
+
+
+# @pytest.fixture(scope='module')
+# def flask_app():
+#     app = create_app()
+#     app.config.from_object(ConfigTest)
+#     with app.app_context():
+#         yield app
+#
+#
+# @pytest.fixture(scope='module')
+# def client(flask_app):
+#     app = flask_app
+#     ctx = flask_app.test_request_context()
+#     ctx.push()
+#     app.test_client_class = FlaskClient
+#     return app.test_client()
 
 # @pytest.fixture(scope='module')
 # def test_client():
@@ -68,7 +102,6 @@ def client(flask_app):
 # @pytest.fixture(scope='module')
 # def new_user():
 #     return Users(username='Vasya', email='vasya@mail.ru', password='123456')
-
 
 
 # @pytest.fixture
