@@ -7,9 +7,30 @@ import pathlib
 from typing import Optional
 
 import pandas as pd
+import sqlalchemy.exc
 
 from cycperf import db
 from cycperf.models import Users, DBActivity
+
+
+class DuplicateActivity(Exception):
+    """Custom error in case of attempt to store duplicate activity """
+
+    # todo consider moving to exceptions package
+    def __init__(self, id: int, message: str) -> None:
+        self.id = id
+        self.message = message
+        super().__init__(message)
+
+
+class UserDoesNotExist(Exception):
+    """Custom error in case of attempt to store duplicate activity """
+
+    # todo consider moving to exceptions package
+    def __init__(self, id: int, message: str) -> None:
+        self.id = id
+        self.message = message
+        super().__init__(message)
 
 
 def get_strava_athlete_id_and_token(user_id: int) -> Optional[tuple[int, str]]:
@@ -25,14 +46,14 @@ def get_strava_athlete_id_and_token(user_id: int) -> Optional[tuple[int, str]]:
         return None
 
 
-def get_athlete_info(athlete_id: int) -> Optional[str]:
+def get_athlete_info(user_id: int) -> Optional[str]:
     """
         Looks up athlete info in database
         :param user_id: cycperf user id
         :return: strava athlete info (JSON string)
         """
     try:
-        athlete = Users.query.filter_by(strava_id=athlete_id).first()
+        athlete = Users.query.filter_by(id=user_id).first()
         return athlete.strava_athlete_info
     except AttributeError:
         return None
@@ -47,9 +68,12 @@ def update_user(user_id: int, update: dict = None) -> None:
     """
     if update is not None:
         user = Users.query.filter_by(id=user_id).first()
-        for k, v in update.items():
-            setattr(user, k, v)
-        db.session.commit()
+        if user:
+            for k, v in update.items():
+                setattr(user, k, v)
+            db.session.commit()
+        else:
+            raise UserDoesNotExist(id=user_id, message=f"User id {user_id} doesn't exist in database")
 
 
 def get_activity_from_db(activity_id: int) -> Optional[bytes]:
@@ -66,7 +90,7 @@ def get_activity_from_db(activity_id: int) -> Optional[bytes]:
         return None
 
 
-def create_new_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes) -> None:
+def _store_new_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes) -> None:
     """
     Creates new cycperf DBActivity object and stores it in database
     :param user_id: cycperf user id
@@ -75,16 +99,21 @@ def create_new_activity(user_id: int, athlete_id: int, activity_id: int, pickle:
     :param pickle: pickled Activity
     :return: None
     """
+    # todo add try/except + handling in IO class. Modify tests accordingly
     db_activity = DBActivity()
     db_activity.user_id = user_id
     db_activity.athlete_id = athlete_id
     db_activity.activity_id = activity_id
     db_activity.pickle = pickle
-    db.session.add(db_activity)
-    db.session.commit()
+    try:
+        db.session.add(db_activity)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
+        raise DuplicateActivity(id=activity_id, message=f"Attempt to store duplicate activity id {activity_id}")
 
 
-def store_cycperf_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes) -> None:
+def store_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes) -> None:
     """
     Stores Cycperf Activity in database
     :param user_id: cycperf user id
@@ -99,7 +128,7 @@ def store_cycperf_activity(user_id: int, athlete_id: int, activity_id: int, pick
         db_activity.pickle = pickle
         db.session.commit()
     else:
-        create_new_activity(user_id, athlete_id, activity_id, pickle)
+        _store_new_activity(user_id, athlete_id, activity_id, pickle)
 
 
 def delete_activity(user_id: int, activity_id: int) -> None:
@@ -128,13 +157,15 @@ def get_user_id_by_activity_id(activity_id: int) -> Optional[int]:
         return None
 
 
-def read_dataframe_from_csv(filename) -> pd.DataFrame:
+def read_dataframe_from_csv(filename: str = "ride.csv", data_path: str = None) -> pd.DataFrame:
     """
     Reads csv file containing activity streams and returns pd.DataFrame
+    :param data_path: relative path to directory containing csv file
     :param filename: csv file name
     :return: DataFrame with activity streams
     """
     # get relative data folder
     path = pathlib.Path(__file__).parent.parent
-    data_path = path.joinpath("iobrocker").resolve()
+    if not data_path:
+        data_path = path.joinpath("tests/testing_data").resolve()
     return pd.read_csv(data_path.joinpath(filename))

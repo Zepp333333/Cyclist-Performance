@@ -58,7 +58,7 @@ class IO:
 
     def save_activity(self, activity: Activity):
         """Saves Activity object to db"""
-        dbutil.store_cycperf_activity(
+        dbutil.store_activity(
             user_id=self.user_id,
             athlete_id=activity.athlete_id,
             activity_id=activity.id,

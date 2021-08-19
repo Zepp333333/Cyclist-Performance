@@ -30,6 +30,7 @@ class ConfigTest:
     DEBUG = True
     SECRET_KEY = os.environ.get('SECRET_KEY')
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASEDIR, 'app_test.db')
+    TEST_DATABASE_SERVER = 'postgresql://postgres@localhost'
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/cp_test_db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

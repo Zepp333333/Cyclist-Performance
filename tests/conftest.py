@@ -10,11 +10,21 @@ from config import ConfigTest
 TEST_DB_NAME = ConfigTest.TEST_DB_NAME
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
+def create_db_connection():
+    # todo add docstring
+    connection = sqlalchemy.create_engine(ConfigTest.SQLALCHEMY_DATABASE_URI,
+                                          isolation_level="AUTOCOMMIT").connect()
+    yield connection
+    # Tear down
+    connection.close()
+
+
+@pytest.fixture(scope='module')
 def create_test_db():
     # todo add docstring
     def _create_test_db():
-        with sqlalchemy.create_engine("postgresql://postgres@localhost",
+        with sqlalchemy.create_engine(ConfigTest.TEST_DATABASE_SERVER,
                                       isolation_level="AUTOCOMMIT").connect() as connection:
             connection.execute(f'CREATE DATABASE {TEST_DB_NAME}')
 
@@ -22,13 +32,36 @@ def create_test_db():
 
     # Tear down
     def _drop_test_db():
-        with sqlalchemy.create_engine("postgresql://postgres@localhost",
+        with sqlalchemy.create_engine(ConfigTest.TEST_DATABASE_SERVER,
                                       isolation_level="AUTOCOMMIT").connect() as connection:
             close_all_sessions()
             connection.execute(f'DROP DATABASE {TEST_DB_NAME} WITH (FORCE)')
 
+    _drop_test_db()
 
-@pytest.fixture(scope='session')
+
+# @pytest.fixture(scope='session')
+# def create_test_db():
+#     # todo add docstring
+#     def _create_test_db():
+#         with sqlalchemy.create_engine("postgresql://postgres@localhost",
+#                                       isolation_level="AUTOCOMMIT").connect() as connection:
+#             connection.execute(f'CREATE DATABASE {TEST_DB_NAME}')
+#
+#     yield _create_test_db()
+
+# # Tear down
+# def _drop_test_db():
+#     print("_in _drop_test_db")
+#     with sqlalchemy.create_engine("postgresql://postgres@localhost",
+#                                   isolation_level="AUTOCOMMIT").connect() as connection:
+#         close_all_sessions()
+#         connection.execute(f'DROP DATABASE {TEST_DB_NAME} WITH (FORCE)')
+#
+# _drop_test_db()
+
+
+@pytest.fixture(scope='module')
 def test_client(create_test_db):
     # todo add docstring
     _app = create_app(ConfigTest)
@@ -40,10 +73,6 @@ def test_client(create_test_db):
     yield testing_client
     # Tear down
     ctx.pop()
-
-
-
-
 
 # @pytest.fixture(scope='module')
 # def flask_app():

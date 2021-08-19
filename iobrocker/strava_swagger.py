@@ -84,7 +84,7 @@ def get_athlete(user_id: int = None) -> str:
     if not athlete_id:
         return ''
     # Attempt to load athlete from db
-    athlete_info = dbutil.get_athlete_info(athlete_id)
+    athlete_info = dbutil.get_athlete_info(user_id)
     # if not in db -> get from strava API and store in db
     if not athlete_info:
         athlete_info = swagger_get_athlete(token).to_dict()
