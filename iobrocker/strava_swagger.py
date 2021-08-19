@@ -12,7 +12,6 @@ from swagger_client.rest import ApiException
 from iobrocker import dbutil
 
 
-
 def swagger_get_athlete(token: str) -> swagger_client.models.detailed_athlete:
     configuration = swagger_client.Configuration()
     configuration.access_token = token

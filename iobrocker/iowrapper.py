@@ -12,10 +12,12 @@ import pandas as pd
 import swagger_client.models
 from flask_login import current_user
 
-from iobrocker import dbutil
+from iobrocker import dbutil, strava_auth
 from iobrocker import strava_swagger
 from middleware import Activity
 from middleware import CyclingActivityFactory
+
+from cycperf.models import Users
 
 
 class ActivityNotFoundInDB(Exception):
@@ -35,17 +37,19 @@ class IO:
     def __init__(self, user_id: int = None):
         self.user_id = user_id if user_id else current_user.id
 
+        if self.is_strava_token_expired():
+            self.refresh_token()
+
     def build_mock_up_ride(self):
         df = dbutil.read_dataframe_from_csv(filename='ride.csv')
         factory = CyclingActivityFactory()
         return factory.get_activity(id=1, athlete_id=0, name='My ride', dataframe=df)
 
     def get_athlete_info(self) -> json:
-        # todo implement
-        pass
+        raise NotImplemented
 
     def get_list_of_activities(self, start_date: datetime, end_date: datetime):
-        pass
+        raise NotImplemented
 
     def get_activity_by_id(self, activity_id: int) -> Activity:
         # try getting activity pickle from DB, deserialize and return
@@ -98,6 +102,16 @@ class IO:
     def is_strava_authorized(self):
         _, token = dbutil.get_strava_athlete_id_and_token(self.user_id)
         return True if token else False
+
+    def is_strava_token_expired(self) -> bool:
+        # todo refactor | simplify -> move out somewhere
+        expiration = dbutil.get_user(self.user_id).strava_token_expires_at
+        if expiration:
+            return strava_auth.is_token_expired(expiration)
+        return False
+
+    def refresh_token(self):
+        strava_auth.refresh_access_token(self.user_id)
 
 
 def _make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:

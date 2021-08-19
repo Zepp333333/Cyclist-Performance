@@ -33,6 +33,15 @@ class UserDoesNotExist(Exception):
         super().__init__(message)
 
 
+def get_user(user_id: int) -> Users:
+    """
+    Locats in DB and returns user based on user_id
+    :return: instance of Users
+    """
+    user = Users.query.filter_by(id=user_id).first()
+    return user if user else None
+
+
 def get_strava_athlete_id_and_token(user_id: int) -> Optional[tuple[int, str]]:
     """
     Looks up strava athlete_id and strava token for cycperf user in database

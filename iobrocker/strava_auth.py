@@ -56,23 +56,22 @@ def store_athlete_access_token(auth_response, user: Users = None):
     db.session.commit()
 
 
-def refresh_access_token(token: str) -> None:
-    user = Users.query.filter_by(strava_access_token=token).first()
-    if check_token_expired(user.strava_token_expires_at):
-        print("token expired, let's refresh it")
-        params = {
-            "client_id": Config.STRAVA_APP_CLIENT_ID,
-            "client_secret": Config.STRAVA_APP_CLIENT_SECRET,
-            "grant_type": "refresh_token",
-            "refresh_token": user.strava_refresh_token
+def refresh_access_token(user_id: int) -> None:
+    user = Users.query.filter_by(id=user_id).first()
+    params = {
+        "client_id": Config.STRAVA_APP_CLIENT_ID,
+        "client_secret": Config.STRAVA_APP_CLIENT_SECRET,
+        "grant_type": "refresh_token",
+        "refresh_token": user.strava_refresh_token
         }
-        base_url = 'https://www.strava.com/api/v3/oauth/token'
-        response = requests.post(base_url, params=params).json()
-        store_athlete_access_token(response, user=user)
+    base_url = 'https://www.strava.com/api/v3/oauth/token'
+    response = requests.post(base_url, params=params).json()
+    store_athlete_access_token(response, user=user)
 
 
-def check_token_expired(expiration: datetime):
-    return expiration < datetime.now()
+def is_token_expired(expiration: datetime) -> bool:
+    now = datetime.utcnow()
+    return (expiration - now).days < 0 or (expiration - now).seconds < 3600
 
 
 def retrieve_known_athlete(auth_response):

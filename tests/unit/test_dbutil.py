@@ -3,11 +3,10 @@ from datetime import datetime
 
 import pandas
 import pytest
-import sqlalchemy.sql.sqltypes
 
+from cycperf.models import DBActivity, Users
 from iobrocker import dbutil, dbutil_admin
 from middleware import Activity, CyclingActivityFactory
-from cycperf.models import DBActivity
 
 
 @pytest.fixture(scope='module')
@@ -51,6 +50,17 @@ def mock_activity():
                                                      athlete_id=123456,
                                                      dataframe=mock_dataframe)
     return activity
+
+
+def test_get_user(populate_db, test_user_id):
+    # testing existing user
+    user = dbutil.get_user(test_user_id)
+    assert isinstance(user, Users)
+    assert user.username == "JohnTest"
+
+    # testing non-existing user
+    user = dbutil.get_user(153)
+    assert user is None
 
 
 def test_get_strava_athlete_id_and_token(populate_db, test_user_id):
