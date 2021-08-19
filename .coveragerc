@@ -1,0 +1,13 @@
+[run]
+omit =
+    generated/*
+    venv*/*
+    Tests_old/*
+    migrations/*
+
+[report]
+omit =
+    generated/*
+    venv*/*
+    Tests_old/*
+    migrations/*

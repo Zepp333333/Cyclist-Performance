@@ -148,7 +148,7 @@ def get_user_id_by_activity_id(activity_id: int) -> Optional[int]:
     """
     Returns user_id associated to an activity in db
     :param activity_id: strava activity id
-    :return: None
+    :return: user_id or None
     """
     db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
     if db_activity:

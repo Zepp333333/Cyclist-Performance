@@ -166,8 +166,12 @@ def test_delete_activity(populate_db, test_user_id, create_db_connection):
 
 
 def test_get_user_id_by_activity_id(populate_db, test_user_id):
+    # test function providing existing activity
     user_id = dbutil.get_user_id_by_activity_id(activity_id=999999)
     assert user_id == test_user_id
+    # test function providing non-existing activity
+    user_id = dbutil.get_user_id_by_activity_id(activity_id=555555)
+    assert user_id is None
 
 
 def test_read_dataframe_from_csv():
