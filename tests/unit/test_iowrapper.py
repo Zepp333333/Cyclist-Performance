@@ -1,0 +1,64 @@
+#  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+import pandas as pd
+import pytest
+from iobrocker import dbutil, IO
+
+
+class TestIowrapper():
+
+    def test_build_mock_up_ride():
+        assert False
+
+    def test_get_athlete_info():
+        assert False
+
+    def test_get_list_of_activities():
+        assert False
+
+    def test_get_strava_activities():
+        assert False
+
+    def test__build_activity():
+        assert False
+
+    def test_get_activity_by_id(self, test_user_id, test_client, mock_activity):
+        io = IO(test_user_id, token_refresh=False)
+        io.save_activity(mock_activity)
+        activity = io.get_activity_by_id(5806863104)
+        assert activity.id == 5806863104
+        assert isinstance(activity.dataframe, pd.DataFrame)
+
+    def test_save_activities():
+        assert False
+
+    def test_save_activity(self, test_user_id, test_client, mock_activity, create_db_connection):
+        io = IO(test_user_id, token_refresh=False)
+        io.save_activity(mock_activity)
+        with create_db_connection as connection:
+            select = connection.execute(f"SELECT * FROM db_activity").fetchall()
+
+        assert select[0].activity_id == 5806863104
+        assert select[0].user_id == test_user_id
+        assert select[0].athlete_id == 21932478
+        assert "Whole Activity" in select[0].intervals
+
+    def test_delete_activity_by_id():
+        assert False
+
+    def test_get_strava_activity_by_id():
+        assert False
+
+    def test_get_last_activity():
+        assert False
+
+    def test_is_strava_authorized():
+        assert False
+
+    def test_is_strava_token_expired():
+        assert False
+
+    def test_refresh_token():
+        assert False
+
+    def test_build_activity():
+        assert False

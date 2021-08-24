@@ -54,3 +54,8 @@ def drop_test_db() -> None:
 def add_activity(db_activity: DBActivity) -> None:
     db.session.add(db_activity)
     db.session.commit()
+
+
+def clean_db_activity() -> None:
+    raise NotImplemented
+    db.create_engine().execute("TRUNCATE TABLE DB_ACTIVITY")

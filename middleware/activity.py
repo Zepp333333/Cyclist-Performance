@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import datetime
 import pickle
 from abc import ABC
 from dataclasses import dataclass, field
 
 import pandas as pd
+import swagger_client.models
 
 from .interval_factory import IntervalFactory
 from .interval import Interval
@@ -14,6 +16,7 @@ from .interval import Interval
 
 class IntervalDoNotExit(Exception):
     """Custom error in case accessing non-existent interval"""
+
     # todo consider moving to exceptions package
     def __init__(self, name: str, id: int, message: str) -> None:
         self.name = name
@@ -29,7 +32,9 @@ class Activity(ABC):
     id: int
     name: str
     athlete_id: int
+    date: datetime.datetime
     dataframe: pd.DataFrame
+    details: str
     intervals: list[Interval] = field(default_factory=list[Interval])
     type: str = 'bike'
 
@@ -48,7 +53,7 @@ class Activity(ABC):
     def new_interval(self, start: int, end: int, name: str = None) -> None:
         # todo: add code to check correctness of interval range
         if not name:
-            name = self.generate_interval_name()
+            name = self._generate_interval_name()
         self.add_intervals([self.make_interval(start, end, name)])
 
     def add_intervals(self, new_intervals: list[Interval]) -> None:
@@ -64,7 +69,7 @@ class Activity(ABC):
                                end=end,
                                dataframe=self.dataframe)
 
-    def generate_interval_name(self) -> str:
+    def _generate_interval_name(self) -> str:
         proposed_name = f"Interval {len(self.intervals)}"
         return proposed_name
 
@@ -85,6 +90,7 @@ class Activity(ABC):
     @classmethod
     def from_pickle(cls, pickle_str) -> Activity:
         return pickle.loads(pickle_str)
+
 
 
 @dataclass

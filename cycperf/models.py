@@ -49,16 +49,16 @@ class Users(db.Model, UserMixin):
 
 
 class DBActivity(db.Model):
-    activity_id = db.Column(db.Integer, primary_key=True)
+    activity_id = db.Column(db.BigInteger, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     athlete_id = db.Column(db.Integer, db.ForeignKey('users.strava_id'), nullable=False)
-    json = db.Column(db.JSON)
+    date = db.Column(db.DateTime(timezone=False), nullable=False)
+    details = db.Column(db.JSON)
     laps = db.Column(db.JSON)
     streams = db.Column(db.JSON)
-    df_json = db.Column(db.JSON)
+    dataframe = db.Column(db.JSON)
     intervals = db.Column(db.JSON)
     pickle = db.Column(db.LargeBinary())
-    comment = db.Column(db.Text)
 
 
 # todo remove

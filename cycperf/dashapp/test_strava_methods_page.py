@@ -45,6 +45,18 @@ def make_layout():
                                 id='btn_get_activities',
                                 n_clicks=0,
                                 className='btn btn-primary'),
+                    html.Br(),
+                    html.Br(),
+                    html.Button('Save Activities',
+                                id='btn_save_activities',
+                                n_clicks=0,
+                                className='btn btn-primary'),
+                    html.Br(),
+                    html.Br(),
+                    html.Button('Delete Activities',
+                                id='btn_del_activities',
+                                n_clicks=0,
+                                className='btn btn-primary'),
                 ], style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
 
                 # second column of second row
@@ -60,6 +72,7 @@ def make_layout():
                 ], style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'})
             ],
                 className='row')
+
         ])
     ])
     return layout
@@ -73,7 +86,7 @@ def json_to_list(json):
 def make_table(data):
     table = DataTable(
         id="data",
-        columns=[{'id':'activity', 'name':'name'}],
+        columns=[{'id': 'activity', 'name': 'name'}],
         data=json_to_list(data),
         page_size=10,
         page_current=0,

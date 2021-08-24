@@ -13,11 +13,10 @@ import swagger_client.models
 from flask_login import current_user
 
 from iobrocker import dbutil, strava_auth
+from iobrocker.utils import CustomEncoder, CustomDecoder, get_activity_factory
 from iobrocker import strava_swagger
 from middleware import Activity
 from middleware import CyclingActivityFactory
-
-from cycperf.models import Users
 
 
 class ActivityNotFoundInDB(Exception):
@@ -34,16 +33,17 @@ class IO:
     """
     Provides High level interface to Strava API and Database requests
     """
-    def __init__(self, user_id: int = None):
+
+    def __init__(self, user_id: int = None, token_refresh=True):
         self.user_id = user_id if user_id else current_user.id
 
-        if self.is_strava_token_expired():
+        if token_refresh and self.is_strava_token_expired():
             self.refresh_token()
 
     def build_mock_up_ride(self):
         df = dbutil.read_dataframe_from_csv(filename='ride.csv')
         factory = CyclingActivityFactory()
-        return factory.get_activity(id=1, athlete_id=0, name='My ride', dataframe=df)
+        return factory.get_activity(id=1, athlete_id=0, name='My ride', dataframe=df, date=datetime.now())
 
     def get_athlete_info(self) -> json:
         raise NotImplemented
@@ -51,22 +51,67 @@ class IO:
     def get_list_of_activities(self, start_date: datetime, end_date: datetime):
         raise NotImplemented
 
+    def get_strava_activities(self, **kwargs) -> list[Activity]:
+        result = []
+        strava_activities = strava_swagger.get_activities(self.user_id, **kwargs)
+        for strava_activity in strava_activities:
+            result.append(self._build_activity(strava_activity))
+        return result
+
+    def _build_activity(self, strava_activity: swagger_client.models.detailed_activity) -> Activity:
+        """
+        Builds cycperf activity object based on strava detailed activity
+        :param strava_activity:
+        :return: Activity object
+        """
+        streams = strava_swagger.get_activity_streams(strava_activity.id, self.user_id)
+        dataframe = _make_df(streams)
+        activity = CyclingActivityFactory().get_activity(
+            id=strava_activity.id,
+            date=strava_activity.start_date,
+            athlete_id=strava_activity.athlete.id,
+            name=strava_activity.name,
+            dataframe=dataframe
+        )
+        return activity
+
     def get_activity_by_id(self, activity_id: int) -> Activity:
         # try getting activity pickle from DB, deserialize and return
-        pickle = dbutil.get_activity_from_db(activity_id=activity_id)
-        if pickle:
-            return Activity.from_pickle(pickle)
+        db_activity = dbutil.get_activity_from_db(activity_id=activity_id)
+        if db_activity:
+            factory = get_activity_factory(db_activity.details)
+            return factory.get_activity(
+                id=db_activity.activity_id,
+                athlete_id=db_activity.athlete_id,
+                name=db_activity.details['name'],
+                date=db_activity.date,
+                dataframe=pd.read_json(db_activity.dataframe),
+                details=db_activity.details
+            )
         else:
             raise ActivityNotFoundInDB(id=activity_id,
                                        message=f"Activity {activity_id} not found in DB")
 
-    def save_activity(self, activity: Activity):
+    def save_activities(self, activities: list[Activity]) -> None:
+        """
+        Saves list of Activity objects to database
+        :param activities: list of Activity objects
+        :return: None
+        """
+        for activity in activities:
+            self.save_activity(activity)
+
+    def save_activity(self, activity: Activity) -> None:
         """Saves Activity object to db"""
         dbutil.store_activity(
             user_id=self.user_id,
             athlete_id=activity.athlete_id,
             activity_id=activity.id,
-            pickle=activity.pickle(),
+            date=activity.date,
+            details=activity.details,
+            dataframe=activity.dataframe.to_json(indent=4),
+            laps='',
+            intervals=json.dumps(activity.intervals, cls=CustomEncoder, indent=4)
         )
 
     def delete_activity_by_id(self, activity_id):
@@ -85,11 +130,14 @@ class IO:
             streams = strava_swagger.get_activity_streams(activity_id=int(activity_id),
                                                           user_id=self.user_id)
             df = _make_df(streams)
+            # todo add factory selector here
             activity = CyclingActivityFactory().get_activity(
                 id=activity_id,
+                date=strava_activity.start_date,
                 athlete_id=strava_activity.athlete.id,
                 name=strava_activity.name,
-                dataframe=df
+                dataframe=df,
+                details=strava_activity.to_dict()
             )
             return activity
         else:
@@ -112,6 +160,23 @@ class IO:
 
     def refresh_token(self):
         strava_auth.refresh_access_token(self.user_id)
+
+    def build_activity(self, strava_activity: swagger_client.models.detailed_activity) -> Activity:
+        """
+        Builds cycperf activity object based on strava detailed activity
+        :param strava_activity:
+        :return: Activity object
+        """
+        streams = strava_swagger.get_activity_streams(strava_activity.id, self.user_id)
+        dataframe = _make_df(streams)
+        activity = CyclingActivityFactory().get_activity(
+            id=strava_activity.id,
+            date=strava_activity.start_date,
+            athlete_id=strava_activity.athlete_id,
+            name=strava_activity.name,
+            dataframe=dataframe
+        )
+        return activity
 
 
 def _make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:

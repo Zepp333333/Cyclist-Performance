@@ -4,6 +4,7 @@ Database utilities module for Cyclist Performance application
 Provides lower level interface to data manipulation in database (and file system for test purposes)
 """
 import pathlib
+import datetime
 from typing import Optional
 
 import pandas as pd
@@ -35,7 +36,7 @@ class UserDoesNotExist(Exception):
 
 def get_user(user_id: int) -> Users:
     """
-    Locats in DB and returns user based on user_id
+    Locates in DB and returns user based on user_id
     :return: instance of Users
     """
     user = Users.query.filter_by(id=user_id).first()
@@ -85,35 +86,51 @@ def update_user(user_id: int, update: dict = None) -> None:
             raise UserDoesNotExist(id=user_id, message=f"User id {user_id} doesn't exist in database")
 
 
-def get_activity_from_db(activity_id: int) -> Optional[bytes]:
+def get_activity_from_db(activity_id: int) -> Optional[DBActivity]:
     """
         Looks up cycperf activity pickled object in database
         :param activity_id: strava activity id
-        :return: cycperf activity pickled object (bytes)
+        :return: cycperf DBActivity object
         """
     try:
         db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
-        return db_activity.pickle
+        return db_activity
     except Exception as e:
         # todo implement SQLAlchemy error handling
         return None
 
 
-def _store_new_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes) -> None:
+def _store_new_activity(user_id: int,
+                        athlete_id: int,
+                        activity_id: int,
+                        date: datetime.datetime,
+                        details: str,
+                        dataframe: str,
+                        laps: str,
+                        intervals: str) -> None:
     """
     Creates new cycperf DBActivity object and stores it in database
-    :param user_id: cycperf user id
+    param user_id: cycperf user id
     :param athlete_id: strava athlete id
     :param activity_id: strava activity id
-    :param pickle: pickled Activity
+    :param date: activity start_date
+    :param intervals: list of intervals
+    :param laps: list of laps
+    :param dataframe: dumped dataframe
+    :param details: activity details
     :return: None
     """
     # todo add try/except + handling in IO class. Modify tests accordingly
-    db_activity = DBActivity()
-    db_activity.user_id = user_id
-    db_activity.athlete_id = athlete_id
-    db_activity.activity_id = activity_id
-    db_activity.pickle = pickle
+    db_activity = DBActivity(
+        activity_id=activity_id,
+        user_id=user_id,
+        athlete_id=athlete_id,
+        date=date,
+        details=details,
+        laps=laps,
+        dataframe=dataframe,
+        intervals=intervals,
+    )
     try:
         db.session.add(db_activity)
         db.session.commit()
@@ -122,22 +139,41 @@ def _store_new_activity(user_id: int, athlete_id: int, activity_id: int, pickle:
         raise DuplicateActivity(id=activity_id, message=f"Attempt to store duplicate activity id {activity_id}")
 
 
-def store_activity(user_id: int, athlete_id: int, activity_id: int, pickle: bytes) -> None:
+def store_activity(user_id: int,
+                   athlete_id: int,
+                   activity_id: int,
+                   date: datetime.datetime,
+                   details: str,
+                   dataframe: str,
+                   laps: str,
+                   intervals: str) -> None:
     """
     Stores Cycperf Activity in database
     :param user_id: cycperf user id
     :param athlete_id: strava athlete id
     :param activity_id: strava activity id
-    :param pickle: pickled Activity
+    :param date: activity start_date
+    :param intervals: list of intervals
+    :param laps: list of laps
+    :param dataframe: dumped dataframe
+    :param details: activity details
     :return: None
     """
     # todo rename
     db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
     if db_activity:
-        db_activity.pickle = pickle
+        db_activity.intervals = intervals
+        db_activity.dataframe = dataframe
         db.session.commit()
     else:
-        _store_new_activity(user_id, athlete_id, activity_id, pickle)
+        _store_new_activity(user_id=user_id,
+                            athlete_id=athlete_id,
+                            activity_id=activity_id,
+                            date=date,
+                            intervals=intervals,
+                            laps=laps,
+                            dataframe=dataframe,
+                            details=details)
 
 
 def delete_activity(user_id: int, activity_id: int) -> None:

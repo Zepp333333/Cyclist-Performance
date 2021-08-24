@@ -137,7 +137,7 @@ def register_callbacks(dashapp):
     )
     def get_activities(_):
         # todo add docstrings
-        activities = strava_swagger.get_activities()
+        activities = IO(current_user.id).get_strava_activities()
         if activities:
             return test_strava_methods_page.make_table(activities), False
         else:

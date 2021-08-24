@@ -9,6 +9,19 @@ from middleware import Activity
 from .utils import ScatterDrawer
 
 
+def make_layout(user_id=None, activity_id=None) -> dash.Dash.layout:
+    if not user_id:
+        return _make_layout(user_id=0, activity=IO(0).build_mock_up_ride())
+    if not activity_id:
+        ioo = IO(user_id=user_id)
+        last_activity = ioo.get_last_activity()
+        for k,v in last_activity.intervals[0].__dict__.items():
+            print(k, type(v))
+        ioo.save_activity(last_activity)
+        return _make_layout(user_id, last_activity)
+    return _make_layout(user_id, IO().get_activity_by_id(int(activity_id)))
+
+
 def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
     fig = ScatterDrawer(
         activity=activity,
@@ -25,14 +38,4 @@ def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
         dcc.Store(id='current_activity', data=activity.id)  # prepare_activity_for_dcc_store(activity))
     ])
     return layout
-
-
-def make_layout(user_id=None, activity_id=None) -> dash.Dash.layout:
-    if not user_id:
-        return _make_layout(user_id=0, activity=IO(0).build_mock_up_ride())
-    if not activity_id:
-        return _make_layout(user_id, IO(user_id=user_id).get_last_activity())
-    return _make_layout(user_id, IO().get_activity_by_id(int(activity_id)))
-
-
 

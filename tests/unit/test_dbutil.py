@@ -1,55 +1,66 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
-from datetime import datetime
+import datetime
+import json
 
 import pandas
+import pandas as pd
 import pytest
 
 from cycperf.models import DBActivity, Users
 from iobrocker import dbutil, dbutil_admin
+from iobrocker.utils import CustomEncoder, CustomDecoder
 from middleware import Activity, CyclingActivityFactory
 
 
-@pytest.fixture(scope='module')
-def populate_db(test_client):
-    # add a user to db
-    dbutil_admin.add_user(username="JohnTest",
-                          email="johnsnow@gmail.com",
-                          password="Pass@word1",
-                          strava_id=123456,
-                          strava_access_token="token",
-                          strava_token_expires_at=datetime(2001, 11, 23),
-                          strava_refresh_token="refresh_token",
-                          strava_athlete_info="info")
-
-    # # add an activity to db
-    # mock_dataframe = dbutil.read_dataframe_from_csv()
-    # activity = CyclingActivityFactory().get_activity(id=999999,
-    #                                                  name="Bike Ride",
-    #                                                  athlete_id=123456,
-    #                                                  dataframe=mock_dataframe)
-    # db_activity = DBActivity(
-    #     activity_id=activity.id,
-    #     user_id=dbutil_admin.get_user_id_by_name("JohnTest")[0],
-    #     athlete_id=activity.athlete_id,
-    #     pickle=activity.pickle()
-    # )
-    #
-    # dbutil_admin.add_activity(db_activity)
 
 
 @pytest.fixture(scope='function')
-def test_user_id():
-    return dbutil_admin.get_user_id_by_name("JohnTest")[0]
+def mock_activity2():
+    df = dbutil.read_dataframe_from_csv()
+    with open('tests/testing_data/test_activity.json', 'r') as infile:
+        activity_json = json.load(infile)
 
-
-@pytest.fixture(scope='function')
-def mock_activity():
-    mock_dataframe = dbutil.read_dataframe_from_csv()
-    activity = CyclingActivityFactory().get_activity(id=999999,
-                                                     name="Bike Ride",
-                                                     athlete_id=123456,
-                                                     dataframe=mock_dataframe)
+    athlete_id = activity_json['athlete']['id']
+    date = datetime.datetime.strptime(activity_json['start_date'], '%Y-%m-%d %H:%M:%S%z')
+    activity_id = 999999
+    activity_name = "activity2"
+    activity = CyclingActivityFactory().get_activity(
+        id=activity_id,
+        athlete_id=athlete_id,
+        name=activity_name,
+        date=date,
+        dataframe=df,
+        details=json.dumps(activity_json, default=str)
+    )
     return activity
+
+
+@pytest.fixture
+def store_call_parameters(mock_activity, test_user_id):
+    return {
+        'user_id': test_user_id,
+        'athlete_id': mock_activity.athlete_id,
+        'activity_id': mock_activity.id,
+        'date': mock_activity.date,
+        'details': mock_activity.details,
+        'dataframe': mock_activity.dataframe.to_json(),
+        'laps': '',
+        'intervals': json.dumps(mock_activity.intervals, cls=CustomEncoder, indent=4)
+    }
+
+
+@pytest.fixture
+def store_call_parameters2(mock_activity2, test_user_id):
+    return {
+        'user_id': test_user_id,
+        'athlete_id': mock_activity2.athlete_id,
+        'activity_id': mock_activity2.id,
+        'date': mock_activity2.date,
+        'details': mock_activity2.details,
+        'dataframe': mock_activity2.dataframe.to_json(),
+        'laps': '',
+        'intervals': json.dumps(mock_activity2.intervals, cls=CustomEncoder, indent=4)
+    }
 
 
 def test_get_user(populate_db, test_user_id):
@@ -65,7 +76,7 @@ def test_get_user(populate_db, test_user_id):
 
 def test_get_strava_athlete_id_and_token(populate_db, test_user_id):
     user_id, token = dbutil.get_strava_athlete_id_and_token(test_user_id)
-    assert user_id == 123456
+    assert user_id == 21932478
     assert token == "token"
     assert dbutil.get_strava_athlete_id_and_token(150) is None
 
@@ -76,33 +87,27 @@ def test_get_athlete_info(populate_db, test_user_id):
     assert dbutil.get_athlete_info(150) is None
 
 
-def test_store_new_activity(populate_db, test_user_id, create_db_connection, mock_activity):
-    dbutil._store_new_activity(user_id=test_user_id,
-                               athlete_id=123456,
-                               activity_id=999999,
-                               pickle=mock_activity.pickle())
+def test_store_new_activity(populate_db, test_user_id, create_db_connection, store_call_parameters):
+    dbutil._store_new_activity(**store_call_parameters)
 
     with create_db_connection as connection:
         select = connection.execute(f"SELECT * FROM db_activity").fetchall()
 
     assert len(select) == 1
-    assert select[0].activity_id == 999999
+    assert select[0].activity_id == 5806863104
     assert select[0].user_id == test_user_id
-    assert select[0].athlete_id == 123456
-    assert isinstance(select[0].pickle, memoryview)
+    assert select[0].athlete_id == 21932478
+    assert "Whole Activity" in select[0].intervals
 
 
-def test_store_new_duplicate_activity(populate_db, test_user_id, create_db_connection, mock_activity):
+def test_store_new_duplicate_activity(populate_db, store_call_parameters):
     with pytest.raises(dbutil.DuplicateActivity):
-        dbutil._store_new_activity(user_id=test_user_id,
-                                   athlete_id=123456,
-                                   activity_id=999999,
-                                   pickle=mock_activity.pickle())
+        dbutil._store_new_activity(**store_call_parameters)
 
 
 def test_get_activity_from_db(populate_db):
-    activity = dbutil.get_activity_from_db(activity_id=999999)
-    assert isinstance(activity, bytes)
+    activity = dbutil.get_activity_from_db(activity_id=5806863104)
+    assert isinstance(activity, DBActivity)
 
 
 def test_update_user(populate_db, test_user_id):
@@ -120,64 +125,44 @@ def test_update_user(populate_db, test_user_id):
         dbutil.update_user(user_id=155, update=update)
 
 
-def test_store_activity(populate_db, test_user_id):
+def test_store_activity(populate_db, test_user_id, mock_activity, mock_activity2, store_call_parameters, store_call_parameters2):
     # Test string (updating) existing activity
-    stored_activity = DBActivity.query.filter_by(activity_id=999999).first()
-    stored_pickle = stored_activity.pickle
+    stored_activity = DBActivity.query.filter_by(activity_id=5806863104).first()
 
-    mock_dataframe = dbutil.read_dataframe_from_csv()
-    activity_update = CyclingActivityFactory().get_activity(id=999999,
-                                                            name="Updated Bike Ride",
-                                                            athlete_id=123456,
-                                                            dataframe=mock_dataframe)
-    dbutil.store_activity(user_id=test_user_id,
-                          athlete_id=123456,
-                          activity_id=999999,
-                          pickle=activity_update.pickle())
+    params = {'user_id': test_user_id,
+              'athlete_id': mock_activity.athlete_id,
+              'activity_id': mock_activity.id,
+              'date': mock_activity.date,
+              'details': mock_activity.details,
+              'dataframe': pd.DataFrame().to_json(),
+              'laps': '',
+              'intervals': []}
 
-    updated_activity = DBActivity.query.filter_by(activity_id=999999).first()
-    updated_pickle = updated_activity.pickle
-    assert updated_activity.pickle != stored_pickle
-    assert Activity.from_pickle(updated_pickle).name == "Updated Bike Ride"
+    dbutil.store_activity(**params)
+
+    updated_activity = DBActivity.query.filter_by(activity_id=5806863104).first()
+    assert updated_activity.intervals == []
 
     # Test string new activity
-    new_activity = CyclingActivityFactory().get_activity(id=888888,
-                                                         name="New Activity",
-                                                         athlete_id=123456,
-                                                         dataframe=mock_dataframe)
-    dbutil.store_activity(user_id=test_user_id,
-                          athlete_id=123456,
-                          activity_id=888888,
-                          pickle=new_activity.pickle())
+    dbutil.store_activity(**store_call_parameters2)
 
-    new_activity = DBActivity.query.filter_by(activity_id=888888).first()
-    assert Activity.from_pickle(new_activity.pickle).id == 888888
-    assert Activity.from_pickle(new_activity.pickle).name == "New Activity"
+    new_activity = DBActivity.query.filter_by(activity_id=999999).first()
+    assert new_activity.activity_id == 999999
 
 
 def test_delete_activity(populate_db, test_user_id, create_db_connection):
-    mock_dataframe = dbutil.read_dataframe_from_csv()
-    activity_update = CyclingActivityFactory().get_activity(id=777777,
-                                                            name="777777",
-                                                            athlete_id=123456,
-                                                            dataframe=mock_dataframe)
-    dbutil.store_activity(user_id=test_user_id,
-                          athlete_id=123456,
-                          activity_id=777777,
-                          pickle=activity_update.pickle())
-
-    dbutil.delete_activity(user_id=test_user_id, activity_id=777777)
+    dbutil.delete_activity(user_id=test_user_id, activity_id=999999)
 
     with create_db_connection as connection:
         activities = connection.execute(f"SELECT * FROM db_activity").fetchall()
 
     ids = [activity.activity_id for activity in activities]
-    assert 777777 not in ids
+    assert 999999 not in ids
 
 
 def test_get_user_id_by_activity_id(populate_db, test_user_id):
     # test function providing existing activity
-    user_id = dbutil.get_user_id_by_activity_id(activity_id=999999)
+    user_id = dbutil.get_user_id_by_activity_id(activity_id=5806863104)
     assert user_id == test_user_id
     # test function providing non-existing activity
     user_id = dbutil.get_user_id_by_activity_id(activity_id=555555)

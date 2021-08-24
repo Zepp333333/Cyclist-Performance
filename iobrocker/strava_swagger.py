@@ -42,7 +42,7 @@ def swagger_get_activities(token: str,
                            page: int = 1,
                            per_page: int = 30,
                            async_req=True) -> list[swagger_client.models.summary_activity.SummaryActivity]:
-    # todo make possible syncronous requests. No asyc behaviour is hardcoded
+    # todo make possible synchronous requests. Now asyc behaviour is hardcoded
     configuration = swagger_client.Configuration()
     configuration.access_token = token
     api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configuration))

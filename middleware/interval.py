@@ -1,9 +1,10 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 from __future__ import annotations
+
+import json
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import pandas as pd
-import pickle
 
 
 @dataclass()
@@ -46,13 +47,6 @@ class Interval(ABC):
         if new_name:
             self.name = new_name
         self.populate_metrics(dataframe)
-
-    def pickle(self):
-        return pickle.dumps(self)
-
-    @classmethod
-    def from_pickle(cls, pickle_str):
-        return pickle.loads(pickle_str)
 
 
 @dataclass()

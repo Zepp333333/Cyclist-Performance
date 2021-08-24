@@ -1,4 +1,7 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
+from datetime import datetime
+import json
+
 import pytest
 import sqlalchemy
 from sqlalchemy.orm import close_all_sessions
@@ -6,6 +9,9 @@ from cycperf import create_app
 from flask_migrate import upgrade
 
 from config import ConfigTest
+from iobrocker import dbutil, dbutil_admin
+from middleware import CyclingActivity
+from middleware.interval_factory import CyclingIntervalFactory
 
 TEST_DB_NAME = ConfigTest.TEST_DB_NAME
 
@@ -38,6 +44,19 @@ def create_test_db():
             connection.execute(f'DROP DATABASE {TEST_DB_NAME} WITH (FORCE)')
 
     _drop_test_db()
+
+
+@pytest.fixture(scope='module')
+def populate_db(test_client):
+    # add a user to db
+    dbutil_admin.add_user(username="JohnTest",
+                          email="johnsnow@gmail.com",
+                          password="Pass@word1",
+                          strava_id=21932478,
+                          strava_access_token="token",
+                          strava_token_expires_at=datetime(2001, 11, 23),
+                          strava_refresh_token="refresh_token",
+                          strava_athlete_info="info")
 
 
 # @pytest.fixture(scope='session')
@@ -73,6 +92,33 @@ def test_client(create_test_db):
     yield testing_client
     # Tear down
     ctx.pop()
+
+
+@pytest.fixture(scope='function')
+def mock_activity():
+    df = dbutil.read_dataframe_from_csv()
+    with open('tests/testing_data/test_activity.json', 'r') as infile:
+        activity_json = json.load(infile)
+
+    athlete_id = activity_json['athlete']['id']
+    date = datetime.strptime(activity_json['start_date'], '%Y-%m-%d %H:%M:%S%z')
+    activity_id = activity_json['id']
+    activity_name = activity_json['name']
+    activity = CyclingActivity(
+        interval_factory=CyclingIntervalFactory(),
+        id=activity_id,
+        athlete_id=athlete_id,
+        name=activity_name,
+        date=date,
+        dataframe=df,
+        details=activity_json
+    )
+    return activity
+
+
+@pytest.fixture(scope='function')
+def test_user_id(populate_db):
+    return dbutil_admin.get_user_id_by_name("JohnTest")[0]
 
 # @pytest.fixture(scope='module')
 # def flask_app():
