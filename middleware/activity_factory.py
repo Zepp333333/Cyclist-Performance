@@ -26,12 +26,15 @@ class CyclingActivityFactory(ActivityFactory):
     def get_activity(self, **kwargs) -> Activity:
         """
         Constructs CyclingActivity together with CyclingInterval
+
         :param id: int - activity id
         :param name: str - activity name
         :param athlete_id: int - athlete id
         :param dataframe: pd.DataFrame - dataframe
+        :param details: str - dump of the activity details json
         :param [optional] intervals: list[Interval] = field(default_factory=list[Interval])
         :param [optional] type: str = 'bike'
+
         """
 
         return CyclingActivity(interval_factory=self.get_interval_factory(), **kwargs)

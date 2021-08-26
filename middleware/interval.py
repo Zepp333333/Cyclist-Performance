@@ -48,6 +48,9 @@ class Interval(ABC):
             self.name = new_name
         self.populate_metrics(dataframe)
 
+    def __eq__(self, other):
+        return self.name == other.name and self.start == other.start and self.end == other.end
+
 
 @dataclass()
 class CyclingInterval(Interval):

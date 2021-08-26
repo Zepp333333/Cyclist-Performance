@@ -47,7 +47,7 @@ class Activity(ABC):
                                activity_id=self.id,
                                name='Whole Activity',
                                start=0,
-                               end=int(self.dataframe.last_valid_index()),
+                               end=int(self.dataframe.last_valid_index() or 0),
                                dataframe=self.dataframe)
 
     def new_interval(self, start: int, end: int, name: str = None) -> None:
@@ -57,7 +57,9 @@ class Activity(ABC):
         self.add_intervals([self._make_interval(start, end, name)])
 
     def add_intervals(self, new_intervals: list[Interval]) -> None:
-        self.intervals.extend(new_intervals)
+        for interval in new_intervals:
+            if interval not in self.intervals:
+                self.intervals.append(interval)
 
     def _make_interval(self, start: int, end: int, name: str = None) -> Interval:
         # todo: add code to check correctness of interval range
@@ -81,7 +83,7 @@ class Activity(ABC):
                                         message="Interval doesn't exist in list of intervals.")
             self.intervals.remove(interval)
 
-    def check_if_interval_exit(self, interval_to_check: Interval) -> bool:
+    def interval_exit(self, interval_to_check: Interval) -> bool:
         return interval_to_check in self.intervals
 
     def pickle(self) -> bytes:
@@ -90,7 +92,6 @@ class Activity(ABC):
     @classmethod
     def from_pickle(cls, pickle_str) -> Activity:
         return pickle.loads(pickle_str)
-
 
 
 @dataclass
