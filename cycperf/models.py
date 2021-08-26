@@ -53,6 +53,7 @@ class DBActivity(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     athlete_id = db.Column(db.Integer, db.ForeignKey('users.strava_id'), nullable=False)
     date = db.Column(db.DateTime(timezone=False), nullable=False)
+    name = db.Column(db.String)
     details = db.Column(db.JSON)
     laps = db.Column(db.JSON)
     streams = db.Column(db.JSON)

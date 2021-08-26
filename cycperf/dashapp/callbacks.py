@@ -84,17 +84,11 @@ def register_callbacks(dashapp):
             interval_range = relayout_data_to_range(relayout_data)
             if interval_range:
                 io_wrapper = IO()
-                activity = io_wrapper.get_activity_by_id(int(data))
+                activity = io_wrapper.get_cp_activity_by_id(int(data))
                 activity.new_interval(*interval_range)
                 io_wrapper.save_activity(activity)
 
                 from .utils.scatter_drawer import ScatterDrawer
-
-        # ctx = dashapp.callback_context
-        # if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
-        #     interval_range = relayout_data_to_range(relayout_data)
-        #     if interval_range:
-        #         ride.make_interval(*interval_range)
 
                 new_fig = ScatterDrawer(
                     activity=activity,
@@ -169,7 +163,7 @@ def register_callbacks(dashapp):
         #        if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
         #            interval_range = relayout_data_to_range(relayout_data)
         #            if interval_range:
-        #                ride.make_interval(*interval_range)
+        #                ride._make_interval(*interval_range)
         #
         #            new_fig = ScatterDrawer(
         #                activity=ride,

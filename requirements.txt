@@ -54,3 +54,6 @@ Werkzeug==2.0.1
 WTForms==2.3.3
 psycopg2==2.9.1
 ./generated/python/
+
+dill~=0.3.4
+setuptools~=57.4.0

@@ -34,7 +34,7 @@ class Activity(ABC):
     athlete_id: int
     date: datetime.datetime
     dataframe: pd.DataFrame
-    details: str
+    details: dict
     intervals: list[Interval] = field(default_factory=list[Interval])
     type: str = 'bike'
 
@@ -47,19 +47,19 @@ class Activity(ABC):
                                activity_id=self.id,
                                name='Whole Activity',
                                start=0,
-                               end=self.dataframe.last_valid_index(),
+                               end=int(self.dataframe.last_valid_index()),
                                dataframe=self.dataframe)
 
     def new_interval(self, start: int, end: int, name: str = None) -> None:
         # todo: add code to check correctness of interval range
         if not name:
             name = self._generate_interval_name()
-        self.add_intervals([self.make_interval(start, end, name)])
+        self.add_intervals([self._make_interval(start, end, name)])
 
     def add_intervals(self, new_intervals: list[Interval]) -> None:
         self.intervals.extend(new_intervals)
 
-    def make_interval(self, start: int, end: int, name: str = None) -> Interval:
+    def _make_interval(self, start: int, end: int, name: str = None) -> Interval:
         # todo: add code to check correctness of interval range
         interval = self.interval_factory.get_interval()
         return interval.create(id=len(self.intervals),

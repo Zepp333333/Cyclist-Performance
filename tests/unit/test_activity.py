@@ -64,7 +64,7 @@ class TestActivity:
         assert mock_activity.intervals[2].name == 'test interval name 2'
 
     def test_make_interval(self, mock_activity):
-        interval = mock_activity.make_interval(start=600, end=700, name='new name')
+        interval = mock_activity._make_interval(start=600, end=700, name='new name')
         assert isinstance(interval, Interval)
         assert interval.activity_id == mock_activity.id
         assert interval.id == 1
@@ -92,6 +92,6 @@ class TestActivity:
 
     def test_check_if_interval_exit(self, mock_activity):
         interval = mock_activity.intervals[0]
-        interval2 = mock_activity.make_interval(400, 500)
+        interval2 = mock_activity._make_interval(400, 500)
         assert mock_activity.check_if_interval_exit(interval)
         assert not mock_activity.check_if_interval_exit(interval2)

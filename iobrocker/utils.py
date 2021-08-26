@@ -18,7 +18,7 @@ class CustomEncoder(json.JSONEncoder):
         if isinstance(obj, datetime):
             return {
                 "_type": "datetime",
-                "value": obj.strftime(DATETIME_FORMAT)
+                "value": obj.isoformat()
             }
 
         # Interval
@@ -31,13 +31,13 @@ class CustomEncoder(json.JSONEncoder):
                 "value": obj.__dict__
             }
 
-        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
-                            np.int16, np.int32, np.int64, np.uint8,
-                            np.uint16, np.uint32, np.uint64)):
-            return int(obj)
-
-        if isinstance(obj, (np.float_, np.float16, np.float32, np.float64)):
-            return float(obj)
+        # if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
+        #                     np.int16, np.int32, np.int64, np.uint8,
+        #                     np.uint16, np.uint32, np.uint64)):
+        #     return int(obj)
+        #
+        # if isinstance(obj, (np.float_, np.float16, np.float32, np.float64)):
+        #     return float(obj)
 
         # for other types - call default
         return json.JSONEncoder.default(self, obj)
@@ -50,7 +50,7 @@ class CustomDecoder(json.JSONDecoder):
     def object_hook(self, obj):
         if "_type" in obj:
             if obj['_type'] == 'datetime':
-                return datetime.strptime(obj['value'], DATETIME_FORMAT)
+                return datetime.fromisoformat(obj['value'])
             if obj['_type'] == 'CyclingInterval':
                 return CyclingInterval(dataframe=pd.DataFrame(), **obj['value'])
         return obj

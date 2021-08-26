@@ -76,20 +76,20 @@ class CyclingInterval(Interval):
         if 'cadence' in df:
             self.populate_cad(df)
 
-    def populate_watts(self, df) -> None:
-        self.avg_power = df.watts.mean()
-        self.max_power = df.watts.max()
-        self.min_power = df.watts.min()
+    def populate_watts(self, df: pd.DataFrame) -> None:
+        self.avg_power = int(df.watts.mean())
+        self.max_power = int(df.watts.max())
+        self.min_power = int(df.watts.min())
 
     def populate_hr(self, df) -> None:
-        self.avg_hr = df.heartrate.mean()
-        self.max_hr = df.heartrate.max()
-        self.min_hr = df.heartrate.min()
+        self.avg_hr = int(df.heartrate.mean())
+        self.max_hr = int(df.heartrate.max())
+        self.min_hr = int(df.heartrate.min())
 
     def populate_cad(self, df) -> None:
-        self.avg_cad = df.cadence.mean()
-        self.max_cad = df.cadence.max()
-        self.min_cad = df.cadence.min()
+        self.avg_cad = int(df.cadence.mean())
+        self.max_cad = int(df.cadence.max())
+        self.min_cad = int(df.cadence.min())
 
 #todo remove testing code
 # df = pd.read_csv('../iobrocker/ride.csv')

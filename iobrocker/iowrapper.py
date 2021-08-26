@@ -55,38 +55,22 @@ class IO:
         result = []
         strava_activities = strava_swagger.get_activities(self.user_id, **kwargs)
         for strava_activity in strava_activities:
-            result.append(self._build_activity(strava_activity))
+            result.append(self.make_cp_activity_from_strava_activity(strava_activity))
         return result
 
-    def _build_activity(self, strava_activity: swagger_client.models.detailed_activity) -> Activity:
-        """
-        Builds cycperf activity object based on strava detailed activity
-        :param strava_activity:
-        :return: Activity object
-        """
-        streams = strava_swagger.get_activity_streams(strava_activity.id, self.user_id)
-        dataframe = _make_df(streams)
-        activity = CyclingActivityFactory().get_activity(
-            id=strava_activity.id,
-            date=strava_activity.start_date,
-            athlete_id=strava_activity.athlete.id,
-            name=strava_activity.name,
-            dataframe=dataframe
-        )
-        return activity
-
-    def get_activity_by_id(self, activity_id: int) -> Activity:
-        # try getting activity pickle from DB, deserialize and return
+    def get_cp_activity_by_id(self, activity_id: int) -> Activity:
         db_activity = dbutil.get_activity_from_db(activity_id=activity_id)
         if db_activity:
-            factory = get_activity_factory(db_activity.details)
+            details = json.loads(db_activity.details, cls=CustomDecoder)
+            factory = get_activity_factory(details)
             return factory.get_activity(
                 id=db_activity.activity_id,
                 athlete_id=db_activity.athlete_id,
-                name=db_activity.details['name'],
+                name=details['name'],
                 date=db_activity.date,
                 dataframe=pd.read_json(db_activity.dataframe),
-                details=db_activity.details
+                details=details,
+                intervals=json.loads(db_activity.intervals, cls=CustomDecoder)
             )
         else:
             raise ActivityNotFoundInDB(id=activity_id,
@@ -108,7 +92,7 @@ class IO:
             athlete_id=activity.athlete_id,
             activity_id=activity.id,
             date=activity.date,
-            details=activity.details,
+            details=json.dumps(activity.details, cls=CustomEncoder, indent=4),
             dataframe=activity.dataframe.to_json(indent=4),
             laps='',
             intervals=json.dumps(activity.intervals, cls=CustomEncoder, indent=4)
@@ -122,23 +106,12 @@ class IO:
         else:
             raise  # todo implement exception
 
-    def get_strava_activity_by_id(self, activity_id: int) -> Optional[Activity]:
+    def get_strava_activity_by_id(self, activity_id: int, get_streams: bool = True) -> Optional[Activity]:
 
         strava_activity = strava_swagger.get_activity_by_id(activity_id=int(activity_id),
                                                             user_id=self.user_id)
         if strava_activity:
-            streams = strava_swagger.get_activity_streams(activity_id=int(activity_id),
-                                                          user_id=self.user_id)
-            df = _make_df(streams)
-            # todo add factory selector here
-            activity = CyclingActivityFactory().get_activity(
-                id=activity_id,
-                date=strava_activity.start_date,
-                athlete_id=strava_activity.athlete.id,
-                name=strava_activity.name,
-                dataframe=df,
-                details=strava_activity.to_dict()
-            )
+            activity = self.make_cp_activity_from_strava_activity(strava_activity.to_dict(), get_streams)
             return activity
         else:
             return None
@@ -161,20 +134,28 @@ class IO:
     def refresh_token(self):
         strava_auth.refresh_access_token(self.user_id)
 
-    def build_activity(self, strava_activity: swagger_client.models.detailed_activity) -> Activity:
+    def make_cp_activity_from_strava_activity(self, strava_activity: dict, get_streams: bool = True) -> Activity:
         """
         Builds cycperf activity object based on strava detailed activity
         :param strava_activity:
         :return: Activity object
+        :param get_streams: [Optional] Default True. Controls whether to call Strava API to get streams or not. Produce activity with
+        empty dataframe in case False.
         """
-        streams = strava_swagger.get_activity_streams(strava_activity.id, self.user_id)
-        dataframe = _make_df(streams)
-        activity = CyclingActivityFactory().get_activity(
-            id=strava_activity.id,
-            date=strava_activity.start_date,
-            athlete_id=strava_activity.athlete_id,
-            name=strava_activity.name,
-            dataframe=dataframe
+        if get_streams:
+            streams = strava_swagger.get_activity_streams(strava_activity['id'], self.user_id)
+            dataframe = _make_df(streams)
+        else:
+            dataframe = pd.DataFrame()
+
+        factory = get_activity_factory(strava_activity)
+        activity = factory.get_activity(
+            id=strava_activity['id'],
+            date=strava_activity['start_date'],
+            athlete_id=strava_activity['athlete']['id'],
+            name=strava_activity['name'],
+            dataframe=dataframe,
+            details=strava_activity
         )
         return activity
 
