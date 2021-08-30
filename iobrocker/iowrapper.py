@@ -17,6 +17,7 @@ from iobrocker.utils import CustomEncoder, CustomDecoder, get_activity_factory
 from iobrocker import strava_swagger
 from middleware import Activity
 from middleware import CyclingActivityFactory
+from cycperf.models import DBActivity
 
 
 class ActivityNotFoundInDB(Exception):
@@ -48,33 +49,46 @@ class IO:
     def get_athlete_info(self) -> json:
         raise NotImplemented
 
-    def get_list_of_activities(self, start_date: datetime, end_date: datetime):
-        raise NotImplemented
+    def get_list_of_activities(self, start_date: datetime, end_date: datetime) -> list[Activity]:
+        list_of_ids: list[int] = dbutil.get_list_of_activities_in_range(start_date, end_date)
+        output = []
+        for activity_id in list_of_ids:
+            output.append(self.get_cp_activity_by_id(activity_id, get_streams=False))
+        return output
 
-    def get_strava_activities(self, **kwargs) -> list[Activity]:
+    def get_activities_from_strava(self, get_streams: bool = False, **kwargs) -> list[Activity]:
         result = []
         strava_activities = strava_swagger.get_activities(self.user_id, **kwargs)
         for strava_activity in strava_activities:
-            result.append(self.make_cp_activity_from_strava_activity(strava_activity))
+            result.append(self.make_cp_activity_from_strava_activity(strava_activity.to_dict(), get_streams))
+            self.save_activities(result)
         return result
 
-    def get_cp_activity_by_id(self, activity_id: int) -> Activity:
+    def get_cp_activity_by_id(self, activity_id: int, get_streams: bool = True) -> Activity:
         db_activity = dbutil.get_activity_from_db(activity_id=activity_id)
-        if db_activity:
-            details = json.loads(db_activity.details, cls=CustomDecoder)
-            factory = get_activity_factory(details)
-            return factory.get_activity(
-                id=db_activity.activity_id,
-                athlete_id=db_activity.athlete_id,
-                name=details['name'],
-                date=db_activity.date,
-                dataframe=pd.read_json(db_activity.dataframe),
-                details=details,
-                intervals=json.loads(db_activity.intervals, cls=CustomDecoder)
-            )
-        else:
-            raise ActivityNotFoundInDB(id=activity_id,
-                                       message=f"Activity {activity_id} not found in DB")
+        if not db_activity:
+            raise ActivityNotFoundInDB(id=activity_id, message=f"Activity {activity_id} not found in DB")
+        return self._make_cp_activity_from_db_activity(db_activity, get_streams)
+
+    def _make_cp_activity_from_db_activity(self, db_activity: DBActivity, get_streams: bool = True) -> Activity:
+        dataframe = pd.read_json(db_activity.dataframe)
+        if dataframe.empty and get_streams:
+            streams = strava_swagger.get_activity_streams(activity_id=db_activity.activity_id, user_id=self.user_id)
+            dataframe = _make_df(streams)
+            db_activity.dataframe = dataframe.to_json(indent=4)
+            dbutil.save_db_activity(db_activity)
+
+        details = json.loads(db_activity.details, cls=CustomDecoder)
+        factory = get_activity_factory(details)
+        return factory.get_activity(
+            id=db_activity.activity_id,
+            athlete_id=db_activity.athlete_id,
+            name=details['name'],
+            date=db_activity.date,
+            dataframe=pd.read_json(db_activity.dataframe),
+            details=details,
+            intervals=json.loads(db_activity.intervals, cls=CustomDecoder)
+        )
 
     def save_activities(self, activities: list[Activity]) -> None:
         """
@@ -83,7 +97,11 @@ class IO:
         :return: None
         """
         for activity in activities:
-            self.save_activity(activity)
+            try:
+                self.save_activity(activity)
+            except Exception as e:
+                # todo, narrow-down, handle
+                pass
 
     def save_activity(self, activity: Activity) -> None:
         """Saves Activity object to db"""
@@ -158,6 +176,9 @@ class IO:
             details=strava_activity
         )
         return activity
+
+    def get_activities_by_date(self, ):
+        pass
 
 
 def _make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:

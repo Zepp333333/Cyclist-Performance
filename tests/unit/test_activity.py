@@ -93,5 +93,5 @@ class TestActivity:
     def test_check_if_interval_exit(self, mock_activity):
         interval = mock_activity.intervals[0]
         interval2 = mock_activity._make_interval(400, 500)
-        assert mock_activity.check_if_interval_exit(interval)
-        assert not mock_activity.check_if_interval_exit(interval2)
+        assert mock_activity.interval_exit(interval)
+        assert not mock_activity.interval_exit(interval2)

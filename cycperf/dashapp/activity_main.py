@@ -13,11 +13,9 @@ def make_layout(user_id=None, activity_id=None) -> dash.Dash.layout:
     if not user_id:
         return _make_layout(user_id=0, activity=IO(0).build_mock_up_ride())
     if not activity_id:
-        ioo = IO(user_id=user_id)
-        last_activity = ioo.get_last_activity()
-        for k,v in last_activity.intervals[0].__dict__.items():
-            print(k, type(v))
-        ioo.save_activity(last_activity)
+        io = IO(user_id=user_id)
+        last_activity = io.get_last_activity()
+        io.save_activity(last_activity)
         return _make_layout(user_id, last_activity)
     return _make_layout(user_id, IO().get_cp_activity_by_id(int(activity_id)))
 

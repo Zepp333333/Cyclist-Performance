@@ -25,8 +25,7 @@ def register_callbacks(dashapp):
         """
         if pathname == "/application/":
             return [
-                       html.H1("Home page", style={"textAlign": "center"}),
-                       calendar.layout
+                       calendar.make_layout(current_user.id),
                    ], [current_user.username]
         elif pathname == "/application/activity":
             return [
@@ -131,7 +130,8 @@ def register_callbacks(dashapp):
     )
     def get_activities(_):
         # todo add docstrings
-        activities = IO(current_user.id).get_strava_activities()
+        activities = IO(current_user.id).get_activities_from_strava()
+
         if activities:
             return test_strava_methods_page.make_table(activities), False
         else:

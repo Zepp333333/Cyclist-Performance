@@ -56,7 +56,7 @@ sidebar = html.Div(
         html.P("Some text here", className="lead"),
         dbc.Nav(
             [
-                dbc.NavLink("Home", href="/application/", active="exact"),
+                dbc.NavLink("Calendar", href="/application/", active="exact"),
                 dbc.NavLink("Activity", href="/application/activity", active="exact"),
                 dbc.NavLink("Something else", href="/application/else", active="exact"),
                 dbc.NavLink("test", href="/application/test/12", active="exact"),

@@ -214,3 +214,21 @@ def read_dataframe_from_csv(filename: str = "ride.csv", data_path: str = None) -
     if not data_path:
         data_path = path.joinpath("tests/testing_data").resolve()
     return pd.read_csv(data_path.joinpath(filename))
+
+
+def get_list_of_activities_in_range(start_date, end_date) -> list[int]:
+    """
+    Queries db to get list if activity ids within date range
+    :param start_date: datetime
+    :param end_date: datetime
+    :return: list of activity id's within given date range
+    """
+    query = db.session.query(DBActivity).filter(DBActivity.date.between(start_date, end_date))
+    output = []
+    for activity in query:
+        output.append(activity.activity_id)
+    return output
+
+
+def save_db_activity(db_activity: DBActivity) -> None:
+    db.session.commit()

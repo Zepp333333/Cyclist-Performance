@@ -49,7 +49,7 @@ class Interval(ABC):
         self.populate_metrics(dataframe)
 
     def __eq__(self, other):
-        return self.name == other.name and self.start == other.start and self.end == other.end
+        return self.name == other.name or (self.start == other.start and self.end == other.end)
 
 
 @dataclass()
