@@ -1,17 +1,11 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
 import calendar
-from calendar import HTMLCalendar
 from datetime import datetime
 
-import dash_core_components as dcc
-import dash_html_components as html
-
-import pandas as pd
-import wrapt
 from dash_table import DataTable
-from iobrocker import IO
 
+from iobrocker import IO
 from middleware import Activity
 
 WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
