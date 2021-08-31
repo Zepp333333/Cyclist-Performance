@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from .interval import Interval, CyclingInterval
+from .interval import Interval, CyclingInterval, RunningInterval
 
 
 class IntervalFactory(ABC):
@@ -14,3 +14,8 @@ class IntervalFactory(ABC):
 class CyclingIntervalFactory(IntervalFactory):
     def get_interval(self, *args, **kwargs):
         return CyclingInterval()
+
+
+class RunningIntervalFactory(IntervalFactory):
+    def get_interval(self, *args, **kwargs):
+        return RunningInterval()

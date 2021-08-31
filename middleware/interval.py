@@ -94,6 +94,31 @@ class CyclingInterval(Interval):
         self.max_cad = int(df.cadence.max())
         self.min_cad = int(df.cadence.min())
 
-#todo remove testing code
-# df = pd.read_csv('../iobrocker/ride.csv')
-# c = CyclingInterval(id=1, activity_id=1, name='something', start=250, end=2500, dataframe=df)
+
+@dataclass()
+class RunningInterval(Interval):
+    avg_pace: int = 0
+    max_pace: int = 0
+    min_pace: int = 0
+
+    avg_hr: int = 0
+    max_hr: int = 0
+    min_hr: int = 0
+
+    def populate_metrics(self, dataframe: pd.DataFrame) -> None:
+        """Compute and populate interval metrics"""
+        df = dataframe.iloc[self.start:self.end]
+        if 'pace' in df:
+            self.populate_pace(df)
+        if 'heartrate' in df:
+            self.populate_hr(df)
+
+    def populate_pace(self, df: pd.DataFrame) -> None:
+        self.avg_pace = int(df.pace.mean())
+        self.max_pace = int(df.pace.max())
+        self.min_pace = int(df.pace.min())
+
+    def populate_hr(self, df) -> None:
+        self.avg_hr = int(df.heartrate.mean())
+        self.max_hr = int(df.heartrate.max())
+        self.min_hr = int(df.heartrate.min())

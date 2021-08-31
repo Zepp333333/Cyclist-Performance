@@ -36,14 +36,10 @@ def register_callbacks(dashapp):
             return [
                        activity_main.make_layout(current_user.id, activity_id)
                    ], [current_user.username]
-        elif pathname == "/application/else":
-            return [
-                       html.H1("Something Else page", style={"textAlign": "center"}),
-                   ], [current_user.username]
         elif pathname == "/application/test_strava":
             return [
                        html.H1("Activity", style={"textAlign": "center"}),
-                       html.H2(current_user.id),
+                       html.H2(f"Current user id: {current_user.id}"),
                        test_strava_methods_page.make_layout()
                    ], [current_user.username]
         elif "/application/test" in pathname:
@@ -82,10 +78,10 @@ def register_callbacks(dashapp):
         if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
             interval_range = relayout_data_to_range(relayout_data)
             if interval_range:
-                io_wrapper = IO()
-                activity = io_wrapper.get_cp_activity_by_id(int(data))
+                io = IO(current_user.id)
+                activity = io.get_cp_activity_by_id(int(data))
                 activity.new_interval(*interval_range)
-                io_wrapper.save_activity(activity)
+                io.save_activity(activity)
 
                 from .utils.scatter_drawer import ScatterDrawer
 

@@ -17,14 +17,21 @@ def make_layout(user_id=None, activity_id=None) -> dash.Dash.layout:
         last_activity = io.get_last_activity()
         io.save_activity(last_activity)
         return _make_layout(user_id, last_activity)
-    return _make_layout(user_id, IO().get_cp_activity_by_id(int(activity_id)))
+    return _make_layout(user_id, IO(user_id=user_id).get_cp_activity_by_id(int(activity_id)))
 
 
 def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
+
+    series_to_plot = {
+        'Ride': ['watts', 'heartrate', 'cadence'],
+        'VirtualRide': ['watts', 'heartrate', 'cadence'],
+        "Run": ['velocity_smooth', 'heartrate', 'cadence']
+    }
+
     fig = ScatterDrawer(
         activity=activity,
         index_col='time',
-        series_to_plot=['watts', 'heartrate', 'cadence'],
+        series_to_plot=series_to_plot[activity.type],
     )
     layout = html.Div([
         html.H1("Activity", style={"textAlign": "center"}),

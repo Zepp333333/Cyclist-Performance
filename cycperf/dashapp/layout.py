@@ -50,15 +50,12 @@ navbar = html.Div([
 
 sidebar = html.Div(
     [
-        html.H2("Sidebar", className="display-4"),
-        html.H3(id="username_placeholder", children=[], className="display-4"),
+        html.H3(id="username_placeholder", children=[], className="display-5"),
         html.Hr(),
-        html.P("Some text here", className="lead"),
         dbc.Nav(
             [
                 dbc.NavLink("Calendar", href="/application/", active="exact"),
                 dbc.NavLink("Activity", href="/application/activity", active="exact"),
-                dbc.NavLink("Something else", href="/application/else", active="exact"),
                 dbc.NavLink("test", href="/application/test/12", active="exact"),
                 dbc.NavLink("Test Strava Methods", href="/application/test_strava", active="exact")
             ],

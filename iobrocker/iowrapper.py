@@ -16,7 +16,7 @@ from iobrocker import dbutil, strava_auth
 from iobrocker.utils import CustomEncoder, CustomDecoder, get_activity_factory
 from iobrocker import strava_swagger
 from middleware import Activity
-from middleware import CyclingActivityFactory
+from middleware import CyclingActivityFactory, PresentationActivity
 from cycperf.models import DBActivity
 
 
@@ -36,7 +36,7 @@ class IO:
     """
 
     def __init__(self, user_id: int = None, token_refresh=True):
-        self.user_id = user_id if user_id else current_user.id
+        self.user_id = user_id
 
         if token_refresh and self.is_strava_token_expired():
             self.refresh_token()
@@ -49,12 +49,11 @@ class IO:
     def get_athlete_info(self) -> json:
         raise NotImplemented
 
-    def get_list_of_activities(self, start_date: datetime, end_date: datetime) -> list[Activity]:
-        list_of_ids: list[int] = dbutil.get_list_of_activities_in_range(start_date, end_date)
-        output = []
-        for activity_id in list_of_ids:
-            output.append(self.get_cp_activity_by_id(activity_id, get_streams=False))
-        return output
+    def get_list_of_activities_in_range(self, start_date: datetime, end_date: datetime) -> list[PresentationActivity]:
+        activities = dbutil.get_list_of_activities_in_range(self.user_id, start_date, end_date)
+        return [self._make_presentation_activity(a) for a in activities]
+
+
 
     def get_activities_from_strava(self, get_streams: bool = False, **kwargs) -> list[Activity]:
         result = []
@@ -65,7 +64,7 @@ class IO:
         return result
 
     def get_cp_activity_by_id(self, activity_id: int, get_streams: bool = True) -> Activity:
-        db_activity = dbutil.get_activity_from_db(activity_id=activity_id)
+        db_activity = dbutil.get_activity_from_db(user_id=self.user_id, activity_id=activity_id)
         if not db_activity:
             raise ActivityNotFoundInDB(id=activity_id, message=f"Activity {activity_id} not found in DB")
         return self._make_cp_activity_from_db_activity(db_activity, get_streams)
@@ -83,7 +82,7 @@ class IO:
         return factory.get_activity(
             id=db_activity.activity_id,
             athlete_id=db_activity.athlete_id,
-            name=details['name'],
+            name=db_activity.name if db_activity.name else details['name'],
             date=db_activity.date,
             dataframe=pd.read_json(db_activity.dataframe),
             details=details,
@@ -110,6 +109,7 @@ class IO:
             athlete_id=activity.athlete_id,
             activity_id=activity.id,
             date=activity.date,
+            name=activity.name,
             details=json.dumps(activity.details, cls=CustomEncoder, indent=4),
             dataframe=activity.dataframe.to_json(indent=4),
             laps='',
@@ -180,6 +180,24 @@ class IO:
     def get_activities_by_date(self, ):
         pass
 
+    def _make_presentation_activity(self, a: DBActivity) -> PresentationActivity:
+        return PresentationActivity(
+            id=a.activity_id,
+            date=a.date,
+            name=self.get_name_of_activity(a),
+            type=self.get_type_of_activity(a.details)
+        )
+
+    def get_type_of_activity(self, details: str) -> str:
+        d = json.loads(details, cls=CustomDecoder)
+        return d['type']
+
+    def get_name_of_activity(self, a: DBActivity) -> str:
+        if a.name:
+            return a.name
+        else:
+            d = json.loads(a.details, cls=CustomDecoder)
+            return d['name']
 
 def _make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:
     """

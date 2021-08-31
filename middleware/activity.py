@@ -38,7 +38,7 @@ class Activity(ABC):
     dataframe: pd.DataFrame
     details: dict
     intervals: list[Interval] = field(default_factory=list[Interval])
-    type: str = 'bike'
+    type: str = 'Ride'
 
     def __post_init__(self) -> None:
         if not self.dataframe.empty:
@@ -103,3 +103,10 @@ class Activity(ABC):
 @dataclass
 class CyclingActivity(Activity):
     """Represents Cycling Activity"""
+    type: str = 'Ride'
+
+
+@dataclass
+class RunningActivity(Activity):
+    """Represents Running Activity"""
+    type: str = 'Run'

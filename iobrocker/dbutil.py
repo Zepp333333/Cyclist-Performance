@@ -86,14 +86,15 @@ def update_user(user_id: int, update: dict = None) -> None:
             raise UserDoesNotExist(id=user_id, message=f"User id {user_id} doesn't exist in database")
 
 
-def get_activity_from_db(activity_id: int) -> Optional[DBActivity]:
+def get_activity_from_db(user_id, activity_id: int) -> Optional[DBActivity]:
     """
         Looks up cycperf activity pickled object in database
+        :param user_id: cycperf user id
         :param activity_id: strava activity id
         :return: cycperf DBActivity object
         """
     try:
-        db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
+        db_activity = DBActivity.query.filter_by(user_id=user_id, activity_id=activity_id).first()
         return db_activity
     except Exception as e:
         # todo implement SQLAlchemy error handling
@@ -105,6 +106,7 @@ def _store_new_activity(user_id: int,
                         activity_id: int,
                         date: datetime.datetime,
                         details: str,
+                        name: str,
                         dataframe: str,
                         laps: str,
                         intervals: str) -> None:
@@ -118,6 +120,7 @@ def _store_new_activity(user_id: int,
     :param laps: list of laps
     :param dataframe: dumped dataframe
     :param details: activity details
+    :param name: activity name
     :return: None
     """
     # todo add try/except + handling in IO class. Modify tests accordingly
@@ -127,6 +130,7 @@ def _store_new_activity(user_id: int,
         athlete_id=athlete_id,
         date=date,
         details=details,
+        name=name,
         laps=laps,
         dataframe=dataframe,
         intervals=intervals,
@@ -144,6 +148,7 @@ def store_activity(user_id: int,
                    activity_id: int,
                    date: datetime.datetime,
                    details: str,
+                   name: str,
                    dataframe: str,
                    laps: str,
                    intervals: str) -> None:
@@ -153,6 +158,7 @@ def store_activity(user_id: int,
     :param athlete_id: strava athlete id
     :param activity_id: strava activity id
     :param date: activity start_date
+    :param name: activity name
     :param intervals: list of intervals
     :param laps: list of laps
     :param dataframe: dumped dataframe
@@ -160,10 +166,11 @@ def store_activity(user_id: int,
     :return: None
     """
     # todo rename
-    db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
+    db_activity = DBActivity.query.filter_by(user_id=user_id, activity_id=activity_id).first()
     if db_activity:
         db_activity.intervals = intervals
         db_activity.dataframe = dataframe
+        db_activity.name = name
         db.session.commit()
     else:
         _store_new_activity(user_id=user_id,
@@ -173,7 +180,8 @@ def store_activity(user_id: int,
                             intervals=intervals,
                             laps=laps,
                             dataframe=dataframe,
-                            details=details)
+                            details=details,
+                            name=name)
 
 
 def delete_activity(user_id: int, activity_id: int) -> None:
@@ -184,7 +192,7 @@ def delete_activity(user_id: int, activity_id: int) -> None:
     :return: None
     """
     # todo implement: check if activity belongs to user_id
-    db_activity = DBActivity.query.filter_by(activity_id=activity_id).first()
+    db_activity = DBActivity.query.filter_by(user_id=user_id, activity_id=activity_id).first()
     db.session.delete(db_activity)
     db.session.commit()
 
@@ -216,19 +224,17 @@ def read_dataframe_from_csv(filename: str = "ride.csv", data_path: str = None) -
     return pd.read_csv(data_path.joinpath(filename))
 
 
-def get_list_of_activities_in_range(start_date, end_date) -> list[int]:
+def get_list_of_activities_in_range(user_id, start_date, end_date) -> list[DBActivity]:
     """
     Queries db to get list if activity ids within date range
+    :param user_id: id of the cycperf user
     :param start_date: datetime
     :param end_date: datetime
     :return: list of activity id's within given date range
     """
-    query = db.session.query(DBActivity).filter(DBActivity.date.between(start_date, end_date))
-    output = []
-    for activity in query:
-        output.append(activity.activity_id)
-    return output
+    query = db.session.query(DBActivity).filter(DBActivity.user_id == user_id, DBActivity.date.between(start_date, end_date)).all()
+    return query
 
 
-def save_db_activity(db_activity: DBActivity) -> None:
+def save_db_activity(_: DBActivity) -> None:
     db.session.commit()

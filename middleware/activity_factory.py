@@ -1,8 +1,8 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from .activity import Activity, CyclingActivity
-from .interval_factory import IntervalFactory, CyclingIntervalFactory
+from .activity import Activity, CyclingActivity, RunningActivity
+from .interval_factory import IntervalFactory, CyclingIntervalFactory, RunningIntervalFactory
 
 
 class ActivityFactory(ABC):
@@ -41,6 +41,31 @@ class CyclingActivityFactory(ActivityFactory):
 
     def get_interval_factory(self, *args, **kwargs) -> IntervalFactory:
         return CyclingIntervalFactory()
+
+
+class RunningActivityFactory(ActivityFactory):
+    """Factory that represents combination of Running Activity and Cycling Interval.
+       Doesn't maintain any of the instances it creates
+       """
+
+    def get_activity(self, **kwargs) -> Activity:
+        """
+        Constructs CyclingActivity together with CyclingInterval
+
+        :param id: int - activity id
+        :param name: str - activity name
+        :param athlete_id: int - athlete id
+        :param dataframe: pd.DataFrame - dataframe
+        :param details: str - dump of the activity details json
+        :param [optional] intervals: list[Interval] = field(default_factory=list[Interval])
+        :param [optional] type: str = 'bike'
+
+        """
+
+        return RunningActivity(interval_factory=self.get_interval_factory(), **kwargs)
+
+    def get_interval_factory(self, *args, **kwargs) -> IntervalFactory:
+        return RunningIntervalFactory()
 
 # todo remove testing code
 # import pandas as pd

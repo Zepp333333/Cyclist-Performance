@@ -6,7 +6,7 @@ from datetime import datetime
 from dash_table import DataTable
 
 from iobrocker import IO
-from middleware import Activity
+from middleware import Activity, PresentationActivity
 
 WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 WEEK_DAYS_DICT = {'Mon': 0, 'Tue': 1, 'Wed': 2, 'Thu': 3, 'Fri': 4, 'Sat': 5, 'Sun': 6}
@@ -45,7 +45,7 @@ class CPCalendar(calendar.Calendar):
         self.month = month
         super().__init__()
 
-    def format_day(self, day: datetime.date, activities: list[Activity]):
+    def format_day(self, day: datetime.date, activities: list[PresentationActivity]):
         if day != 0:
             activities_of_day = list(filter(lambda x: x.date.date() == day, activities))
             d = f"{day.day}"
@@ -57,26 +57,23 @@ class CPCalendar(calendar.Calendar):
             return d
         return {}
 
-    def format_week(self, week: list[datetime.date], activities: list[Activity]):
+    def format_week(self, week: list[datetime.date], activities: list[PresentationActivity]):
         w = {}
         for day in week:
             w[day_of_week_to_str(day.weekday())] = self.format_day(day, activities)
         return w
 
-    def format_month(self, month: list[list[datetime.date]], activities: list[Activity]):
+    def format_month(self, month: list[list[datetime.date]], activities: list[PresentationActivity]):
         m = []
         for week in month:
             m.append(self.format_week(week, activities))
         return m
 
-    def make_href(self, activity: Activity) -> str:
-        return f"<p><a href=\"/application/{activity.id}\">{activity.name}</a></p>"
-
 
 def make_layout(user_id):
     cal = calendar.Calendar().monthdatescalendar(2021, 8)
     io = IO(user_id)
-    activities_list = io.get_list_of_activities(cal[0][0], cal[-1][-1])
+    activities_list = io.get_list_of_activities_in_range(cal[0][0], cal[-1][-1])
     formatted_cal = CPCalendar().format_month(cal, activities_list)
 
     # columns = [

@@ -43,6 +43,7 @@ def store_call_parameters(mock_activity, test_user_id):
         'activity_id': mock_activity.id,
         'date': mock_activity.date,
         'details': mock_activity.details,
+        'name': mock_activity.details['name'],
         'dataframe': mock_activity.dataframe.to_json(),
         'laps': '',
         'intervals': json.dumps(mock_activity.intervals, cls=CustomEncoder, indent=4)
@@ -57,6 +58,7 @@ def store_call_parameters2(mock_activity2, test_user_id):
         'activity_id': mock_activity2.id,
         'date': mock_activity2.date,
         'details': mock_activity2.details,
+        'name': mock_activity2.name,
         'dataframe': mock_activity2.dataframe.to_json(),
         'laps': '',
         'intervals': json.dumps(mock_activity2.intervals, cls=CustomEncoder, indent=4)
@@ -105,8 +107,8 @@ def test_store_new_duplicate_activity(populate_db, store_call_parameters):
         dbutil._store_new_activity(**store_call_parameters)
 
 
-def test_get_activity_from_db(populate_db):
-    activity = dbutil.get_activity_from_db(activity_id=5806863104)
+def test_get_activity_from_db(populate_db, test_user_id):
+    activity = dbutil.get_activity_from_db(user_id=test_user_id, activity_id=5806863104)
     assert isinstance(activity, DBActivity)
 
 
@@ -135,6 +137,7 @@ def test_store_activity(populate_db, test_user_id, mock_activity, mock_activity2
               'date': mock_activity.date,
               'details': mock_activity.details,
               'dataframe': pd.DataFrame().to_json(),
+              'name': mock_activity.name,
               'laps': '',
               'intervals': []}
 

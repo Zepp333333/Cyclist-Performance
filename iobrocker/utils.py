@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from middleware import Interval, CyclingInterval, ActivityFactory, CyclingActivityFactory
+from middleware.activity_factory import RunningActivityFactory
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S%z'
 
@@ -58,7 +59,9 @@ class CustomDecoder(json.JSONDecoder):
 
 def get_activity_factory(details: dict) -> ActivityFactory:
     factories = {
-        "Ride": CyclingActivityFactory
+        "Ride": CyclingActivityFactory,
+        "VirtualRide": CyclingActivityFactory,
+        "Run": RunningActivityFactory
     }
 
     if 'type' in details:
