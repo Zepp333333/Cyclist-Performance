@@ -6,7 +6,7 @@ import pandas
 import pandas as pd
 import pytest
 
-from cycperf.models import DBActivity, Users
+from hardio.models import DBActivity, Users
 from iobrocker import dbutil, dbutil_admin
 from iobrocker.utils import CustomEncoder, CustomDecoder
 from middleware import Activity, CyclingActivityFactory

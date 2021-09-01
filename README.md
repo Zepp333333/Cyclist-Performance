@@ -1,21 +1,20 @@
 Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-# Cyclist Performance
+# HARDIO
 
-Cyclist Performance is a free Performance Management tool 
-for cyclists (and potentially runners in future) with emphasis on analysing cardiovascular 
+HARDIO is a free Performance Management tool for cyclists (and potentially runners in future) with emphasis on analysing cardiovascular 
 and metabolic effects of training with power.
 
-Besides, learning purpose (more on that below) in my cycling training journey I needed a simple 
+Besides the Software Development Learning purpose (more on that below) in my cycling training journey I needed a simple 
 way to analyse and visualize progress of my ability to recover after various training efforts.
 I'm talking mainly about post-interval Heart Rate (HR) recovery and HR drift spanning across weeks 
 and month of training. More ideas to come.  
 
 
-Cyclist Performance is deployed on a free Heroku Dyno and is [available](https://cyclist-performance.herokuapp.com/) for use (may take a while to load if Dyno has fallen asleep). You can either create your account and authorize application to get your cycling rides data from [Strava](http://strava.com) or 
+HARDIO is deployed on a free Heroku Dyno and is [available](https://hardio.herokuapp.com/) for use (may take a while to load if Dyno has fallen asleep). You can either create your account and authorize application to get your cycling rides data from [Strava](http://strava.com) or 
 play with test dataset based on my own rides. 
 
-This is  mainly a learning project as part of my Open Source Society University [journey](https://github.com/Zepp333333/OSSU "Sergei's OSSU Journey").
+Main emphasis of the project is a "close-to-real-world" software development experience as part of my Open Source Society University [journey](https://github.com/Zepp333333/OSSU "Sergei's OSSU Journey").
 
 Purpose: Gain experience of building a web application by doing along with learning and exercise 
 different concepts, techniques and  frameworks. Here is the ever-growing list of things:
@@ -34,7 +33,6 @@ different concepts, techniques and  frameworks. Here is the ever-growing list of
    - Strategy (tbd)
 - git basics
 - Unit and Functional testing (Pytest)
-- Pylint
 - Flask basics
    - SQLAlchemy basics
    - Flask migrate
@@ -43,10 +41,6 @@ different concepts, techniques and  frameworks. Here is the ever-growing list of
 - SwaggerClient
 - Web Hooks (tbd)
 - Packaging and deployment (Heroku)
-
-
-I've got a lots of inspiration from https://intervals.icu. 
-My kudos to David for making such a beautiful and powerful platform. 
 
 
 
@@ -69,7 +63,7 @@ My kudos to David for making such a beautiful and powerful platform.
     
     `export STRAVA_APP_REDIRECT_URI="http:<HOSTNAME>/exchange_token"`
     
-    `export FLASK_APP="cycperf:create_app()"`
+    `export FLASK_APP="hardio:create_app()"`
 
 
 2. `git push heroku master`

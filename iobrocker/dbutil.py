@@ -1,6 +1,6 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 """
-Database utilities module for Cyclist Performance application
+Database utilities module for HARDIO application
 Provides lower level interface to data manipulation in database (and file system for test purposes)
 """
 import pathlib
@@ -10,8 +10,8 @@ from typing import Optional
 import pandas as pd
 import sqlalchemy.exc
 
-from cycperf import db
-from cycperf.models import Users, DBActivity
+from hardio import db
+from hardio.models import Users, DBActivity
 
 
 class DuplicateActivity(Exception):
@@ -45,8 +45,8 @@ def get_user(user_id: int) -> Users:
 
 def get_strava_athlete_id_and_token(user_id: int) -> Optional[tuple[int, str]]:
     """
-    Looks up strava athlete_id and strava token for cycperf user in database
-    :param user_id: cycperf user id
+    Looks up strava athlete_id and strava token for hardio user in database
+    :param user_id: hardio user id
     :return: tuple[athlete_id, token]
     """
     try:
@@ -59,7 +59,7 @@ def get_strava_athlete_id_and_token(user_id: int) -> Optional[tuple[int, str]]:
 def get_athlete_info(user_id: int) -> Optional[str]:
     """
         Looks up athlete info in database
-        :param user_id: cycperf user id
+        :param user_id: hardio user id
         :return: strava athlete info (JSON string)
         """
     try:
@@ -71,8 +71,8 @@ def get_athlete_info(user_id: int) -> Optional[str]:
 
 def update_user(user_id: int, update: dict = None) -> None:
     """
-    updates Cycperf user record in database
-    :param user_id: Cycperf user id
+    updates hardio user record in database
+    :param user_id: hardio user id
     :param update: dict of filed:value to update
     :return:
     """
@@ -88,10 +88,10 @@ def update_user(user_id: int, update: dict = None) -> None:
 
 def get_activity_from_db(user_id, activity_id: int) -> Optional[DBActivity]:
     """
-        Looks up cycperf activity pickled object in database
-        :param user_id: cycperf user id
+        Looks up hardio activity pickled object in database
+        :param user_id: hardio user id
         :param activity_id: strava activity id
-        :return: cycperf DBActivity object
+        :return: hardio DBActivity object
         """
     try:
         db_activity = DBActivity.query.filter_by(user_id=user_id, activity_id=activity_id).first()
@@ -111,8 +111,8 @@ def _store_new_activity(user_id: int,
                         laps: str,
                         intervals: str) -> None:
     """
-    Creates new cycperf DBActivity object and stores it in database
-    param user_id: cycperf user id
+    Creates new hardio DBActivity object and stores it in database
+    param user_id: hardio user id
     :param athlete_id: strava athlete id
     :param activity_id: strava activity id
     :param date: activity start_date
@@ -153,8 +153,8 @@ def store_activity(user_id: int,
                    laps: str,
                    intervals: str) -> None:
     """
-    Stores Cycperf Activity in database
-    :param user_id: cycperf user id
+    Stores hardio Activity in database
+    :param user_id: hardio user id
     :param athlete_id: strava athlete id
     :param activity_id: strava activity id
     :param date: activity start_date
@@ -187,7 +187,7 @@ def store_activity(user_id: int,
 def delete_activity(user_id: int, activity_id: int) -> None:
     """
     Deletes stored Activity
-    :param user_id: Cycperf user id
+    :param user_id: hardio user id
     :param activity_id: strava activity id
     :return: None
     """
@@ -227,7 +227,7 @@ def read_dataframe_from_csv(filename: str = "ride.csv", data_path: str = None) -
 def get_list_of_activities_in_range(user_id, start_date, end_date) -> list[DBActivity]:
     """
     Queries db to get list if activity ids within date range
-    :param user_id: id of the cycperf user
+    :param user_id: id of the hardio user
     :param start_date: datetime
     :param end_date: datetime
     :return: list of activity id's within given date range

@@ -6,8 +6,8 @@ import requests
 from flask_login import current_user
 
 from config import Config
-from cycperf import db
-from cycperf.models import Users
+from hardio import db
+from hardio.models import Users
 
 
 class BearerAuth(requests.auth.AuthBase):

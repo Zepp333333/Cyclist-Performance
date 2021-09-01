@@ -10,11 +10,11 @@ from flask import (render_template, url_for, flash,
                    redirect, Blueprint, request)
 from flask_login import login_user, current_user, logout_user, login_required
 
-from cycperf import db, bcrypt
-from cycperf.models import Users
-from cycperf.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
-                                 RequestResetForm, ResetPasswordForm)
-from cycperf.users.utils import save_picture, send_reset_email
+from hardio import db, bcrypt
+from hardio.models import Users
+from hardio.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
+                                RequestResetForm, ResetPasswordForm)
+from hardio.users.utils import save_picture, send_reset_email
 from iobrocker import strava_auth
 
 users = Blueprint('users', __name__)

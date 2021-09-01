@@ -1,9 +1,9 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 """
-Runner for Cyclist Performance
+Runner for HARDIO
 Do not use it in a production deployment.
 """
-from cycperf import create_app
+from hardio import create_app
 
 app = create_app()
 

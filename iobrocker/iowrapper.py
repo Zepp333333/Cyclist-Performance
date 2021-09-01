@@ -17,7 +17,7 @@ from iobrocker.utils import CustomEncoder, CustomDecoder, get_activity_factory
 from iobrocker import strava_swagger
 from middleware import Activity
 from middleware import CyclingActivityFactory, PresentationActivity
-from cycperf.models import DBActivity
+from hardio.models import DBActivity
 
 
 class ActivityNotFoundInDB(Exception):
@@ -154,7 +154,7 @@ class IO:
 
     def make_cp_activity_from_strava_activity(self, strava_activity: dict, get_streams: bool = True) -> Activity:
         """
-        Builds cycperf activity object based on strava detailed activity
+        Builds hardio activity object based on strava detailed activity
         :param strava_activity:
         :return: Activity object
         :param get_streams: [Optional] Default True. Controls whether to call Strava API to get streams or not. Produce activity with

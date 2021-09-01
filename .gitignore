@@ -1,4 +1,4 @@
-cycperf/site.db
+hardio/site.db
 site.db
 site.db.old
 *.db*
@@ -10,6 +10,7 @@ htmlcov/
 # IDE:
 workspace.xml
 tasks.xml
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -5,7 +5,7 @@ import json
 import pytest
 import sqlalchemy
 from sqlalchemy.orm import close_all_sessions
-from cycperf import create_app
+from hardio import create_app
 from flask_migrate import upgrade
 
 from config import ConfigTest

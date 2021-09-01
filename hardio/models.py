@@ -4,7 +4,7 @@ Models for Flask SQLAlchemy.
 User - represents application user for authorization purposes
 DBActivity - represents Sport Activity metaphor
 """
-from cycperf import db, login_manager
+from hardio import db, login_manager
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app

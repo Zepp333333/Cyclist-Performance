@@ -4,8 +4,8 @@ Admin module providing simple interface to querying and manipulating data in dat
 Use for development and debug purpose only
 """
 
-from cycperf import db, bcrypt
-from cycperf.models import Users, DBActivity
+from hardio import db, bcrypt
+from hardio.models import Users, DBActivity
 
 
 def add_user(username: str, email: str, password: str, image_file: str = 'default.jpg', **kwargs) -> None:

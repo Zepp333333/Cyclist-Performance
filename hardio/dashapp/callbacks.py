@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output, State
 from flask import url_for
 from flask_login import current_user
 
-from cycperf.dashapp import activity_main, calendar, test_strava_methods_page, dash_external_redirect
+from hardio.dashapp import activity_main, calendar, test_strava_methods_page, dash_external_redirect
 from iobrocker import IO
 from iobrocker import strava_swagger
 

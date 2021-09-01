@@ -1,6 +1,6 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 """
-Cycling Performance (cycperf) application lets you connect to to your profile at
+HARDIO application lets you connect to to your profile at
 Strava.com, download activities and perform extensive analysis with emphasis on
 cycling activities and unique intent to enable post-interval recovery analysis on similar
 workouts.
@@ -51,8 +51,8 @@ def create_app(config_class=Config) -> Flask:
     login_manager.init_app(app)
     mail.init_app(app)
 
-    from cycperf.main.routes import main
-    from cycperf.users.routes import users
+    from hardio.main.routes import main
+    from hardio.users.routes import users
     # todo import errors.handlers
 
     app.register_blueprint(main)
@@ -70,15 +70,15 @@ def register_dash(app: Flask) -> None:
     :param app: Instance of Flask app
     :return: None
     """
-    from cycperf.dashapp.layout import layout
-    from cycperf.dashapp.callbacks import register_callbacks
+    from hardio.dashapp.layout import layout
+    from hardio.dashapp.callbacks import register_callbacks
 
     # Meta tags for viewport responsiveness
     meta_viewport = {"name": "viewport", "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
 
     dash_app = dash.Dash(__name__,
                          server=app,
-                         title='Cyclist Performance',
+                         title='HARDIO',
                          url_base_pathname='/application/',
                          external_stylesheets=[dbc.themes.BOOTSTRAP],
                          assets_folder=get_root_path(__name__) + 'dashboard/assets/',

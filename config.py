@@ -25,13 +25,13 @@ class Config:
 
 
 class ConfigTest:
-    TEST_DB_NAME = 'cp_test_db'
+    TEST_DB_NAME = 'hardio_test_db'
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
     DEBUG = True
     SECRET_KEY = os.environ.get('SECRET_KEY')
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASEDIR, 'app_test.db')
     TEST_DATABASE_SERVER = 'postgresql://postgres@localhost'
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/cp_test_db'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/hardio_test_db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Enable the TESTING flag to disable the error catching during request handling
