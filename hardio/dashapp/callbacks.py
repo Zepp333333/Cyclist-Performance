@@ -79,7 +79,7 @@ def register_callbacks(dashapp):
             interval_range = relayout_data_to_range(relayout_data)
             if interval_range:
                 io = IO(current_user.id)
-                activity = io.get_cp_activity_by_id(int(data))
+                activity = io.get_hardio_activity_by_id(int(data))
                 activity.new_interval(*interval_range)
                 io.save_activity(activity)
 

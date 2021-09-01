@@ -17,7 +17,7 @@ def make_layout(user_id=None, activity_id=None) -> dash.Dash.layout:
         last_activity = io.get_last_activity()
         io.save_activity(last_activity)
         return _make_layout(user_id, last_activity)
-    return _make_layout(user_id, IO(user_id=user_id).get_cp_activity_by_id(int(activity_id)))
+    return _make_layout(user_id, IO(user_id=user_id).get_hardio_activity_by_id(int(activity_id)))
 
 
 def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:

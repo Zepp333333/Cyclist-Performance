@@ -48,7 +48,7 @@ def drop_test_db() -> None:
     with sqlalchemy.create_engine("postgresql://postgres@localhost",
                                   isolation_level="AUTOCOMMIT").connect() as connection:
         close_all_sessions()
-        connection.execute(f'drop database cp_test_db WITH (FORCE)')
+        connection.execute(f'drop database hardio_test_db WITH (FORCE)')
 
 
 def add_activity(db_activity: DBActivity) -> None:

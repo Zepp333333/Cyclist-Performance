@@ -59,17 +59,17 @@ class IO:
         result = []
         strava_activities = strava_swagger.get_activities(self.user_id, **kwargs)
         for strava_activity in strava_activities:
-            result.append(self.make_cp_activity_from_strava_activity(strava_activity.to_dict(), get_streams))
+            result.append(self.make_hardio_activity_from_strava_activity(strava_activity.to_dict(), get_streams))
             self.save_activities(result)
         return result
 
-    def get_cp_activity_by_id(self, activity_id: int, get_streams: bool = True) -> Activity:
+    def get_hardio_activity_by_id(self, activity_id: int, get_streams: bool = True) -> Activity:
         db_activity = dbutil.get_activity_from_db(user_id=self.user_id, activity_id=activity_id)
         if not db_activity:
             raise ActivityNotFoundInDB(id=activity_id, message=f"Activity {activity_id} not found in DB")
-        return self._make_cp_activity_from_db_activity(db_activity, get_streams)
+        return self._make_hardio_activity_from_db_activity(db_activity, get_streams)
 
-    def _make_cp_activity_from_db_activity(self, db_activity: DBActivity, get_streams: bool = True) -> Activity:
+    def _make_hardio_activity_from_db_activity(self, db_activity: DBActivity, get_streams: bool = True) -> Activity:
         dataframe = pd.read_json(db_activity.dataframe)
         if dataframe.empty and get_streams:
             streams = strava_swagger.get_activity_streams(activity_id=db_activity.activity_id, user_id=self.user_id)
@@ -129,7 +129,7 @@ class IO:
         strava_activity = strava_swagger.get_activity_by_id(activity_id=int(activity_id),
                                                             user_id=self.user_id)
         if strava_activity:
-            activity = self.make_cp_activity_from_strava_activity(strava_activity.to_dict(), get_streams)
+            activity = self.make_hardio_activity_from_strava_activity(strava_activity.to_dict(), get_streams)
             return activity
         else:
             return None
@@ -152,7 +152,7 @@ class IO:
     def refresh_token(self):
         strava_auth.refresh_access_token(self.user_id)
 
-    def make_cp_activity_from_strava_activity(self, strava_activity: dict, get_streams: bool = True) -> Activity:
+    def make_hardio_activity_from_strava_activity(self, strava_activity: dict, get_streams: bool = True) -> Activity:
         """
         Builds hardio activity object based on strava detailed activity
         :param strava_activity:

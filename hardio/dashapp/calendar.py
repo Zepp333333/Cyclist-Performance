@@ -39,7 +39,7 @@ def get_month_template(year: int, month: int):
 # )
 
 
-class CPCalendar(calendar.Calendar):
+class HardioCalendar(calendar.Calendar):
     def __init__(self, year=None, month=None):
         self.year = year
         self.month = month
@@ -74,7 +74,7 @@ def make_layout(user_id):
     cal = calendar.Calendar().monthdatescalendar(2021, 8)
     io = IO(user_id)
     activities_list = io.get_list_of_activities_in_range(cal[0][0], cal[-1][-1])
-    formatted_cal = CPCalendar().format_month(cal, activities_list)
+    formatted_cal = HardioCalendar().format_month(cal, activities_list)
 
     # columns = [
     #     {'name': 'Mon', 'id': 'Mon', 'type': 'datetime', 'editable': False, 'presentation': 'markdown'},

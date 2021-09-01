@@ -143,7 +143,7 @@ def strava_login() -> redirect:
     :return: redirects user to strava.com for app authorization
     """
     return redirect(strava_auth.prep_app_auth_url())
-# todo consider the scenario if user creates new account in CP and tries to authorize already authorized strava account
+# todo consider the scenario if user creates new account in HARDIO and tries to authorize already authorized strava account
     # currently it leads to sqlalchemy.exc.IntegrityError
 
 

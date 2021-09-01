@@ -24,10 +24,10 @@ class TestIowrapper():
     def test__build_activity(self):
         assert False
 
-    def test_get_cp_activity_by_id(self, test_user_id, test_client, mock_activity):
+    def test_get_hardio_activity_by_id(self, test_user_id, test_client, mock_activity):
         io = IO(test_user_id, token_refresh=False)
         io.save_activity(mock_activity)
-        activity = io.get_cp_activity_by_id(5806863104)
+        activity = io.get_hardio_activity_by_id(5806863104)
         assert activity.id == 5806863104
         assert isinstance(activity.dataframe, pd.DataFrame)
 
@@ -67,6 +67,6 @@ class TestIowrapper():
         with open('tests/testing_data/detailed_activity.dill', 'rb') as f:
             strava_activity = dill.load(f)
         io = IO(test_user_id, token_refresh=False)
-        activity = io.make_cp_activity_from_strava_activity(strava_activity=strava_activity.to_dict(), get_streams=False)
+        activity = io.make_hardio_activity_from_strava_activity(strava_activity=strava_activity.to_dict(), get_streams=False)
         assert isinstance(activity, Activity)
         assert isinstance(activity.details, dict)

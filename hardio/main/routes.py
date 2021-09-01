@@ -24,7 +24,7 @@ def home() -> str:
     content = []
     try:
         user_id = current_user.id
-        return render_template('index.html', content=content, title='CP Home',
+        return render_template('index.html', content=content, title='HARDIO Home',
                                strava_authorized=IO(user_id).is_strava_authorized())
     except AttributeError:
         return render_template('index.html', content=content)
