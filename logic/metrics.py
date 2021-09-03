@@ -3,5 +3,5 @@
 from abc import ABC, abstractmethod
 import pandas as pd
 
-class Metric:
+class Metric(ABC):
 
