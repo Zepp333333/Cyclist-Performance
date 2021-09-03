@@ -2,7 +2,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 
-from middleware import Activity
+from logic import Activity
 
 
 class ScatterDrawer:

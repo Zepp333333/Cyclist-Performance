@@ -2,9 +2,9 @@
 
 import pandas as pd
 
-from middleware import Activity, CyclingActivity
-from middleware.interval import Interval
-from middleware.interval_factory import CyclingIntervalFactory
+from logic import Activity, CyclingActivity
+from logic.interval import Interval
+from logic.interval_factory import CyclingIntervalFactory
 
 
 class TestActivity:

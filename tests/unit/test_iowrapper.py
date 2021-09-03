@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from iobrocker import dbutil, IO
 import dill
-from middleware import Activity
+from logic import Activity
 
 
 

@@ -7,8 +7,8 @@ import numpy as np
 
 import pandas as pd
 
-from middleware import Interval, CyclingInterval, ActivityFactory, CyclingActivityFactory
-from middleware.activity_factory import RunningActivityFactory
+from logic import Interval, CyclingInterval, ActivityFactory, CyclingActivityFactory
+from logic.activity_factory import RunningActivityFactory
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S%z'
 

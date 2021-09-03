@@ -10,8 +10,8 @@ from flask_migrate import upgrade
 
 from config import ConfigTest
 from iobrocker import dbutil, dbutil_admin
-from middleware import CyclingActivity
-from middleware.interval_factory import CyclingIntervalFactory
+from logic import CyclingActivity
+from logic.interval_factory import CyclingIntervalFactory
 
 TEST_DB_NAME = ConfigTest.TEST_DB_NAME
 

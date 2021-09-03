@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime, timezone
 import json
 from iobrocker import CustomEncoder, CustomDecoder
-from middleware import Interval, CyclingInterval
+from logic import Interval, CyclingInterval
 from iobrocker import dbutil
 
 

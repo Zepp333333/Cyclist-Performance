@@ -9,7 +9,7 @@ import pytest
 from hardio.models import DBActivity, Users
 from iobrocker import dbutil, dbutil_admin
 from iobrocker.utils import CustomEncoder, CustomDecoder
-from middleware import Activity, CyclingActivityFactory
+from logic import Activity, CyclingActivityFactory
 
 
 

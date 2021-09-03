@@ -15,8 +15,8 @@ from flask_login import current_user
 from iobrocker import dbutil, strava_auth
 from iobrocker.utils import CustomEncoder, CustomDecoder, get_activity_factory
 from iobrocker import strava_swagger
-from middleware import Activity
-from middleware import CyclingActivityFactory, PresentationActivity
+from logic import Activity
+from logic import CyclingActivityFactory, PresentationActivity
 from hardio.models import DBActivity
 
 
