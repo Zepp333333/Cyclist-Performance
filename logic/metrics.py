@@ -86,12 +86,9 @@ class Bests:
         for k in self.bests.keys():
             means = dataframe.rolling(window=k).mean()
             max_mean = means.max()
-            print(max_mean)
-            window_starts = np.where(means.dropna().values == max_mean)[0].tolist()
-            windows = [(s, s + (k-1)) for s in window_starts]
-            self.bests[k] = Best(max_mean, windows)
-
-
+            window_starts = means.loc[means.values == float(max_mean)].index.to_list()
+            windows = [(s - k + 1, s) for s in window_starts]
+            self.bests[k] = Best(float(max_mean), windows)
 
 
 class Power(LinearMetric):
@@ -106,25 +103,6 @@ class Power(LinearMetric):
         self.avg = dataframe[self.dataframe_field].mean()
         self.min = dataframe[self.dataframe_field].min()
         self.max = dataframe[self.dataframe_field].max()
-
-
-def read_dataframe_from_csv(filename: str = "ride.csv", data_path: str = None) -> pd.DataFrame:
-    """
-    Reads csv file containing activity streams and returns pd.DataFrame
-    :param data_path: relative path to directory containing csv file
-    :param filename: csv file name
-    :return: DataFrame with activity streams
-    """
-    # get relative data folder
-    import pathlib
-    path = pathlib.Path(__file__).parent.parent
-    if not data_path:
-        data_path = path.joinpath("tests/testing_data").resolve()
-    return pd.read_csv(data_path.joinpath(filename))
-
-df = read_dataframe_from_csv()
-b = Bests()
-b.calculate(df.watts)
 
 
 
