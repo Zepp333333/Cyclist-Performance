@@ -85,8 +85,8 @@ def register_dash(app: Flask) -> None:
                          assets_folder=get_root_path(__name__) + 'dashboard/assets/',
                          meta_tags=[meta_viewport])
 
-    dash_app.enable_dev_tools(dev_tools_ui=True,
-                              dev_tools_serve_dev_bundles=True, )
+    # dash_app.enable_dev_tools(dev_tools_ui=True,
+    #                           dev_tools_serve_dev_bundles=True, )
     with app.app_context():
         dash_app.layout = layout
         register_callbacks(dash_app)
