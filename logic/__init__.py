@@ -5,6 +5,7 @@ from .activity import Activity, CyclingActivity, RunningActivity
 from .activity_factory import ActivityFactory, CyclingActivityFactory, RunningActivityFactory
 from .pactivity import PresentationActivity
 from .metrics import Metric, Bests, LinearMetric, Power
+from .derivatives import Derivative, MovingAverage
 
 
 

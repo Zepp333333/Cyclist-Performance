@@ -12,6 +12,7 @@ import swagger_client.models
 
 from .interval_factory import IntervalFactory
 from .interval import Interval
+from .interval_finder import IntervalFinder
 
 from typing import Optional
 
@@ -31,6 +32,7 @@ class IntervalDoNotExit(Exception):
 class Activity(ABC):
     """Represents basic activity interface"""
     interval_factory: IntervalFactory
+    interval_finder: IntervalFinder
     id: int
     name: str
     athlete_id: int
@@ -99,6 +101,22 @@ class Activity(ABC):
     def from_pickle(cls, pickle_str) -> Activity:
         return pickle.loads(pickle_str)
 
+    def find_intervals(self, duration: int, count: int, power: int, tolerance: float) -> list[Interval]:
+        found = self.interval_finder.find_manual(duration=duration,
+                                                 count=count,
+                                                 tolerance=tolerance,
+                                                 dataframe=self.dataframe.watts,
+                                                 power=power)
+        intervals = []
+        i = 1
+        for interval in found:
+            intervals.append(self._make_interval(interval[0], interval[1], f'{duration}-sec interval {i}'))
+            i += 1
+        return intervals
+
+    def delete_intervals(self) -> None:
+        self.intervals = []
+        self.make_whole_activity_interval()
 
 @dataclass
 class CyclingActivity(Activity):

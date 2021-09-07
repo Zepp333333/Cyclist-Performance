@@ -38,7 +38,7 @@ navbar = html.Div([
     html.Header([
         html.Nav([
             html.Div([
-                html.A("HARDIO", href="/Application/", className="navbar-brand mr-4")
+                html.A("HARDIO", href="/", className="navbar-brand mr-4")
             ], "Navbar_Container", className="container")
         ], "Navbar",
             className="navbar navbar-expand-md navbar-dark bg-steel fixed-top",

@@ -49,7 +49,6 @@ def register_callbacks(dashapp):
                        html.H2(activity_id)
                    ], [current_user.username]
 
-
         # If the user tries to reach a different page, return a 404 message
         return dbc.Jumbotron(
             [
@@ -59,50 +58,66 @@ def register_callbacks(dashapp):
             ]
         )
 
-    @dashapp.callback(
-        Output(component_id='my-fig', component_property='figure'),
-        [Input(component_id='create_interval', component_property='n_clicks'),
-         Input(component_id='current_activity', component_property='data')],
-        [State(component_id='my-fig', component_property='relayoutData')],
-        prevent_initial_call=True
-    )
-    def create_interval(n_clicks: int, data: int, relayout_data: dict):
-        """
-        Creates an interval in current activity based on relayoutData and button click"
-        :param n_clicks: number of create_interval button clicks
-        :param data: dcc.store containing integer id of current activity
-        :param relayout_data: dict containing ends of a range slider (or user selection on a graph)
-        :return: go.Figure
-        """
-        ctx = dash.callback_context
-        if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
-            interval_range = relayout_data_to_range(relayout_data)
-            if interval_range:
-                io = IO(current_user.id)
-                activity = io.get_hardio_activity_by_id(int(data))
-                activity.new_interval(*interval_range)
-                io.save_activity(activity)
 
-                from .utils.scatter_drawer import ScatterDrawer
 
-                new_fig = ScatterDrawer(
-                    activity=activity,
-                    index_col='time',
-                    series_to_plot=['watts', 'heartrate', 'cadence'],
-                )
-                return new_fig.get_fig()
-        return dash.no_update
-
-    def relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
-        """Helper fuction converting relaout_daya dict to tuple"""
-        try:
-            if len(relayout_data) == 1:
-                return int(relayout_data['xaxis.range'][0]), int(relayout_data['xaxis.range'][1])
-            else:
-                result = [int(v) for v in relayout_data.values()]
-                return result[0], result[1]
-        except KeyError:
-            return tuple()
+    # @dashapp.callback(
+    #     Output(component_id='my-fig', component_property='figure'),
+    #     [Input(component_id='find_intervals', component_property='n_clicks'),
+    #      Input(component_id='interval_length', component_property='value'),
+    #      Input(component_id='how_many_to_find', component_property='value'),
+    #      Input(component_id='interval_power', component_property='value'),
+    #      Input(component_id='interval_tolerance', component_property='value'),
+    #      Input(component_id='current_activity', component_property='data')],
+    #     prevent_initial_call=True
+    # )
+    # def find_intervals(n_clicks: int,
+    #                    interval_length: int,
+    #                    how_many_to_find: int,
+    #                    interval_power: int,
+    #                    interval_tolerance: int,
+    #                    data: int):
+    #     """
+    #     Finds intervals in activity based on provided parameters
+    #     :param n_clicks: number of create_interval button clicks
+    #     :param interval_length - length of interval in seconds
+    #     :param how_many_to_find - how many intervals to find
+    #     :param interval_power: power to look for
+    #     :param interval_tolerance - tolerance in % to power intervals to look for
+    #     :param data: dcc.store containing integer id of current activity
+    #     :return: go.Figure
+    #     """
+    #     ctx = dash.callback_context
+    #     if not ctx.triggered[0]['prop_id'] == 'find_intervals.n_clicks':
+    #         return dash.no_update
+    #
+    #     if not interval_length or interval_length == 0:
+    #         interval_length = 300
+    #     if not how_many_to_find or how_many_to_find == 0:
+    #         how_many_to_find = 5
+    #     if not interval_tolerance or interval_tolerance == 0:
+    #         interval_tolerance = 0.2
+    #     else:
+    #         interval_tolerance /= 100
+    #     if not interval_power or interval_power == 0:
+    #         interval_power = None
+    #
+    #     io = IO(current_user.id)
+    #     activity = io.get_hardio_activity_by_id(int(data))
+    #     found_intervals = activity.find_intervals(length=interval_length,
+    #                                               count=how_many_to_find,
+    #                                               power=interval_power,
+    #                                               tolerance=interval_tolerance)
+    #     activity.add_intervals(found_intervals)
+    #     io.save_activity(activity)
+    #
+    #     from .utils.scatter_drawer import ScatterDrawer
+    #
+    #     new_fig = ScatterDrawer(
+    #         activity=activity,
+    #         index_col='time',
+    #         series_to_plot=['watts', 'heartrate', 'cadence'],
+    #     )
+    #     return new_fig.get_fig()
 
     @dashapp.callback(
         Output(component_id='get_athlete_output', component_property='children'),
@@ -133,10 +148,6 @@ def register_callbacks(dashapp):
         else:
             return dash_external_redirect.redirect(url_for('users.strava_login')), True
 
-
-
-
-
     # def get_athlete(_):
     #         athlete = strava_swagger.get_athlete()
     #         if athlete:
@@ -144,36 +155,36 @@ def register_callbacks(dashapp):
     #         else:
 #             return '', True
 
-        # @dashapp.callback(
-        #        Output(component_id='my-fig', component_property='figure'),
-        #        [Input(component_id='create_interval', component_property='n_clicks')],
-        #        [State(component_id='my-fig', component_property='relayoutData')],
-        #        prevent_initial_call=True
-        #    )
-        #    def create_interval(n_clicks, relayout_data):
-        #
-        #        from .activity_main import ride
-        #        from .utils.scatter_drawer import ScatterDrawer
-        #
-        #        ctx = dashapp.callback_context
-        #        if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
-        #            interval_range = relayout_data_to_range(relayout_data)
-        #            if interval_range:
-        #                ride._make_interval(*interval_range)
-        #
-        #            new_fig = ScatterDrawer(
-        #                activity=ride,
-        #                index_col='time',
-        #                series_to_plot=['watts', 'heartrate', 'cadence'],
-        #            )
-        #            return new_fig.get_fig()
-        #
-        #    def relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
-        #        try:
-        #            if len(relayout_data) == 1:
-        #                return int(relayout_data['xaxis.range'][0]), int(relayout_data['xaxis.range'][1])
-        #            else:
-        #                result = [int(v) for v in relayout_data.values()]
-        #                return result[0], result[1]
-        #        except KeyError:
-        #            return tuple()
+# @dashapp.callback(
+#        Output(component_id='my-fig', component_property='figure'),
+#        [Input(component_id='create_interval', component_property='n_clicks')],
+#        [State(component_id='my-fig', component_property='relayoutData')],
+#        prevent_initial_call=True
+#    )
+#    def create_interval(n_clicks, relayout_data):
+#
+#        from .activity_main import ride
+#        from .utils.scatter_drawer import ScatterDrawer
+#
+#        ctx = dashapp.callback_context
+#        if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
+#            interval_range = relayout_data_to_range(relayout_data)
+#            if interval_range:
+#                ride._make_interval(*interval_range)
+#
+#            new_fig = ScatterDrawer(
+#                activity=ride,
+#                index_col='time',
+#                series_to_plot=['watts', 'heartrate', 'cadence'],
+#            )
+#            return new_fig.get_fig()
+#
+#    def relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
+#        try:
+#            if len(relayout_data) == 1:
+#                return int(relayout_data['xaxis.range'][0]), int(relayout_data['xaxis.range'][1])
+#            else:
+#                result = [int(v) for v in relayout_data.values()]
+#                return result[0], result[1]
+#        except KeyError:
+#            return tuple()

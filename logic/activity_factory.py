@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from .activity import Activity, CyclingActivity, RunningActivity
 from .interval_factory import IntervalFactory, CyclingIntervalFactory, RunningIntervalFactory
+from .interval_finder import IntervalFinder
 
 
 class ActivityFactory(ABC):
@@ -15,6 +16,10 @@ class ActivityFactory(ABC):
 
     @abstractmethod
     def get_interval_factory(self) -> IntervalFactory:
+        """Returns interval belonging to this factory"""
+
+    @abstractmethod
+    def get_interval_finder(self) -> IntervalFinder:
         """Returns interval belonging to this factory"""
 
 
@@ -37,10 +42,16 @@ class CyclingActivityFactory(ActivityFactory):
 
         """
 
-        return CyclingActivity(interval_factory=self.get_interval_factory(), **kwargs)
+        return CyclingActivity(interval_factory=self.get_interval_factory(),
+                               interval_finder=self.get_interval_finder(),
+                               **kwargs)
 
     def get_interval_factory(self, *args, **kwargs) -> IntervalFactory:
         return CyclingIntervalFactory()
+
+    def get_interval_finder(self) -> IntervalFinder:
+        """Returns interval belonging to this factory"""
+        return IntervalFinder()
 
 
 class RunningActivityFactory(ActivityFactory):
@@ -62,10 +73,16 @@ class RunningActivityFactory(ActivityFactory):
 
         """
 
-        return RunningActivity(interval_factory=self.get_interval_factory(), **kwargs)
+        return RunningActivity(interval_factory=self.get_interval_factory(),
+                               interval_finder=self.get_interval_finder(),
+                               **kwargs)
 
     def get_interval_factory(self, *args, **kwargs) -> IntervalFactory:
         return RunningIntervalFactory()
+
+    def get_interval_finder(self) -> IntervalFinder:
+        """Returns interval belonging to this factory"""
+        return IntervalFinder()
 
 # todo remove testing code
 # import pandas as pd

@@ -72,6 +72,7 @@ def register_dash(app: Flask) -> None:
     """
     from hardio.dashapp.layout import layout
     from hardio.dashapp.callbacks import register_callbacks
+    from hardio.dashapp.interval_callbacks import register_interval_callbacks
 
     # Meta tags for viewport responsiveness
     meta_viewport = {"name": "viewport", "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
@@ -84,9 +85,12 @@ def register_dash(app: Flask) -> None:
                          assets_folder=get_root_path(__name__) + 'dashboard/assets/',
                          meta_tags=[meta_viewport])
 
+    dash_app.enable_dev_tools(dev_tools_ui=True,
+                              dev_tools_serve_dev_bundles=True, )
     with app.app_context():
         dash_app.layout = layout
         register_callbacks(dash_app)
+        register_interval_callbacks(dash_app)
 
     _protect_dash_views(dash_app)
 

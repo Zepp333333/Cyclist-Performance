@@ -37,7 +37,36 @@ def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
         html.H1("Activity", style={"textAlign": "center"}),
         html.H2(user_id),
         html.Button('Create Interval', id='create_interval', n_clicks=0, className="btn btn-primary"),
+        html.Br(),
+        html.Div(
+            [
+                dcc.Input(
+                    id='interval_duration',
+                    type="number",
+                    placeholder='Set interval length',
+                ),
+                dcc.Input(
+                    id='how_many_to_find',
+                    type="number",
+                    placeholder='How many to find',
+                ),
+                dcc.Input(
+                    id='interval_power',
+                    type="number",
+                    placeholder='Interval Power, wt',
+                ),
+                dcc.Input(
+                    id='interval_tolerance',
+                    type="number",
+                    placeholder='Tolerance %',
+                ),
+                html.Button('Find Intervals', id='find_intervals', n_clicks=0, className="btn btn-primary"),
+            ]
+        ),
+        html.Br(),
+        html.Button('Delete Intervals', id='delete_intervals', n_clicks=0, className="btn btn-primary"),
         dcc.Graph(id='my-fig', figure=fig.get_fig()),
+
 
         # dcc.Store inside the app that stores the intermediate value
         dcc.Store(id='current_activity', data=activity.id)  # prepare_activity_for_dcc_store(activity))
