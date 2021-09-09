@@ -59,7 +59,6 @@ def register_callbacks(dashapp):
         )
 
 
-
     # @dashapp.callback(
     #     Output(component_id='my-fig', component_property='figure'),
     #     [Input(component_id='find_intervals', component_property='n_clicks'),

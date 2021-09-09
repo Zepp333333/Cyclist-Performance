@@ -62,10 +62,10 @@ class ScatterDrawer:
             ))
         # add empty trace for interval annotations on top
         self.figure.add_trace(go.Scatter(
-                x=[1],
-                y=[1],
-                visible=False
-            ))
+            x=[1],
+            y=[1],
+            visible=False
+        ))
 
     def configure_traces(self) -> None:
         """
@@ -185,7 +185,12 @@ class ScatterDrawer:
                     xref="x",
                     xanchor="left",
                     yanchor="top",
-                    yref="paper"
+                    yref="paper",
+                    font=dict(
+                        family="sans serif",
+                        size=6,
+                        color="crimson",
+                    ),
                 )
             )
 
@@ -226,4 +231,3 @@ class ScatterDrawer:
 
     def update_data_series(self, new_data_series: list[str]) -> None:
         self.series_to_plot = new_data_series
-

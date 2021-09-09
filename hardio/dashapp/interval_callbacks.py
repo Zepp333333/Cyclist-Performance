@@ -73,7 +73,6 @@ def register_interval_callbacks(dashapp):
         return dash.no_update
 
     def _make_new_fig(activity):
-        from .utils.scatter_drawer import ScatterDrawer
         new_fig = ScatterDrawer(
             activity=activity,
             index_col='time',

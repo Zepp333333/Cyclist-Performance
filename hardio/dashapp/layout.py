@@ -19,7 +19,7 @@ SIDEBAR_STYLE = {
     "top": 0,
     "left": 0,
     "bottom": 0,
-    "width": "16rem",
+    "width": "10rem",
     "padding": "2rem 1rem",
     "background-color": "#f8f9fa",
     "margin-top": "2rem"
@@ -29,8 +29,8 @@ SIDEBAR_STYLE = {
 CONTENT_STYLE = {
     "position": "relative",
     "margin-top": "2rem",
-    "margin-left": "18rem",
-    "margin-right": "2rem",
+    "margin-left": "11rem",
+    "margin-right": "1rem",
     "padding": "2rem 1rem",
 }
 

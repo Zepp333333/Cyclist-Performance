@@ -18,7 +18,6 @@ class IntervalFinder:
                                                                params['tolerance'])  # filter candidates by power, if provided
         local_max_candidates = self._remove_non_local_max_candidates(filtered_candidates)
         non_overlapping_candidates = self._remove_overlapping_candidates(local_max_candidates, params['duration'])
-        print(non_overlapping_candidates)
         return self._make_intervals_list(params['duration'], non_overlapping_candidates.nlargest(params['count']))
 
     def _produce_candidates(self, dataframe: pd.DataFrame, duration: int):
@@ -131,37 +130,37 @@ def read_dataframe_from_csv(filename: str = "ride.csv", data_path: str = None) -
     return pd.read_csv(data_path.joinpath(filename))
 
 
-# def test():
-duration = 70
-count = 12
-power = 300
-tolerance = 0.05
+def test():
+    duration = 70
+    count = 12
+    power = 300
+    tolerance = 0.05
 
-df = read_dataframe_from_csv(filename='12_alps.csv')
-finder = IntervalFinder()
-found = finder.find_manual(duration, count, tolerance, df.watts)
-print(found)
+    df = read_dataframe_from_csv(filename='12_alps.csv')
+    finder = IntervalFinder()
+    found = finder.find_manual(duration, count, tolerance, df.watts)
+    print(found)
 
-list_intervals = []
-for r in found:
-    list_intervals.extend(list(range(r[0], r[1])))
+    list_intervals = []
+    for r in found:
+        list_intervals.extend(list(range(r[0], r[1])))
 
-import numpy as np
+    import numpy as np
 
-newdf = pd.DataFrame({'watts': df.watts})
-newdf['intervals'] = np.nan
-for i in list_intervals:
-    newdf.loc[i, 'intervals'] = power
+    newdf = pd.DataFrame({'watts': df.watts})
+    newdf['intervals'] = np.nan
+    for i in list_intervals:
+        newdf.loc[i, 'intervals'] = power
 
-import plotly.graph_objects as go
+    import plotly.graph_objects as go
 
-fig = go.Figure()
-# Full line
-fig.add_scattergl(x=newdf.index, y=newdf.watts, line={'color': 'blue'})
-# Above threshhgold
-fig.add_scattergl(y=newdf.intervals, line={'color': 'red'})
+    fig = go.Figure()
+    # Full line
+    fig.add_scattergl(x=newdf.index, y=newdf.watts, line={'color': 'blue'})
+    # Above threshhgold
+    fig.add_scattergl(y=newdf.intervals, line={'color': 'red'})
 
-fig.show()
+    fig.show()
 
 
 # idf = pd.DataFrame(([s, f] for s, f in found), columns=['start', 'end'])
