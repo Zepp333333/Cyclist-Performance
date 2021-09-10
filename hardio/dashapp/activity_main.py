@@ -62,6 +62,13 @@ def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
 
 
 def make_activity_info_header(activity: Activity):
+    if activity.type == 'Run':
+        return html.Div(
+            [
+
+            ]
+        )
+
     line1 = dbc.ListGroup(
         [
             dbc.ListGroupItem(

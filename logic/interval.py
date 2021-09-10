@@ -18,11 +18,11 @@ class Interval(ABC):
     end: int = None
     dataframe: pd.DataFrame = pd.DataFrame()
 
-    def __post_init__(self) -> None:
-        """Populate post-init fields and metrics"""
-        self.sort_index = self.id
-        self.populate_metrics(self.dataframe)
-        del self.dataframe
+    # def __post_init__(self) -> None:
+    #     """Populate post-init fields and metrics"""
+    #     self.sort_index = self.id
+    #     self.populate_metrics(self.dataframe)
+    #     del self.dataframe
 
     def create(self, id, activity_id, name, start, end, dataframe) -> Interval:
         """Return populated interval. Use for factory instantiated instances"""
@@ -106,11 +106,15 @@ class RunningInterval(Interval):
     min_hr: int = 0
 
     def populate_metrics(self, dataframe: pd.DataFrame) -> None:
+        print(f"start = {self.start}, end= {self.end}")
+        print(dataframe)
         """Compute and populate interval metrics"""
         df = dataframe.iloc[self.start:self.end]
         if 'pace' in df:
             self.populate_pace(df)
         if 'heartrate' in df:
+            print(df)
+            print(df['heartrate'].mean())
             self.populate_hr(df)
 
     def populate_pace(self, df: pd.DataFrame) -> None:
