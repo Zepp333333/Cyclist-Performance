@@ -4,8 +4,9 @@ import dash
 from dash.dependencies import Input, Output, State
 from flask_login import current_user
 
-from hardio.dashapp.utils import ScatterDrawer
 from iobrocker import IO
+
+from .activity_main import make_figure
 
 
 def register_interval_callbacks(dashapp):
@@ -49,14 +50,14 @@ def register_interval_callbacks(dashapp):
                 activity = io.get_hardio_activity_by_id(int(data))
                 activity.new_interval(*interval_range)
                 io.save_activity(activity)
-                return _make_new_fig(activity)
+                return make_figure(activity)
 
         elif ctx.triggered[0]['prop_id'] == 'delete_intervals.n_clicks':
             io = IO(current_user.id)
             activity = io.get_hardio_activity_by_id(int(data))
             activity.delete_intervals()
             io.save_activity(activity)
-            return _make_new_fig(activity)
+            return make_figure(activity)
 
         elif ctx.triggered[0]['prop_id'] == 'find_intervals.n_clicks':
 
@@ -69,16 +70,9 @@ def register_interval_callbacks(dashapp):
             activity.add_intervals(found_intervals)
             io.save_activity(activity)
 
-            return _make_new_fig(activity)
+            return make_figure(activity)
         return dash.no_update
 
-    def _make_new_fig(activity):
-        new_fig = ScatterDrawer(
-            activity=activity,
-            index_col='time',
-            series_to_plot=['watts', 'heartrate', 'cadence'],
-        )
-        return new_fig.get_fig()
 
     def _relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
         """Helper fuction converting relaout_daya dict to tuple"""

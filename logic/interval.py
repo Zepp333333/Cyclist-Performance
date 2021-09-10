@@ -16,7 +16,7 @@ class Interval(ABC):
     name: str = None
     start: int = None
     end: int = None
-    dataframe: pd.DataFrame = pd.DataFrame()
+    # dataframe: pd.DataFrame = pd.DataFrame()
 
     # def __post_init__(self) -> None:
     #     """Populate post-init fields and metrics"""
@@ -32,6 +32,7 @@ class Interval(ABC):
         self.start = start
         self.end = end
         self.populate_metrics(dataframe)
+        # del self.dataframe
         return self
 
     @abstractmethod
@@ -71,7 +72,7 @@ class CyclingInterval(Interval):
 
     def populate_metrics(self, dataframe: pd.DataFrame) -> None:
         """Compute and populate interval metrics"""
-        df = dataframe.iloc[self.start:self.end]
+        df = dataframe.loc[(dataframe['time'] >= self.start) & (dataframe['time'] <= self.end)]
         if 'watts' in df:
             self.populate_watts(df)
         if 'heartrate' in df:
@@ -106,15 +107,11 @@ class RunningInterval(Interval):
     min_hr: int = 0
 
     def populate_metrics(self, dataframe: pd.DataFrame) -> None:
-        print(f"start = {self.start}, end= {self.end}")
-        print(dataframe)
         """Compute and populate interval metrics"""
-        df = dataframe.iloc[self.start:self.end]
+        df = dataframe.loc[(dataframe['time'] >= self.start) & (dataframe['time'] <= self.end)]
         if 'pace' in df:
             self.populate_pace(df)
         if 'heartrate' in df:
-            print(df)
-            print(df['heartrate'].mean())
             self.populate_hr(df)
 
     def populate_pace(self, df: pd.DataFrame) -> None:

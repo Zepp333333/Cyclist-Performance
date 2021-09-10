@@ -22,19 +22,9 @@ def make_layout(user_id=None, activity_id=None) -> dash.Dash.layout:
 
 
 def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
-    series_to_plot = {
-        'Ride': ['watts', 'heartrate', 'cadence'],
-        'VirtualRide': ['watts', 'heartrate', 'cadence'],
-        "Run": ['velocity_smooth', 'heartrate', 'cadence']
-    }
-
-    fig = ScatterDrawer(
-        activity=activity,
-        index_col='time',
-        series_to_plot=series_to_plot[activity.type],
-    )
+    fig = make_figure(activity)
     page_content = html.Div([
-        dcc.Graph(id='my-fig', figure=fig.get_fig()),
+        dcc.Graph(id='my-fig', figure=fig),
         make_interval_input_group(),
         make_interval_button_group(),
         # dcc.Store inside the app that stores the intermediate value
@@ -59,6 +49,20 @@ def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
     )
 
     return layout
+
+
+def make_figure(activity) -> ScatterDrawer.get_fig:
+    series_to_plot = {
+        'Ride': ['watts', 'heartrate', 'cadence'],
+        'VirtualRide': ['watts', 'heartrate', 'cadence'],
+        "Run": ['velocity_smooth', 'heartrate', 'cadence']
+    }
+    fig = ScatterDrawer(
+        activity=activity,
+        index_col='time',
+        series_to_plot=series_to_plot[activity.type],
+    )
+    return fig.get_fig()
 
 
 def make_activity_info_header(activity: Activity):

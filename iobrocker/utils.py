@@ -7,7 +7,7 @@ import numpy as np
 
 import pandas as pd
 
-from logic import Interval, CyclingInterval, ActivityFactory, CyclingActivityFactory
+from logic import Interval, CyclingInterval, RunningInterval, ActivityFactory, CyclingActivityFactory
 from logic.activity_factory import RunningActivityFactory
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S%z'
@@ -53,7 +53,9 @@ class CustomDecoder(json.JSONDecoder):
             if obj['_type'] == 'datetime':
                 return datetime.fromisoformat(obj['value'])
             if obj['_type'] == 'CyclingInterval':
-                return CyclingInterval(dataframe=pd.DataFrame(), **obj['value'])
+                return CyclingInterval(**obj['value'])
+            if obj['_type'] == 'RunningInterval':
+                return RunningInterval(**obj['value'])
         return obj
 
 
