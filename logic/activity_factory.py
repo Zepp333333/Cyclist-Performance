@@ -10,6 +10,20 @@ class ActivityFactory(ABC):
     """Factory that represents combination of Activity and Interval.
     Doesn't maintain any of the instances it creates"""
 
+    @classmethod
+    def get_activity_factory(cls, details: dict) -> ActivityFactory:
+        factories = {
+            "Ride": CyclingActivityFactory,
+            "VirtualRide": CyclingActivityFactory,
+            "Run": RunningActivityFactory
+        }
+
+        if 'type' in details:
+            factory = factories[details['type']]
+            return factory()
+        else:
+            return CyclingActivityFactory()
+
     @abstractmethod
     def get_activity(self, *args, **kwargs) -> Activity:
         """Returns activity belonging to this factory"""
@@ -84,8 +98,3 @@ class RunningActivityFactory(ActivityFactory):
         """Returns interval belonging to this factory"""
         return IntervalFinder()
 
-# todo remove testing code
-# import pandas as pd
-# df = pd.read_csv('../iobrocker/ride.csv')
-# f = CyclingActivityFactory()
-# a = f.get_activity(id=1, name='activity1', dataframe=df)

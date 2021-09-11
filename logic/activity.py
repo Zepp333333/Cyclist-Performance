@@ -1,8 +1,10 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
 from __future__ import annotations
+from typing import Any
 
-import datetime
+from datetime import datetime
+import json
 import pickle
 from abc import ABC
 from dataclasses import dataclass, field
@@ -36,7 +38,7 @@ class Activity(ABC):
     id: int
     name: str
     athlete_id: int
-    date: datetime.datetime
+    date: datetime
     dataframe: pd.DataFrame
     details: dict
     intervals: list[Interval] = field(default_factory=list[Interval])
@@ -117,6 +119,32 @@ class Activity(ABC):
     def delete_intervals(self) -> None:
         self.intervals = []
         self.make_whole_activity_interval()
+
+    def intervals_to_json(self) -> list[str]:
+        return [i.to_json() for i in self.intervals]
+
+    @classmethod
+    def read_intervals_from_json(cls, lst: list[str]) -> list[Interval]:
+        return [Interval.from_json(s) for s in lst]
+
+    def details_to_json(self) -> str:
+        def _details_encoder(obj: Any):
+            if isinstance(obj, datetime):
+                return {
+                    "_type": "datetime",
+                    "value": obj.isoformat()
+                }
+            return obj
+        return json.dumps(self.details, default=_details_encoder, indent=4)
+
+    @classmethod
+    def read_details_from_json(cls, string: str) -> dict:
+        def _details_decoder(obj: Any):
+            if "_type" in obj:
+                if obj['_type'] == 'datetime':
+                    return datetime.fromisoformat(obj['value'])
+            return obj
+        return json.loads(string, object_hook=_details_decoder)
 
 @dataclass
 class CyclingActivity(Activity):

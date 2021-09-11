@@ -10,14 +10,12 @@ from typing import Optional
 
 import pandas as pd
 import swagger_client.models
-from flask_login import current_user
 
+from hardio.models import DBActivity
 from iobrocker import dbutil, strava_auth
-from iobrocker.utils import CustomEncoder, CustomDecoder, get_activity_factory
 from iobrocker import strava_swagger
 from logic import Activity
-from logic import CyclingActivityFactory, PresentationActivity
-from hardio.models import DBActivity
+from logic import ActivityFactory, PresentationActivity
 
 
 class ActivityNotFoundInDB(Exception):
@@ -43,7 +41,7 @@ class IO:
 
     def build_mock_up_ride(self):
         df = dbutil.read_dataframe_from_csv(filename='ride.csv')
-        factory = CyclingActivityFactory()
+        factory = ActivityFactory.get_activity_factory({'type': "Ride"})
         return factory.get_activity(id=1, athlete_id=0, name='My ride', dataframe=df, date=datetime.now())
 
     def get_athlete_info(self) -> json:
@@ -77,8 +75,8 @@ class IO:
             db_activity.dataframe = dataframe.to_json(indent=4)
             dbutil.save_db_activity(db_activity)
 
-        details = json.loads(db_activity.details, cls=CustomDecoder)
-        factory = get_activity_factory(details)
+        details = Activity.read_details_from_json(db_activity.details)
+        factory = ActivityFactory.get_activity_factory(details)
         return factory.get_activity(
             id=db_activity.activity_id,
             athlete_id=db_activity.athlete_id,
@@ -86,7 +84,7 @@ class IO:
             date=db_activity.date,
             dataframe=pd.read_json(db_activity.dataframe),
             details=details,
-            intervals=json.loads(db_activity.intervals, cls=CustomDecoder)
+            intervals=Activity.read_intervals_from_json(db_activity.intervals)
         )
 
     def save_activities(self, activities: list[Activity]) -> None:
@@ -110,10 +108,10 @@ class IO:
             activity_id=activity.id,
             date=activity.date,
             name=activity.name,
-            details=json.dumps(activity.details, cls=CustomEncoder, indent=4),
+            details=activity.details_to_json(),
             dataframe=activity.dataframe.to_json(indent=4),
             laps='',
-            intervals=json.dumps(activity.intervals, cls=CustomEncoder, indent=4)
+            intervals=activity.intervals_to_json()
         )
 
     def delete_activity_by_id(self, activity_id):
@@ -166,7 +164,7 @@ class IO:
         else:
             dataframe = pd.DataFrame()
 
-        factory = get_activity_factory(strava_activity)
+        factory = ActivityFactory.get_activity_factory(strava_activity)
         activity = factory.get_activity(
             id=strava_activity['id'],
             date=strava_activity['start_date'],
@@ -185,18 +183,18 @@ class IO:
             id=a.activity_id,
             date=a.date,
             name=self.get_name_of_activity(a),
-            type=self.get_type_of_activity(a.details)
+            type=self.get_type_of_activity(a)
         )
 
-    def get_type_of_activity(self, details: str) -> str:
-        d = json.loads(details, cls=CustomDecoder)
+    def get_type_of_activity(self, a: DBActivity) -> str:
+        d = Activity.read_details_from_json(a.details)
         return d['type']
 
     def get_name_of_activity(self, a: DBActivity) -> str:
         if a.name:
             return a.name
         else:
-            d = json.loads(a.details, cls=CustomDecoder)
+            d = Activity.read_details_from_json(a.details)
             return d['name']
 
 def _make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:
