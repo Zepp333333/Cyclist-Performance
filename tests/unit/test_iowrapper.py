@@ -6,8 +6,7 @@ import dill
 from logic import Activity
 
 
-
-class TestIowrapper():
+class TestIowrapper:
 
     def test_build_mock_up_ride(self):
         assert False
@@ -67,6 +66,7 @@ class TestIowrapper():
         with open('tests/testing_data/detailed_activity.dill', 'rb') as f:
             strava_activity = dill.load(f)
         io = IO(test_user_id, token_refresh=False)
-        activity = io.make_hardio_activity_from_strava_activity(strava_activity=strava_activity.to_dict(), get_streams=False)
+        activity = io.make_hardio_activity_from_strava_activity(strava_activity=strava_activity.to_dict(),
+                                                                get_streams=False)
         assert isinstance(activity, Activity)
         assert isinstance(activity.details, dict)

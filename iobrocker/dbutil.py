@@ -151,7 +151,7 @@ def store_activity(user_id: int,
                    name: str,
                    dataframe: str,
                    laps: str,
-                   intervals: str) -> None:
+                   intervals: list[str]) -> None:
     """
     Stores hardio Activity in database
     :param user_id: hardio user id

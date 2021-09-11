@@ -73,5 +73,3 @@ def get_activity_factory(details: dict) -> ActivityFactory:
         return CyclingActivityFactory()
 
 
-def datetime_from_string(string: str) -> datetime:
-    return datetime.strptime(string, DATETIME_FORMAT)

@@ -12,6 +12,7 @@ from config import ConfigTest
 from iobrocker import dbutil, dbutil_admin
 from logic import CyclingActivity
 from logic.interval_factory import CyclingIntervalFactory
+from logic.interval_finder import IntervalFinder
 
 TEST_DB_NAME = ConfigTest.TEST_DB_NAME
 
@@ -106,6 +107,7 @@ def mock_activity():
     activity_name = activity_json['name']
     activity = CyclingActivity(
         interval_factory=CyclingIntervalFactory(),
+        interval_finder=IntervalFinder(),
         id=activity_id,
         athlete_id=athlete_id,
         name=activity_name,
