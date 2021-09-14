@@ -66,3 +66,8 @@ class DBActivity(db.Model):
 class DBDataFrame(db.Model):
     activity_id = db.Column(db.Integer, db.ForeignKey('db_activity.activity_id'), primary_key=True, nullable=False)
     df_json = db.Column(db.JSON)
+
+
+class UserConfig(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, primary_key=True)
+    config = db.Column(db.JSON)

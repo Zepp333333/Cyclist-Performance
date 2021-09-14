@@ -11,7 +11,7 @@ import pandas as pd
 import sqlalchemy.exc
 
 from hardio import db
-from hardio.models import Users, DBActivity
+from hardio.models import Users, DBActivity, UserConfig
 
 
 class DuplicateActivity(Exception):
@@ -109,7 +109,7 @@ def _store_new_activity(user_id: int,
                         name: str,
                         dataframe: str,
                         laps: str,
-                        intervals: str) -> None:
+                        intervals: list[str]) -> None:
     """
     Creates new hardio DBActivity object and stores it in database
     param user_id: hardio user id
@@ -237,4 +237,22 @@ def get_list_of_activities_in_range(user_id, start_date, end_date) -> list[DBAct
 
 
 def save_db_activity(_: DBActivity) -> None:
+    db.session.commit()
+
+
+def read_user_config(user_id: int) -> Optional[str]:
+    user_config = UserConfig.query.filter_by(user_id=user_id).first()
+    if user_config:
+        return user_config.config
+    else:
+        return None
+
+
+def save_user_config(user_id: int, config: str) -> None:
+    db_config = UserConfig.query.filter_by(user_id=user_id).first()
+    if db_config:
+        db_config.config = config
+    else:
+        db_config = UserConfig(user_id=user_id, config=config)
+        db.session.add(db_config)
     db.session.commit()

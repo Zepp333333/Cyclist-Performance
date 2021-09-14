@@ -11,6 +11,7 @@ from typing import Optional
 import pandas as pd
 import swagger_client.models
 
+from hardio.dashapp import UserConfig
 from hardio.models import DBActivity
 from iobrocker import dbutil, strava_auth
 from iobrocker import strava_swagger
@@ -50,8 +51,6 @@ class IO:
     def get_list_of_activities_in_range(self, start_date: datetime, end_date: datetime) -> list[PresentationActivity]:
         activities = dbutil.get_list_of_activities_in_range(self.user_id, start_date, end_date)
         return [self._make_presentation_activity(a) for a in activities]
-
-
 
     def get_activities_from_strava(self, get_streams: bool = False, **kwargs) -> list[Activity]:
         result = []
@@ -196,6 +195,18 @@ class IO:
         else:
             d = Activity.read_details_from_json(a.details)
             return d['name']
+
+    def read_user_config(self) -> UserConfig:
+        config = dbutil.read_user_config(user_id=self.user_id)
+        if config:
+            return UserConfig.from_json(config)
+        else:
+            return UserConfig()
+
+    def save_user_config(self, user_config: UserConfig) -> None:
+        dbutil.save_user_config(user_id=self.user_id, config=user_config.to_json())
+
+
 
 def _make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:
     """
