@@ -24,11 +24,13 @@ def make_layout(user_id=None, activity_id=None) -> dash.Dash.layout:
 def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
     fig = make_figure(activity)
     page_content = html.Div([
+        make_configuration_modal(activity),
         dcc.Graph(id='my-fig', figure=fig),
         make_interval_input_group(),
         make_interval_button_group(),
         # dcc.Store inside the app that stores the intermediate value
-        dcc.Store(id='current_activity', data=activity.id)  # prepare_activity_for_dcc_store(activity))
+        dcc.Store(id="current_activity", data=activity.id),  # prepare_activity_for_dcc_store(activity))
+        dcc.Store(id="user_config", data=""), # User config store
     ])
 
     activity_tab = dbc.Card(dbc.CardBody([page_content]), className="mt-3")
@@ -121,19 +123,19 @@ def make_activity_info_header(activity: Activity):
 
 def make_interval_button_group():
     button_group = dbc.ButtonGroup(
-                [
-                    dbc.Button('Create Interval', id='create_interval', n_clicks=0, className="btn btn-primary"),
-                    dbc.Button('Find Intervals', id='find_intervals', n_clicks=0, className="btn btn-primary"),
-                    dbc.Button('Delete Intervals', id='delete_intervals', n_clicks=0, className="btn btn-primary")
-                ],
-                size="sm",
-                className="mr-1",
-            )
+        [
+            dbc.Button('Create Interval', id='create_interval', n_clicks=0, className="btn btn-primary"),
+            dbc.Button('Find Intervals', id='find_intervals', n_clicks=0, className="btn btn-primary"),
+            dbc.Button('Delete Intervals', id='delete_intervals', n_clicks=0, className="btn btn-primary")
+        ],
+        size="sm",
+        className="mr-1",
+    )
 
     return button_group
 
 
-def make_interval_input_group():
+def make_interval_input_group() -> html:
     input_group = html.Div(
         [
 
@@ -145,10 +147,58 @@ def make_interval_input_group():
                     dbc.Input(id='how_many_to_find', type="number", placeholder='How many to find'),
                     dbc.Input(id='interval_power', type="number", placeholder='Interval Power, wt'),
                     dbc.Input(id='interval_tolerance', type="number", placeholder='Tolerance %'),
-                 ],
+                ],
                 size="sm",
             ),
 
         ]
     )
     return input_group
+
+
+def make_configuration_modal(activity: Activity) -> html:
+    config_modal = html.Div(
+        [
+            dbc.Button("Configuration", id="btn-configuration", color="link", n_clicks=0),
+            dbc.Modal(
+                [
+                    dbc.ModalHeader("Configuration"),
+                    dbc.ModalBody(make_charts_selector(activity)),
+                    dbc.ModalFooter(
+                        [
+                            dbc.Button("Save", id="btn-save-configuration", color="link", n_clicks=0),
+                            dbc.Button("Close", id="btn-close-configuration", color="link", n_clicks=0)
+                        ]
+                    )
+                ],
+                id="configuration-modal-centered",
+                centered=True,
+                is_open=False,
+            )
+        ]
+    )
+    return config_modal
+
+
+def make_charts_selector(activity: Activity) -> html:
+    def _make_options(activity: Activity) -> list[dict]:
+        streams = [s for s in activity.dataframe.columns]
+        streams.remove("time")
+        streams.remove("latlng")
+        return [{"label": stream, "value": stream} for stream in streams]
+
+    options: list[dict] = _make_options(activity)
+
+    switches = dbc.FormGroup(
+        [
+            dbc.Label("Select charts to plot"),
+            dbc.Checklist(options=options, value=[1], id="charts_config_switches", switch=True),
+        ],
+    )
+    config_input = html.Div(
+        [
+            dbc.Form(switches),
+            html.P(id="charts_config_switches-output")
+        ]
+    )
+    return config_input

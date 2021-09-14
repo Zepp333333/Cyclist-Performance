@@ -1,22 +1,18 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
 from __future__ import annotations
-from typing import Any
 
-from datetime import datetime
 import json
-import pickle
 from abc import ABC
 from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any
 
 import pandas as pd
-import swagger_client.models
 
-from .interval_factory import IntervalFactory
 from .interval import Interval
+from .interval_factory import IntervalFactory
 from .interval_finder import IntervalFinder
-
-from typing import Optional
 
 
 class IntervalDoNotExit(Exception):
@@ -92,17 +88,6 @@ class Activity(ABC):
     def interval_exit(self, interval_to_check: Interval) -> bool:
         return interval_to_check in self.intervals
 
-    def dataframe_filled(self) -> bool:
-        return self.dataframe.empty
-
-    def pickle(self) -> bytes:
-        # todo remove
-        return pickle.dumps(self, protocol=0)
-
-    @classmethod
-    def from_pickle(cls, pickle_str) -> Activity:
-        return pickle.loads(pickle_str)
-
     def find_intervals(self, duration: int, count: int, power: int, tolerance: float) -> list[Interval]:
         found = self.interval_finder.find_manual(duration=duration,
                                                  count=count,
@@ -135,6 +120,7 @@ class Activity(ABC):
                     "value": obj.isoformat()
                 }
             return obj
+
         return json.dumps(self.details, default=_details_encoder, indent=4)
 
     @classmethod
@@ -144,7 +130,9 @@ class Activity(ABC):
                 if obj['_type'] == 'datetime':
                     return datetime.fromisoformat(obj['value'])
             return obj
+
         return json.loads(string, object_hook=_details_decoder)
+
 
 @dataclass
 class CyclingActivity(Activity):

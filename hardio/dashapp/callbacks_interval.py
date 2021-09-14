@@ -9,8 +9,8 @@ from iobrocker import IO
 from .activity_main import make_figure
 
 
-def register_interval_callbacks(dashapp):
-    @dashapp.callback(
+def register_interval_callbacks(dash_app: dash.Dash) -> None:
+    @dash_app.callback(
         Output(component_id='my-fig', component_property='figure'),
         [Input(component_id='create_interval', component_property='n_clicks'),
          Input(component_id='find_intervals', component_property='n_clicks'),
@@ -72,7 +72,6 @@ def register_interval_callbacks(dashapp):
 
             return make_figure(activity)
         return dash.no_update
-
 
     def _relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
         """Helper fuction converting relaout_daya dict to tuple"""
