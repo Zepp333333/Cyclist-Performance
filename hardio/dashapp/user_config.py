@@ -1,17 +1,46 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 from __future__ import annotations
-from dataclasses import dataclass, field
+
 import json
-from typing import Any
+from dataclasses import dataclass, field
+from typing import Any, ClassVar
+
 
 @dataclass
 class ActivityConfig:
-    charts_to_plot: list = field(default_factory=list[str])
+    CHARTS_PRIORITY: ClassVar[dict[str:int]] = {
+        'watts': 0,
+        'pace': 0,
+        'watts_30sec': 2,
+        'heartrate': 4,
+        'cadence': 6,
+        'altitude': 8,
+        'velocity_smooth': 10,
+        'distance': 12,
+        'grade_smooth': 14,
+        'temp': 16,
+        'moving': 30,
+        'latlng': 40,
+        'time': 50
+    }
+    _charts_to_plot: list[str] = field(default_factory=list[str])
 
     def __post_init__(self):
-        if not self.charts_to_plot:
+        if not self._charts_to_plot:
             self.charts_to_plot = ['heartrate', 'cadence']
 
+    @property
+    def charts_to_plot(self) -> dict[int:str]:
+        return self._charts_to_plot
+
+    @charts_to_plot.setter
+    def charts_to_plot(self, charts_list: list[str]) -> None:
+        charts_dict = {self.CHARTS_PRIORITY[chart]: chart for chart in charts_list}
+        sorted_charts_dict = dict(sorted(charts_dict.items()))
+        self._charts_to_plot = [v for v in sorted_charts_dict.values()]
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}={self.__dict__} "
 
 @dataclass
 class ZonesConfig:
@@ -23,7 +52,6 @@ class ZonesConfig:
     z5: int = ftp * 1.2
     z6: int = ftp * 1.5
     Z7: int = ftp * 5
-
 
 
 @dataclass
@@ -46,6 +74,7 @@ class UserConfig:
     def from_json(cls, string) -> UserConfig:
         if not string:
             return UserConfig()
+
         def _object_hook(obj):
             if '_type' in obj:
                 if obj['_type'] == 'UserConfig':

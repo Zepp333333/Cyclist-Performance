@@ -189,17 +189,16 @@ def make_configuration_modal(activity: Activity, config: UserConfig) -> html:
 
 
 def make_charts_selector(activity: Activity, config: UserConfig) -> html:
-    print(config)
-
     def _make_options(activity: Activity) -> list[dict]:
         streams = [s for s in activity.dataframe.columns]
-        streams.remove("time")
-        streams.remove("latlng")
+        if "time" in streams:
+            streams.remove("time")
+        if "latlng" in streams:
+            streams.remove("latlng")
         return [{"label": stream, "value": stream} for stream in streams]
 
     def _make_user_selected_options(config: UserConfig) -> list[str]:
         return config.activity_config.charts_to_plot if config else []
-
 
     options: list[dict] = _make_options(activity)
     selected_option = _make_user_selected_options(config)
