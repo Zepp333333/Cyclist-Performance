@@ -6,6 +6,9 @@ Use for development and debug purpose only
 
 from hardio import db, bcrypt
 from hardio.models import Users, DBActivity
+from hardio import Config
+import sqlalchemy
+from config import ConfigTest
 
 
 def add_user(username: str, email: str, password: str, image_file: str = 'default.jpg', **kwargs) -> None:
@@ -45,15 +48,21 @@ def list_users() -> str:
 def drop_test_db() -> None:
     import sqlalchemy
     from sqlalchemy.orm import close_all_sessions
-    with sqlalchemy.create_engine("postgresql://postgres@localhost",
+    with sqlalchemy.create_engine(ConfigTest.TEST_DATABASE_SERVER,
                                   isolation_level="AUTOCOMMIT").connect() as connection:
         close_all_sessions()
-        connection.execute(f'drop database hardio_test_db WITH (FORCE)')
+        connection.execute(f'drop database {ConfigTest.TEST_DB_NAME} WITH (FORCE)')
 
 
 def add_activity(db_activity: DBActivity) -> None:
     db.session.add(db_activity)
     db.session.commit()
+
+def clen_user_config() -> None:
+    with sqlalchemy.create_engine(Config.SQLALCHEMY_DATABASE_URI,
+                                  isolation_level="AUTOCOMMIT").connect() as connection:
+        connection.execute(f'TRUNCATE TABLE user_config')
+
 
 
 def clean_db_activity() -> None:

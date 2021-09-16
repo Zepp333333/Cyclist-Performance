@@ -9,7 +9,8 @@ class ActivityConfig:
     charts_to_plot: list = field(default_factory=list[str])
 
     def __post_init__(self):
-        self.charts_to_plot = ['heartrate', 'cadence']
+        if not self.charts_to_plot:
+            self.charts_to_plot = ['heartrate', 'cadence']
 
 
 @dataclass
@@ -43,6 +44,8 @@ class UserConfig:
 
     @classmethod
     def from_json(cls, string) -> UserConfig:
+        if not string:
+            return UserConfig()
         def _object_hook(obj):
             if '_type' in obj:
                 if obj['_type'] == 'UserConfig':

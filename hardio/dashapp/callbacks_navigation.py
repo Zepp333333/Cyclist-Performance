@@ -3,26 +3,35 @@
 import dash
 import dash_bootstrap_components as dbc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from flask_login import current_user
 
-from hardio.dashapp import activity_main, calendar, test_strava_methods_page
+from hardio.dashapp import UserConfig, activity_main, calendar, test_strava_methods_page
+
+from iobrocker import IO
 
 
 def register_navigation_callbacks(dash_app: dash.Dash) -> None:
-    @dash_app.callback(Output(component_id="page-content", component_property="children"),
-                      Output(component_id="username_placeholder", component_property="children"),
-                      Input(component_id="url", component_property="pathname")
-                      )
-    def render_page_content(pathname) -> dash.Dash.layout:
+    @dash_app.callback(
+        Output(component_id="page-content", component_property="children"),
+        Output(component_id="username_placeholder", component_property="children"),
+        Input(component_id="url", component_property="pathname"),
+        State(component_id="user_config", component_property="data"),
+    )
+    def render_page_content(pathname, user_config) -> dash.Dash.layout:
         """
         Callback defines general structure of an multi-page Dash app.
         :param pathname: string
-        :return: layout
+        :param user_config: json containing user configuration
+        :return: layout, username, user_config
         """
+
+        io = IO(current_user.id)
+        config = io.read_user_config()
+
         if pathname == "/application/":
             return [
-                       calendar.make_layout(current_user.id),
+                       calendar.make_layout(current_user.id, config),
                    ], [current_user.username]
         elif pathname == "/application/activity":
             return [
@@ -31,7 +40,7 @@ def register_navigation_callbacks(dash_app: dash.Dash) -> None:
         elif "/application/activity/" in pathname:
             activity_id = pathname.split("/")[-1]
             return [
-                       activity_main.make_layout(current_user.id, activity_id)
+                       activity_main.make_layout(current_user.id, activity_id, config)
                    ], [current_user.username]
         elif pathname == "/application/test_strava":
             return [

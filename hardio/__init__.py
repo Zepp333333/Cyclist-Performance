@@ -10,6 +10,7 @@ app authorization with Strava. Plotly/Dash is run under Flask to enable authoriz
 """
 
 import dash
+from dash_extensions.enrich import DashProxy, MultiplexerTransform
 import dash_bootstrap_components as dbc
 from flask import Flask
 from flask.helpers import get_root_path
@@ -78,13 +79,21 @@ def register_dash(app: Flask) -> None:
     # Meta tags for viewport responsiveness
     meta_viewport = {"name": "viewport", "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
 
-    dash_app = dash.Dash(__name__,
+    # dash_app = dash.Dash(__name__,
+    #                      server=app,
+    #                      title='HARDIO',
+    #                      url_base_pathname='/application/',
+    #                      external_stylesheets=[dbc.themes.BOOTSTRAP],
+    #                      assets_folder=get_root_path(__name__) + 'dashboard/assets/',
+    #                      meta_tags=[meta_viewport])
+    dash_app = DashProxy(__name__,
                          server=app,
                          title='HARDIO',
                          url_base_pathname='/application/',
                          external_stylesheets=[dbc.themes.BOOTSTRAP],
                          assets_folder=get_root_path(__name__) + 'dashboard/assets/',
-                         meta_tags=[meta_viewport])
+                         meta_tags=[meta_viewport],
+                         transforms=[MultiplexerTransform()])
 
     # dash_app.enable_dev_tools(dev_tools_ui=True,
     #                           dev_tools_serve_dev_bundles=True, )

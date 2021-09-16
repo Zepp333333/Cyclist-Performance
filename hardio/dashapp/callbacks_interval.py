@@ -11,7 +11,7 @@ from .activity_main import make_figure
 
 def register_interval_callbacks(dash_app: dash.Dash) -> None:
     @dash_app.callback(
-        Output(component_id='my-fig', component_property='figure'),
+        Output(component_id='activity-main-chart', component_property='figure'),
         [Input(component_id='create_interval', component_property='n_clicks'),
          Input(component_id='find_intervals', component_property='n_clicks'),
          Input(component_id='delete_intervals', component_property='n_clicks'),
@@ -20,7 +20,7 @@ def register_interval_callbacks(dash_app: dash.Dash) -> None:
          Input(component_id='interval_power', component_property='value'),
          Input(component_id='interval_tolerance', component_property='value'),
          Input(component_id='current_activity', component_property='data')],
-        [State(component_id='my-fig', component_property='relayoutData')],
+        [State(component_id='activity-main-chart', component_property='relayoutData')],
         prevent_initial_call=True
     )
     def manage_intervals(_: int,

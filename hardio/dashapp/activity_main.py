@@ -7,30 +7,31 @@ import dash_bootstrap_components as dbc
 
 from iobrocker import IO
 from logic import Activity
+from . import UserConfig
 from .utils import ScatterDrawer
 
 
-def make_layout(user_id=None, activity_id=None) -> dash.Dash.layout:
+def make_layout(user_id: int = None, activity_id: int = None, config: UserConfig = None) -> dash.Dash.layout:
     if not user_id:
-        return _make_layout(user_id=0, activity=IO(0).build_mock_up_ride())
+        return _make_layout(activity=IO(0).build_mock_up_ride())
     if not activity_id:
         io = IO(user_id=user_id)
         last_activity = io.get_last_activity()
         io.save_activity(last_activity)
-        return _make_layout(user_id, last_activity)
-    return _make_layout(user_id, IO(user_id=user_id).get_hardio_activity_by_id(int(activity_id)))
+        return _make_layout(last_activity, config)
+    return _make_layout(IO(user_id=user_id).get_hardio_activity_by_id(int(activity_id)), config)
 
 
-def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
-    fig = make_figure(activity)
+def _make_layout(activity: Activity, config: UserConfig = None) -> dash.Dash.layout:
+    fig = make_figure(activity, config)
     page_content = html.Div([
-        make_configuration_modal(activity),
-        dcc.Graph(id='my-fig', figure=fig),
+        make_configuration_modal(activity, config),
+        dcc.Graph(id='activity-main-chart', figure=fig),
         make_interval_input_group(),
         make_interval_button_group(),
         # dcc.Store inside the app that stores the intermediate value
         dcc.Store(id="current_activity", data=activity.id),  # prepare_activity_for_dcc_store(activity))
-        dcc.Store(id="user_config", data=""), # User config store
+        dcc.Store(id="user_config", data=config.to_json())
     ])
 
     activity_tab = dbc.Card(dbc.CardBody([page_content]), className="mt-3")
@@ -38,9 +39,11 @@ def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
 
     tabs = dbc.Tabs(
         [
-            dbc.Tab(activity_tab, label="Activity"),
-            dbc.Tab(power_tab, label="Power"),
-        ]
+            dbc.Tab(activity_tab, label="Activity", tab_id="Activity"),
+            dbc.Tab(power_tab, label="Power", tab_id="Power"),
+        ],
+        id="activity-tabs",
+        active_tab="Activity"
     )
 
     layout = html.Div(
@@ -53,16 +56,21 @@ def _make_layout(user_id: int, activity: Activity) -> dash.Dash.layout:
     return layout
 
 
-def make_figure(activity) -> ScatterDrawer.get_fig:
-    series_to_plot = {
-        'Ride': ['watts', 'heartrate', 'cadence'],
-        'VirtualRide': ['watts', 'heartrate', 'cadence'],
-        "Run": ['velocity_smooth', 'heartrate', 'cadence']
-    }
+def make_figure(activity, config: UserConfig) -> ScatterDrawer.get_fig:
+    if config:
+        series_to_plot = config.activity_config.charts_to_plot
+    else:
+        series = {
+            'Ride': ['watts', 'heartrate', 'cadence'],
+            'VirtualRide': ['watts', 'heartrate', 'cadence'],
+            "Run": ['velocity_smooth', 'heartrate', 'cadence']
+        }
+        series_to_plot = series[activity.type]
+
     fig = ScatterDrawer(
         activity=activity,
         index_col='time',
-        series_to_plot=series_to_plot[activity.type],
+        series_to_plot=series_to_plot,
     )
     return fig.get_fig()
 
@@ -156,14 +164,14 @@ def make_interval_input_group() -> html:
     return input_group
 
 
-def make_configuration_modal(activity: Activity) -> html:
+def make_configuration_modal(activity: Activity, config: UserConfig) -> html:
     config_modal = html.Div(
         [
             dbc.Button("Configuration", id="btn-configuration", color="link", n_clicks=0),
             dbc.Modal(
                 [
                     dbc.ModalHeader("Configuration"),
-                    dbc.ModalBody(make_charts_selector(activity)),
+                    dbc.ModalBody(make_charts_selector(activity, config)),
                     dbc.ModalFooter(
                         [
                             dbc.Button("Save", id="btn-save-configuration", color="link", n_clicks=0),
@@ -180,19 +188,25 @@ def make_configuration_modal(activity: Activity) -> html:
     return config_modal
 
 
-def make_charts_selector(activity: Activity) -> html:
+def make_charts_selector(activity: Activity, config: UserConfig) -> html:
+    print(config)
+
     def _make_options(activity: Activity) -> list[dict]:
         streams = [s for s in activity.dataframe.columns]
         streams.remove("time")
         streams.remove("latlng")
         return [{"label": stream, "value": stream} for stream in streams]
 
-    options: list[dict] = _make_options(activity)
+    def _make_user_selected_options(config: UserConfig) -> list[str]:
+        return config.activity_config.charts_to_plot if config else []
 
+
+    options: list[dict] = _make_options(activity)
+    selected_option = _make_user_selected_options(config)
     switches = dbc.FormGroup(
         [
             dbc.Label("Select charts to plot"),
-            dbc.Checklist(options=options, value=[1], id="charts_config_switches", switch=True),
+            dbc.Checklist(options=options, value=selected_option, id="charts_config_switches", switch=True),
         ],
     )
     config_input = html.Div(

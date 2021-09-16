@@ -5,6 +5,7 @@ from datetime import datetime
 
 from dash_table import DataTable
 
+from hardio.dashapp import UserConfig
 from iobrocker import IO
 from logic import Activity, PresentationActivity
 
@@ -46,7 +47,7 @@ def day_of_week_to_str(day_of_week: int) -> str:
     return WEEK_DAYS[day_of_week]
 
 
-def make_layout(user_id):
+def make_layout(user_id: int, config: UserConfig):
     cal = calendar.Calendar().monthdatescalendar(2021, 8)
     io = IO(user_id)
     activities_list = io.get_list_of_activities_in_range(cal[0][0], cal[-1][-1])
