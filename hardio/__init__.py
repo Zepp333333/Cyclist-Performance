@@ -86,6 +86,7 @@ def register_dash(app: Flask) -> None:
     #                      external_stylesheets=[dbc.themes.BOOTSTRAP],
     #                      assets_folder=get_root_path(__name__) + 'dashboard/assets/',
     #                      meta_tags=[meta_viewport])
+
     dash_app = DashProxy(__name__,
                          server=app,
                          title='HARDIO',
