@@ -1,7 +1,7 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
 import pandas as pd
-from abc import ABC, abstractmethod
+from abc import ABC
 
 
 class Derivative(ABC):
@@ -9,17 +9,10 @@ class Derivative(ABC):
 
 
 class MovingAverage(Derivative):
-    def __init__(self, windows: int) -> None:
+    def __init__(self, window: int = 30) -> None:
         super().__init__()
-        self.window = windows
+        self.window = window
 
     def produce(self, df: pd.DataFrame) -> list[float]:
         moving_average = df.rolling(window=self.window).mean()
         return moving_average
-
-
-
-
-
-
-

@@ -15,7 +15,7 @@ from hardio.dashapp import UserConfig
 from hardio.models import DBActivity
 from iobrocker import dbutil, strava_auth
 from iobrocker import strava_swagger
-from logic import Activity
+from logic import Activity, ActivityProcessor
 from logic import ActivityFactory, PresentationActivity
 
 
@@ -68,7 +68,9 @@ class IO:
 
     def _make_hardio_activity_from_db_activity(self, db_activity: DBActivity, get_streams: bool = True) -> Activity:
         dataframe = pd.read_json(db_activity.dataframe)
+        to_save = False
         if dataframe.empty and get_streams:
+            to_save = True
             streams = strava_swagger.get_activity_streams(activity_id=db_activity.activity_id, user_id=self.user_id)
             dataframe = _make_df(streams)
             db_activity.dataframe = dataframe.to_json(indent=4)
@@ -76,7 +78,7 @@ class IO:
 
         details = Activity.read_details_from_json(db_activity.details)
         factory = ActivityFactory.get_activity_factory(details)
-        return factory.get_activity(
+        activity = factory.get_activity(
             id=db_activity.activity_id,
             athlete_id=db_activity.athlete_id,
             name=db_activity.name if db_activity.name else details['name'],
@@ -85,6 +87,12 @@ class IO:
             details=details,
             intervals=Activity.read_intervals_from_json(db_activity.intervals)
         )
+
+        if to_save:
+            activity = ActivityProcessor.get_activity_processor(activity.details).pre_process(activity)
+            self.save_activity(activity)
+        return activity
+
 
     def save_activities(self, activities: list[Activity]) -> None:
         """
@@ -172,7 +180,8 @@ class IO:
             dataframe=dataframe,
             details=strava_activity
         )
-        return activity
+        processed_activity = ActivityProcessor.get_activity_processor(activity.details).pre_process(activity)
+        return processed_activity
 
     def get_activities_by_date(self, ):
         pass

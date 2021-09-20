@@ -97,4 +97,3 @@ class RunningActivityFactory(ActivityFactory):
     def get_interval_finder(self) -> IntervalFinder:
         """Returns interval belonging to this factory"""
         return IntervalFinder()
-
