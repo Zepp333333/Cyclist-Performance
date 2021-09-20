@@ -35,12 +35,12 @@ def register_navigation_callbacks(dash_app: dash.Dash) -> None:
                    ], [current_user.username]
         elif pathname == "/application/activity":
             return [
-                       activity_main.make_layout(user_id=current_user.id, activity_id=None)
+                       activity_main.make_layout(user_id=current_user.id, activity_id=None, config=config)
                    ], [current_user.username]
         elif "/application/activity/" in pathname:
             activity_id = pathname.split("/")[-1]
             return [
-                       activity_main.make_layout(current_user.id, activity_id, config)
+                       activity_main.make_layout(user_id=current_user.id, activity_id=activity_id, config=config)
                    ], [current_user.username]
         elif pathname == "/application/test_strava":
             return [

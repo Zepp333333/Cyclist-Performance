@@ -75,6 +75,6 @@ layout = html.Div(
         sidebar,
         content,
         dcc.Store(id="current_activity"),
-        dcc.Store(id="user_config", storage_type='local'),  # User config store
+        dcc.Store(id="user_config", storage_type='session'),  # User config store
     ]
 )

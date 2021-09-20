@@ -11,7 +11,7 @@ class ActivityConfig:
     CHARTS_PRIORITY: ClassVar[dict[str:int]] = {
         'watts': 0,
         'pace': 0,
-        'watts_30sec': 2,
+        'watts30': 2,
         'heartrate': 4,
         'cadence': 6,
         'altitude': 8,
@@ -28,6 +28,8 @@ class ActivityConfig:
     def __post_init__(self):
         if not self._charts_to_plot:
             self.charts_to_plot = ['heartrate', 'cadence']
+        else:
+            self.charts_to_plot = self.charts_to_plot
 
     @property
     def charts_to_plot(self) -> dict[int:str]:

@@ -20,7 +20,7 @@ class ScatterDrawer:
         """
         self.data_frame = activity.dataframe
         self.index_col = index_col
-        self.series_to_plot = series_to_plot
+        self.series_to_plot = [series for series in series_to_plot if series in activity.dataframe.columns]
         self.series_to_plot.reverse()  # reverse as plotly would render traces in reverse order
         self.intervals = activity.intervals[1:]
 

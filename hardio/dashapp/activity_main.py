@@ -31,7 +31,7 @@ def _make_layout(activity: Activity, config: UserConfig = None) -> dash.Dash.lay
         make_interval_button_group(),
         # dcc.Store inside the app that stores the intermediate value
         dcc.Store(id="current_activity", data=activity.id),  # prepare_activity_for_dcc_store(activity))
-        dcc.Store(id="user_config", data=config.to_json())
+        dcc.Store(id="user_config", storage_type='session', data=config.to_json())
     ])
 
     activity_tab = dbc.Card(dbc.CardBody([page_content]), className="mt-3")
