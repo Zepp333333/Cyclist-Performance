@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 from iobrocker import IO
 from logic import Activity
 from . import UserConfig
-from .utils import ScatterDrawer
+from .utils import ScatterDrawer, CPPlotter
 
 
 def make_layout(user_id: int = None, activity_id: int = None, config: UserConfig = None) -> dash.Dash.layout:
@@ -35,7 +35,18 @@ def _make_layout(activity: Activity, config: UserConfig = None) -> dash.Dash.lay
     ])
 
     activity_tab = dbc.Card(dbc.CardBody([page_content]), className="mt-3")
-    power_tab = dbc.Card(dbc.CardBody([html.P("This is tab 2", className="card-text")]), className="mt-3")
+    power_tab = dbc.Card(dbc.CardBody(
+        [
+            html.Div(
+                [
+                    html.P("This is tab 2", className="card-text"),
+                    dcc.Graph(id='activity-cp-chart', figure=CPPlotter().get_ride_cp_fig(activity))
+                ]
+
+            )
+
+        ]
+    ), className="mt-3")
 
     tabs = dbc.Tabs(
         [
