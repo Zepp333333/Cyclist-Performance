@@ -121,4 +121,4 @@ def get_activity_streams(activity_id: int, user_id: int = None) -> Optional[swag
 def get_last_activity_id(user_id: int = None) -> Optional[int]:
     # todo add try except
     activities = get_activities(user_id=user_id, page=1, per_page=1)
-    return activities[0].id
+    return int(activities[0].id)
