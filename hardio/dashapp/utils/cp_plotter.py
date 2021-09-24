@@ -1,7 +1,7 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import pandas as pd
 import plotly.graph_objects as go
-from logic import Activity, calculate_ride_cp
+from logic import Activity, calculate_cp
 
 
 class CPPlotter:
@@ -11,19 +11,25 @@ class CPPlotter:
     def __init__(self):
         self.xlabels = CPPlotter._ticks_to_labels(self.xticks)
 
-    def get_ride_cp_fig(self, activity: Activity) -> go.Figure:
-        cp = calculate_ride_cp(activity.dataframe)
-        return self._plot_cp(cp)
+    def get_cp_fig(self, activity: Activity) -> go.Figure:
+        cp, metric_series_name = calculate_cp(activity)
+        print(cp, metric_series_name)
+        return self._plot_cp(cp, metric_series_name)
 
-    def _plot_cp(self, cp: pd.DataFrame) -> go.Figure:
+    def _plot_cp(self, cp: pd.DataFrame, metric_series_name: str) -> go.Figure:
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=cp["Duration"], y=cp['Watts']))
+        fig.add_trace(go.Scatter(x=cp["time"], y=cp[metric_series_name]))
         fig.update_layout(
             xaxis=dict(
                 tickmode='array',
                 tickvals=self.xticks,
                 ticktext=self.xlabels,
-            )
+            ),
+            template="simple_white",
+            margin=dict(
+                t=0,
+                b=100
+            ),
         )
         fig.update_xaxes(type="log")
         return fig

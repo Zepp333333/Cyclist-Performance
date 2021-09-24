@@ -39,8 +39,7 @@ def _make_layout(activity: Activity, config: UserConfig = None) -> dash.Dash.lay
         [
             html.Div(
                 [
-                    html.P("This is tab 2", className="card-text"),
-                    dcc.Graph(id='activity-cp-chart', figure=CPPlotter().get_ride_cp_fig(activity))
+                    dcc.Graph(id='activity-cp-chart', figure=CPPlotter().get_cp_fig(activity))
                 ]
 
             )
