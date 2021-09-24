@@ -1,15 +1,15 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 from __future__ import annotations
 
-from abc import ABC
 from typing import Optional
 
-from logic import Activity, MovingAverage
+from logic import Activity, Derivative, RunningPace, MovingAverage
 
 
-class ActivityProcessor(ABC):
+class ActivityProcessor:
     def __init__(self):
         self.streams_to_preprocess: list[str] = []
+        self.derivatives_to_add: dict[str: Derivative()] = {}
 
     @classmethod
     def get_activity_processor(cls, details: dict) -> ActivityProcessor:
@@ -28,30 +28,27 @@ class ActivityProcessor(ABC):
     def pre_process(self, activity: Activity) -> Activity:
         if activity.dataframe.empty:
             return activity
-        processed_activity = self.add_derivatives(activity, self.streams_to_preprocess)
+        processed_activity = self.add_derivatives(activity, self.derivatives_to_add)
         return processed_activity
 
-    def add_derivatives(self, activity: Activity, streams: list[str]) -> Activity:
-        for stream in streams:
-            if stream in activity.dataframe:
-                produced_stream = MovingAverage().produce(activity.dataframe[stream])
-                activity.dataframe[f'{stream}30'] = produced_stream
+    def add_derivatives(self, activity: Activity, derivatives_to_add: dict[str: Derivative()]) -> Activity:
+        for derivative_name, derivative_object in derivatives_to_add.items():
+            new_stream = derivative_object.produce(df=activity.dataframe, stream_name=derivative_name)
+            activity.dataframe[derivative_name] = new_stream
         return activity
 
 
 class RideActivityProcessor(ActivityProcessor):
     def __init__(self):
         super().__init__()
-        self.streams_to_preprocess = ['watts']
+        self.derivatives_to_add = {'watts30': MovingAverage(stream='watts')}
 
 
 class RunActivityProcessor(ActivityProcessor):
     def __init__(self):
         super().__init__()
-        self.streams_to_preprocess = ['velocity_smooth']
-
-    def pre_process(self, activity: Activity) -> Activity:
-        return activity
+        self.derivatives_to_add = {'pace': RunningPace(),
+                                   'pace30': MovingAverage(stream='pace')}
 
 
 class GenericActivityProcessor(ActivityProcessor):

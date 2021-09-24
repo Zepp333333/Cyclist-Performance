@@ -96,8 +96,8 @@ def register_dash(app: Flask) -> None:
                          meta_tags=[meta_viewport],
                          transforms=[MultiplexerTransform()])
 
-    # dash_app.enable_dev_tools(dev_tools_ui=True,
-    #                           dev_tools_serve_dev_bundles=True, )
+    dash_app.enable_dev_tools(dev_tools_ui=True,
+                              dev_tools_serve_dev_bundles=True, )
     with app.app_context():
         dash_app.layout = layout
         register_navigation_callbacks(dash_app)
