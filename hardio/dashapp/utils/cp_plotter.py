@@ -13,7 +13,6 @@ class CPPlotter:
 
     def get_cp_fig(self, activity: Activity) -> go.Figure:
         cp, metric_series_name = calculate_cp(activity)
-        print(cp, metric_series_name)
         return self._plot_cp(cp, metric_series_name)
 
     def _plot_cp(self, cp: pd.DataFrame, metric_series_name: str) -> go.Figure:

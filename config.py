@@ -23,6 +23,21 @@ class Config:
 
     STRAVA_REQUIRED_SCOPES = ['read', 'read_all', 'profile:read_all', 'activity:read_all']
 
+    PRIORITIZED_STREAMS: dict[str:int] = {
+        'watts': 0,
+        'pace': 0,
+        'watts30': 2,
+        'heartrate': 4,
+        'cadence': 6,
+        'altitude': 8,
+        'velocity_smooth': 10,
+        'distance': 12,
+        'grade_smooth': 14,
+        'temp': 16,
+        'moving': 30,
+        'latlng': 40,
+        'time': 50
+    }
 
 class ConfigTest:
     TEST_DB_NAME = 'hardio_test_db'

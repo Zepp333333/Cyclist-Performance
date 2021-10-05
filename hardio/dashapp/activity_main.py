@@ -7,7 +7,7 @@ import dash_bootstrap_components as dbc
 
 from iobrocker import IO
 from logic import Activity
-from . import UserConfig
+from . import UserConfig, ConfigForm, ActivityHeader
 from .utils import ScatterDrawer, CPPlotter
 
 
@@ -25,7 +25,7 @@ def make_layout(user_id: int = None, activity_id: int = None, config: UserConfig
 def _make_layout(activity: Activity, config: UserConfig = None) -> dash.Dash.layout:
     fig = make_figure(activity, config)
     page_content = html.Div([
-        make_configuration_modal(activity, config),
+        ConfigForm().make_configuration_modal(activity, config),
         dcc.Graph(id='activity-main-chart', figure=fig),
         make_interval_input_group(),
         make_interval_button_group(),
@@ -58,7 +58,7 @@ def _make_layout(activity: Activity, config: UserConfig = None) -> dash.Dash.lay
 
     layout = html.Div(
         [
-            make_activity_info_header(activity),
+            ActivityHeader().make_activity_info_header(activity),
             tabs,
         ]
     )
@@ -83,60 +83,6 @@ def make_figure(activity, config: UserConfig) -> ScatterDrawer.get_fig:
         series_to_plot=series_to_plot,
     )
     return fig.get_fig()
-
-
-def make_activity_info_header(activity: Activity):
-    if activity.type == 'Run':
-        return html.Div(
-            [
-
-            ]
-        )
-
-    line1 = dbc.ListGroup(
-        [
-            dbc.ListGroupItem(
-                [
-                    dbc.ListGroupItemHeading(activity.name, style={'font-size': '1rem'}),
-                    dbc.ListGroupItemText(activity.date),
-                    dbc.ListGroupItemText("text2"),
-                ]
-            ),
-            dbc.ListGroupItem(
-                [
-                    dbc.ListGroupItemHeading("Power", style={'font-size': '1rem'}),
-                    dbc.ListGroupItemText(f"Avg power: {activity.intervals[0].avg_power} text"),
-                    dbc.ListGroupItemText(f"Max power: {activity.intervals[0].max_power}"),
-
-                ]
-            ),
-            dbc.ListGroupItem(
-                [
-                    dbc.ListGroupItemHeading("HR", style={'font-size': '1rem'}),
-                    dbc.ListGroupItemText(f"Avg HR: {activity.intervals[0].avg_hr}"),
-                    dbc.ListGroupItemText(f"Max HR: {activity.intervals[0].max_hr}"),
-
-                ]
-            ),
-        ],
-        horizontal=True,
-        className="mb-1",
-        style={'font-size': '0.8rem'},
-    )
-
-    line2 = dbc.ListGroup(
-        [
-
-        ]
-    )
-
-    list_group = html.Div(
-        [
-            line1,
-            line2,
-        ]
-    )
-    return list_group
 
 
 def make_interval_button_group():
@@ -172,56 +118,3 @@ def make_interval_input_group() -> html:
         ]
     )
     return input_group
-
-
-def make_configuration_modal(activity: Activity, config: UserConfig) -> html:
-    config_modal = html.Div(
-        [
-            dbc.Button("Configuration", id="btn-configuration", color="link", n_clicks=0),
-            dbc.Modal(
-                [
-                    dbc.ModalHeader("Configuration"),
-                    dbc.ModalBody(make_charts_selector(activity, config)),
-                    dbc.ModalFooter(
-                        [
-                            dbc.Button("Save", id="btn-save-configuration", color="link", n_clicks=0),
-                            dbc.Button("Close", id="btn-close-configuration", color="link", n_clicks=0)
-                        ]
-                    )
-                ],
-                id="configuration-modal-centered",
-                centered=True,
-                is_open=False,
-            )
-        ]
-    )
-    return config_modal
-
-
-def make_charts_selector(activity: Activity, config: UserConfig) -> html:
-    def _make_options(activity: Activity) -> list[dict]:
-        streams = [s for s in activity.dataframe.columns]
-        if "time" in streams:
-            streams.remove("time")
-        if "latlng" in streams:
-            streams.remove("latlng")
-        return [{"label": stream, "value": stream} for stream in streams]
-
-    def _make_user_selected_options(config: UserConfig) -> list[str]:
-        return config.activity_config.charts_to_plot if config else []
-
-    options: list[dict] = _make_options(activity)
-    selected_option = _make_user_selected_options(config)
-    switches = dbc.FormGroup(
-        [
-            dbc.Label("Select charts to plot"),
-            dbc.Checklist(options=options, value=selected_option, id="charts_config_switches", switch=True),
-        ],
-    )
-    config_input = html.Div(
-        [
-            dbc.Form(switches),
-            html.P(id="charts_config_switches-output")
-        ]
-    )
-    return config_input
