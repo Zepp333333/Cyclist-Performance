@@ -21,7 +21,7 @@ print('\n'
       'IF: {}'.format(str(round(norm_power, 1)), str(round(tss, 1)), str(round(intensity, 2))))
 
 
-# This value will be used to create a sensible log scale on the powercurve graph
+# This value will be used to create a sensible log scale on the power curve graph
 logscale = 0.4
 
 spc = pd.DataFrame(df.groupby(['watts']).time.sum())

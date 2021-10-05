@@ -8,3 +8,4 @@ from .metrics import Metric, Bests, LinearMetric, Power
 from .derivatives import Derivative, MovingAverage, RunningPace
 from .activity_processor import ActivityProcessor
 from .cp import calculate_cp
+from .datafields import DataField

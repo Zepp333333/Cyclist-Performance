@@ -3,26 +3,12 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from typing import Any, ClassVar
+from typing import Any
+from config import Config
 
 
 @dataclass
 class ActivityConfig:
-    CHARTS_PRIORITY: ClassVar[dict[str:int]] = {
-        'watts': 0,
-        'pace': 0,
-        'watts30': 2,
-        'heartrate': 4,
-        'cadence': 6,
-        'altitude': 8,
-        'velocity_smooth': 10,
-        'distance': 12,
-        'grade_smooth': 14,
-        'temp': 16,
-        'moving': 30,
-        'latlng': 40,
-        'time': 50
-    }
     _charts_to_plot: list[str] = field(default_factory=list[str])
 
     def __post_init__(self):
@@ -37,12 +23,13 @@ class ActivityConfig:
 
     @charts_to_plot.setter
     def charts_to_plot(self, charts_list: list[str]) -> None:
-        charts_dict = {self.CHARTS_PRIORITY[chart]: chart for chart in charts_list}
+        charts_dict = {Config.PRIORITIZED_STREAMS[chart]: chart for chart in charts_list}
         sorted_charts_dict = dict(sorted(charts_dict.items()))
         self._charts_to_plot = [v for v in sorted_charts_dict.values()]
 
     def __repr__(self):
         return f"{self.__class__.__name__}={self.__dict__} "
+
 
 @dataclass
 class ZonesConfig:
