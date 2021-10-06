@@ -27,6 +27,7 @@ class TestIowrapper:
         io = IO(test_user_id, token_refresh=False)
         io.save_activity(mock_activity)
         activity = io.get_hardio_activity_by_id(5806863104)
+        assert isinstance(activity, Activity)
         assert activity.id == 5806863104
         assert isinstance(activity.dataframe, pd.DataFrame)
 
@@ -42,7 +43,7 @@ class TestIowrapper:
         assert select[0].activity_id == 5806863104
         assert select[0].user_id == test_user_id
         assert select[0].athlete_id == 21932478
-        assert "Whole Activity" in select[0].intervals
+        assert "All" in select[0].intervals[0]
 
     def test_delete_activity_by_id(self):
         assert False

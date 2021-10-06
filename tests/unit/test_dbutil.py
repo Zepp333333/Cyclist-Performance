@@ -8,7 +8,6 @@ import pytest
 
 from hardio.models import DBActivity, Users
 from iobrocker import dbutil, dbutil_admin
-from iobrocker.utils import CustomEncoder, CustomDecoder
 from logic import Activity, CyclingActivityFactory
 
 
@@ -46,7 +45,7 @@ def store_call_parameters(mock_activity, test_user_id):
         'name': mock_activity.details['name'],
         'dataframe': mock_activity.dataframe.to_json(),
         'laps': '',
-        'intervals': json.dumps(mock_activity.intervals, cls=CustomEncoder, indent=4)
+        'intervals': mock_activity.intervals_to_json()
     }
 
 
@@ -61,7 +60,7 @@ def store_call_parameters2(mock_activity2, test_user_id):
         'name': mock_activity2.name,
         'dataframe': mock_activity2.dataframe.to_json(),
         'laps': '',
-        'intervals': json.dumps(mock_activity2.intervals, cls=CustomEncoder, indent=4)
+        'intervals': mock_activity2.intervals_to_json()
     }
 
 
@@ -99,7 +98,8 @@ def test_store_new_activity(populate_db, test_user_id, create_db_connection, sto
     assert select[0].activity_id == 5806863104
     assert select[0].user_id == test_user_id
     assert select[0].athlete_id == 21932478
-    assert "Whole Activity" in select[0].intervals
+    print(select[0].intervals)
+    assert "All" in select[0].intervals[0]
 
 
 def test_store_new_duplicate_activity(populate_db, store_call_parameters):

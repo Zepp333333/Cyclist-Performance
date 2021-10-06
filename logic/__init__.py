@@ -4,8 +4,8 @@ from .interval import Interval, CyclingInterval, RunningInterval
 from .activity import Activity, CyclingActivity, RunningActivity
 from .activity_factory import ActivityFactory, CyclingActivityFactory, RunningActivityFactory
 from .pactivity import PresentationActivity
-from .metrics import Metric, Bests, LinearMetric, Power
+from .bests import Bests
 from .derivatives import Derivative, MovingAverage, RunningPace
 from .activity_processor import ActivityProcessor
 from .cp import calculate_cp
-from .datafields import DataField
+from .metrics import Metric

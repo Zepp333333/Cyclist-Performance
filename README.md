@@ -22,23 +22,23 @@ different concepts, techniques and  frameworks. Here is the ever-growing list of
    - OOP
    - Abstract Classes / Interfaces
    - Dataclasses
-   - Type hinting 
-   - Decorators
+   - Type hinting
    - Pandas basics
    - Package and requirements management
    - requests lib
 - Design Patterns in general, including following implemented in the application:
    - Abstract Factory
+   - Strategy 
    - Observer (tbd)
-   - Strategy (tbd)
 - git basics
 - Unit and Functional testing (Pytest)
-- Flask basics
+- Flask
    - SQLAlchemy basics
    - Flask migrate
    - Basics of html, css, jinja2, Bootstrap
 - Plotly/Dash
 - SwaggerClient
+- Decorators
 - Web Hooks (tbd)
 - Packaging and deployment (Heroku)
 
@@ -67,7 +67,3 @@ different concepts, techniques and  frameworks. Here is the ever-growing list of
 
 
 2. `git push heroku master`
-
-
-
-
