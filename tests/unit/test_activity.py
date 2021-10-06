@@ -12,18 +12,21 @@ class TestActivity:
     def test_activity_init(self, mock_activity):
         assert isinstance(mock_activity, Activity)
         assert isinstance(mock_activity, CyclingActivity)
+        assert mock_activity.intervals[0].name == 'All'
 
     def test_make_whole_activity_interval(self, mock_activity):
-        interval = mock_activity.make_whole_activity_interval()
+        mock_activity.intervals = []  # manually delete all intervals from activity
+        print(mock_activity.intervals)
+        mock_activity.make_all_activity_interval()
+        interval = mock_activity.intervals[0]
         assert interval.id == 0
         assert interval.activity_id == mock_activity.id
         assert interval.start == 0
         assert interval.end == mock_activity.dataframe.last_valid_index()
-        assert pd.DataFrame(interval.dataframe).empty
 
     def test_new_interval(self, mock_activity):
-        mock_activity.new_interval(start=130, end=1330)
-        mock_activity.new_interval(start=230, end=2330, name='New Name')
+        mock_activity.add_interval(start=130, end=1330)
+        mock_activity.add_interval(start=230, end=2330, name='New Name')
         assert len(mock_activity.intervals) == 3
         assert mock_activity.intervals[1].activity_id == mock_activity.id
         assert mock_activity.intervals[1].start == 130
@@ -74,24 +77,18 @@ class TestActivity:
 
     def test_generate_interval_name(self, mock_activity):
         name1 = mock_activity._generate_interval_name()
-        mock_activity.new_interval(15, 20)
+        mock_activity.add_interval(15, 20)
         name2 = mock_activity._generate_interval_name()
 
         assert name1 == 'Interval 1'
         assert name2 == 'Interval 2'
 
     def test_remove_intervals(self, mock_activity):
-        mock_activity.new_interval(15, 20)
-        mock_activity.new_interval(50, 60)
+        mock_activity.add_interval(15, 20)
+        mock_activity.add_interval(50, 60)
         assert len(mock_activity.intervals) == 3
         interval_to_remove1 = mock_activity.intervals[1]
         interval_to_remove2 = mock_activity.intervals[2]
         mock_activity.remove_intervals([interval_to_remove1, interval_to_remove2])
         assert len(mock_activity.intervals) == 1
-        assert mock_activity.intervals[0].name == 'Whole Activity'
-
-    def test_check_if_interval_exit(self, mock_activity):
-        interval = mock_activity.intervals[0]
-        interval2 = mock_activity._make_interval(400, 500)
-        assert mock_activity.interval_exit(interval)
-        assert not mock_activity.interval_exit(interval2)
+        assert mock_activity.intervals[0].name == 'All'

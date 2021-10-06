@@ -42,17 +42,17 @@ class Activity(ABC):
 
     def __post_init__(self) -> None:
         if not self.dataframe.empty:
-            self.make_whole_activity_interval()
+            self.make_all_activity_interval()
 
-    def make_whole_activity_interval(self) -> None:
-        if 'Whole Activity' not in [n.name for n in self.intervals]:
-            self.new_interval(
-                name='Whole Activity',
+    def make_all_activity_interval(self) -> None:
+        if 'All' not in [n.name for n in self.intervals]:
+            self.add_interval(
+                name='All',
                 start=0,
                 end=int(self.dataframe.last_valid_index() or 0)
             )
 
-    def new_interval(self, start: int, end: int, name: str = None) -> None:
+    def add_interval(self, start: int, end: int, name: str = None) -> None:
         # todo: add code to check correctness of interval range
         if not name:
             name = self._generate_interval_name()
@@ -85,9 +85,6 @@ class Activity(ABC):
                                         message="Interval doesn't exist in list of intervals.")
             self.intervals.remove(interval)
 
-    def interval_exit(self, interval_to_check: Interval) -> bool:
-        return interval_to_check in self.intervals
-
     def find_intervals(self, duration: int, count: int, power: int, tolerance: float) -> list[Interval]:
         found = self.interval_finder.find_manual(duration=duration,
                                                  count=count,
@@ -103,7 +100,7 @@ class Activity(ABC):
 
     def delete_intervals(self) -> None:
         self.intervals = []
-        self.make_whole_activity_interval()
+        self.make_all_activity_interval()
 
     def intervals_to_json(self) -> list[str]:
         return [i.to_json() for i in self.intervals]

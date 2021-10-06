@@ -1,136 +1,83 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from __future__ import annotations
 
-import numpy as np
-import pandas as pd
+from typing import Optional
 
-
-class Metric(ABC):
-    METRIC_TYPES = [None, 'custom', 'bests', 'summary']
-    DATAFRAME_FIELDS = {
-        'Power': 'watts',
-        'HR': 'heartrate',
-        'Cad': 'cadence',
-    }
-
-    def __init__(self, dataframe: pd.DataFrame, metric_type: str = None, graph_type: str = None):
-        self.metric_type = metric_type
-        self.graph_type = graph_type
-
-        if self.graph_type not in self.METRIC_TYPES:
-            raise ValueError('HARDIO Metric object instantiated with a wrong type')
-
-        self.dataframe_field = self.DATAFRAME_FIELDS[self.__class__.__name__]
-
-        self.calculate(dataframe=dataframe)
-
-    @abstractmethod
-    def calculate(self, dataframe) -> None:
-        """
-        Caclulate metrics and populate proerties based on provided dataframe
-        :param dataframe: pandas DataFrame
-        """
+from logic import Activity
+from logic.datafield_calculator import DataFieldCalculator, CALCULATORS, MEASURES
 
 
-class LinearMetric(Metric, ABC):
-    avg: float
-    min: float
-    max: float
+class Metric:
+    """
+    Defines interface for Activity Metric(s)
+    implements Strategy pattern
+    """
 
-    def __init__(self, dataframe: pd.DataFrame):
-        super().__init__(dataframe)
+    def __init__(self, name: str, measure: str, strategy: DataFieldCalculator,
+                 config: dict = None) -> None:
+        self.name: str = name
+        self.measure: str = measure
+        self.strategy = strategy
+        self.config = config
 
-        if not self.graph_type:
-            self.graph_type = 'line'
+        self.value: Optional[float] = None
 
-    @abstractmethod
-    def calculate(self, dataframe) -> None:
-        """
-        Caclulate metrics and populate proerties based on provided dataframe
-        :param dataframe: pandas DataFrame
-        """
+    def calculate(self, df: Activity.dataframe) -> None:
+        """calculate data field and store it in self.value"""
+        self.value = self.strategy(df, self.config)
 
-@dataclass
-class Best:
-    value: float
-    windows: list[tuple[int, int]]
-
-class Bests:
-    def __init__(self):
-        self._bests: dict[int: Best] = {
-            1: Best(0, []),
-            5: Best(0, []),
-            15: Best(0, []),
-            60: Best(0, []),
-            300: Best(0, []),
-            1200: Best(0, []),
-            3600: Best(0, [])
-        }
-        self.graph_type = 'none'
-
-    @property
-    def bests(self) -> dict[int: Best]:
-        return self._bests
-
-    @bests.setter
-    def bests(self, bests: dict[int: Best]) -> None:
-        self._bests = bests
-
-    def calculate(self, dataframe: pd.DataFrame) -> None:
-        """
-        Caclulate metrics and populate proerties based on provided dataframe
-        :param dataframe: pandas DataFrame
-        """
-        for k in self.bests.keys():
-            means = dataframe.rolling(window=k).mean()
-            max_mean = means.max()
-            window_starts = means.loc[means.values == float(max_mean)].index.to_list()
-            windows = [(s - k + 1, s) for s in window_starts]
-            self.bests[k] = Best(float(max_mean), windows)
+    def __str__(self):
+        return f"{self.name.title()}: {round(self.value)}{self.measure}"
 
 
-class Power(LinearMetric):
-    def __init__(self, dataframe: pd.DataFrame):
-        super().__init__(dataframe)
+class ActivityMetrics:
+    """
+    Represents a set of data fields of an Activity
+    """
+    def __init__(self, activity: Activity, config: dict = None) -> None:
+        self.activity = activity
+        self.config = config
 
-    def calculate(self, dataframe) -> None:
-        """
-        Caclulate metrics and populate proerties based on provided dataframe
-        :param dataframe: pandas DataFrame
-        """
-        self.avg = dataframe[self.dataframe_field].mean()
-        self.min = dataframe[self.dataframe_field].min()
-        self.max = dataframe[self.dataframe_field].max()
+    def populate(self) -> None:
+        for name, strategy in CALCULATORS.items():
+            measure = MEASURES[name] or ''
+            field = Metric(name=name, strategy=strategy(), measure=measure, config=self.config)
+            field.calculate(self.activity.dataframe)
+            self.__setattr__(name, field)
 
 
-
-# @dataclass
-# class LinearMetric(Metric):
-#     @dataclass
-#     class Metric(ABC):
-#         METRIC_TYPES = [None, 'custom', 'bests', 'summary']
-#         DATAFRAME_FIELDS = {
-#             'Power': 'watts',
-#             'HR': 'heartrate',
-#             'Cad': 'cadence',
-#         }
+#     def __init__(self) -> None:
+#     date: datetime = None
+#     name: str = None
+#     duration: float = None
 #
-#         type: str = None
-#         graph_type: str = None
+#     time_moving: float = None
+#     distance: float = None
+#     elevation_gain: float = None
+#     average_speed: float = None
+#     sport: str = None
 #
-#         avg: float = None
-#         min: float = None
-#         max: float = None
+#     notes: str = None
+#     keyword: str = None
 #
-#         dataframe_field: str = None
+#     RPE: int = None
 #
-#         def __post_init__(self):
-#             if self.type not in self.METRIC_TYPES:
-#                 raise ValueError('HARDIO Metric object instantiated with a wrong type')
 #
-#             self.dataframe_field = self.DATAFRAME_FIELDS[self.__class__.__name__]
 #
-#     @dataclass
-#     class LinearMetric(Metric):
+#
+#     VI: float = None
+#     Power_HR: float = None
+#     LRBalance: float = None
+#
+#     device: str = None
+#     recording_interval: int = None
+#
+#     weight: float = None
+#     work: float = None
+#     Work_above_FTP: float = None
+#     Efficiency: float = None
+#     FTP: float = None
+#
+#     def calculate_fields(self, fields_to_calculate: list[str]):
+#         pass

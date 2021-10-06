@@ -29,15 +29,6 @@ class Interval(ABC):
     max_cad: int = 0
     min_cad: int = 0
 
-    # todo: delete
-    # dataframe: pd.DataFrame = pd.DataFrame()
-
-    # def __post_init__(self) -> None:
-    #     """Populate post-init fields and metrics"""
-    #     self.sort_index = self.id
-    #     self.populate_metrics(self.dataframe)
-    #     del self.dataframe
-
     def create(self, id, activity_id, name, start, end, dataframe) -> Interval:
         """Return populated interval. Use for factory instantiated instances"""
         self.id = id
@@ -46,10 +37,11 @@ class Interval(ABC):
         self.start = start
         self.end = end
         self.populate_metrics(dataframe)
-        # del self.dataframe
         return self
 
     def populate_metrics(self, dataframe: pd.DataFrame) -> None:
+        if dataframe.empty:
+            return
         dataframe_slice = dataframe.loc[(dataframe['time'] >= self.start) & (dataframe['time'] <= self.end)]
         self.populate_general_metrics(dataframe_slice)
         self.populate_specific_metrics(dataframe_slice)

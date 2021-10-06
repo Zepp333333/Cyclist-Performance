@@ -56,7 +56,7 @@ def register_interval_callbacks(dash_app: dash.Dash) -> None:
             if interval_range:
                 io = IO(current_user.id)
                 activity = io.get_hardio_activity_by_id(int(activity_id))
-                activity.new_interval(*interval_range)
+                activity.add_interval(*interval_range)
                 io.save_activity(activity)
                 return make_figure(activity, config=config)
 
