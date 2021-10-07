@@ -4,7 +4,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 
 
-class DataFieldCalculator(ABC):
+class MetricCalculator(ABC):
     """ Strategy interface declares method of Metric calculation"""
 
     @abstractmethod
@@ -12,7 +12,7 @@ class DataFieldCalculator(ABC):
         pass
 
 
-class Normalized(DataFieldCalculator):
+class Normalized(MetricCalculator):
     def __call__(self, df: pd.DataFrame, config: dict = None) -> float:
         if 'watts' not in df:
             raise KeyError(f"watts stream not found in provided dataframe during call to {self.__class__.__name__} ")
@@ -20,7 +20,7 @@ class Normalized(DataFieldCalculator):
         return norm_power
 
 
-class Intensity(DataFieldCalculator):
+class Intensity(MetricCalculator):
     def __call__(self, df: pd.DataFrame, config: dict = None) -> float:
         if not config:
             raise ValueError(f"Attempt to call {self.__class__.__name__} with no config provided")
@@ -32,7 +32,7 @@ class Intensity(DataFieldCalculator):
         return intensity
 
 
-class Load(DataFieldCalculator):
+class Load(MetricCalculator):
     def __call__(self, df: pd.DataFrame, config: dict = None) -> float:
         if not config:
             raise ValueError(f"Attempt to call {self.__class__.__name__} with no config provided")
@@ -48,7 +48,7 @@ class Load(DataFieldCalculator):
         return tss
 
 
-class AveragePower(DataFieldCalculator):
+class AveragePower(MetricCalculator):
     def __call__(self, df: pd.DataFrame, config: dict = None) -> float:
         if 'watts' not in df:
             raise KeyError(f"watts stream not found in provided dataframe during call to {self.__class__.__name__} ")
@@ -56,7 +56,7 @@ class AveragePower(DataFieldCalculator):
         return average_power
 
 
-class Work(DataFieldCalculator):
+class Work(MetricCalculator):
     def __call__(self, df: pd.DataFrame, config: dict = None) -> float:
         if 'watts' not in df:
             raise KeyError(f"watts stream not found in provided dataframe during call to {self.__class__.__name__} ")
@@ -64,7 +64,7 @@ class Work(DataFieldCalculator):
         return work
 
 
-class AverageHR(DataFieldCalculator):
+class AverageHR(MetricCalculator):
     def __call__(self, df: pd.DataFrame, config: dict = None) -> float:
         if 'heartrate' not in df:
             raise KeyError(f"heartrate stream not found in provided dataframe during call to {self.__class__.__name__} ")
@@ -72,7 +72,7 @@ class AverageHR(DataFieldCalculator):
         return average_hr
 
 
-class MaxHR(DataFieldCalculator):
+class MaxHR(MetricCalculator):
     def __call__(self, df: pd.DataFrame, config: dict = None) -> float:
         if 'heartrate' not in df:
             raise KeyError(f"heartrate stream not found in provided dataframe during call to {self.__class__.__name__} ")
@@ -80,7 +80,7 @@ class MaxHR(DataFieldCalculator):
         return max_hr
 
 
-class AverageCadence(DataFieldCalculator):
+class AverageCadence(MetricCalculator):
     def __call__(self, df: pd.DataFrame, config: dict = None) -> float:
         if 'cadence' not in df:
             raise KeyError(f"heartrate stream not found in provided dataframe during call to {self.__class__.__name__} ")

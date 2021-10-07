@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Optional
 
 from logic import Activity
-from logic.datafield_calculator import DataFieldCalculator, CALCULATORS, MEASURES
+from logic.metric_calculator import MetricCalculator, CALCULATORS, MEASURES
 
 
 class Metric:
@@ -14,7 +14,7 @@ class Metric:
     implements Strategy pattern
     """
 
-    def __init__(self, name: str, measure: str, strategy: DataFieldCalculator,
+    def __init__(self, name: str, measure: str, strategy: MetricCalculator,
                  config: dict = None) -> None:
         self.name: str = name
         self.measure: str = measure
