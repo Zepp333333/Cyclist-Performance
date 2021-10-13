@@ -41,9 +41,7 @@ def _make_layout(activity: Activity, config: UserConfig = None) -> dash.Dash.lay
                 [
                     dcc.Graph(id='activity-cp-chart', figure=CPPlotter().get_cp_fig(activity))
                 ]
-
             )
-
         ]
     ), className="mt-3")
 
@@ -102,7 +100,6 @@ def make_interval_button_group():
 def make_interval_input_group() -> html:
     input_group = html.Div(
         [
-
             html.Br(),
             dbc.InputGroup(
                 [
@@ -114,7 +111,6 @@ def make_interval_input_group() -> html:
                 ],
                 size="sm",
             ),
-
         ]
     )
     return input_group

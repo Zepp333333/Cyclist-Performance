@@ -21,7 +21,7 @@ class ActivityView(View):
     #     config = self.presenter.get_config(user_id=user_id, activity_id=activity_id)
 
     @property
-    def page(self):
+    def page(self) -> dash.Dash.layout:
         layout = html.Div([
             self.header,
             self.page_tabs,

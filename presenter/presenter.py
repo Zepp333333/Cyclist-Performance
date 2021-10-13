@@ -5,9 +5,6 @@ from abc import ABC
 from hardio.dashapp.activity_main_new import ActivityView
 
 
-class Presenter:
-    pass
-
 
 class ActivityPresenter:
     def __init__(self, view: ActivityView, user_id: int, activity_id: int):

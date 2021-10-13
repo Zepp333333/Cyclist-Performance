@@ -18,26 +18,37 @@ class Metric:
                  config: dict = None) -> None:
         self.name: str = name
         self.measure: str = measure
-        self.strategy = strategy
-        self.config = config
+        self.strategy: MetricCalculator = strategy
+        self.config: dict = config
+        self.title: str = ''
 
         self.value: Optional[float] = None
 
     def calculate(self, df: Activity.dataframe) -> None:
         """calculate data field and store it in self.value"""
-        self.value = self.strategy(df, self.config)
+        self.value, self.title = self.strategy(df, self.config)
 
     def __str__(self):
-        return f"{self.name.title()}: {round(self.value)}{self.measure}"
+        return f"{self.title}: {round(self.value)}{self.measure}"
 
 
 class ActivityMetrics:
     """
-    Represents a set of data fields of an Activity
+    Represents a set of Metrics of an Activity
     """
-    def __init__(self, activity: Activity, config: dict = None) -> None:
+    def __init__(self, activity: Activity, config: dict) -> None:
         self.activity = activity
         self.config = config
+
+        self.load = None
+        self.intensity = None
+        self.average_power = None
+        self.normalized = None
+        self.average_hr = None
+        self.max_hr = None
+        self.average_cad = None
+        self.work = None
+        self.populate()
 
     def populate(self) -> None:
         for name, strategy in CALCULATORS.items():
