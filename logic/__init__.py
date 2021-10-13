@@ -8,4 +8,4 @@ from .bests import Bests
 from .derivatives import Derivative, MovingAverage, RunningPace
 from .activity_processor import ActivityProcessor
 from .cp import calculate_cp
-from .metrics import Metric
+from .metrics import Metric, ActivityMetrics
