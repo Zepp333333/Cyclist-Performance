@@ -24,7 +24,7 @@ def prep_app_auth_url():
         "client_id": Config.STRAVA_APP_CLIENT_ID,
         "redirect_uri": Config.STRAVA_APP_REDIRECT_URI,
         "response_type": "code",
-        "scope": "read_all,profile:read_all,activity:read_all",
+        "scope": "read_all,profile:read_all,activity:read_all,activity:write",
         "approval_prompt": "force"
     }
     base_url = Config.STRAVA_AUTH_URL
@@ -105,5 +105,3 @@ def retrieve_strava_athlete(auth_code, token=None):
     return retrieve_first_time_coming_athlete(auth_code)
 
 #todo implement strava de-authorize
-
-

@@ -5,6 +5,7 @@ site.db.old
 *.env
 *.old
 htmlcov/
+temp/
 
 
 # IDE:
