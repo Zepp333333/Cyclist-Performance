@@ -21,7 +21,7 @@ class Config:
 
     STRAVA_TOKEN_EXCHANGE_URL = "https://www.strava.com/oauth/token"
 
-    STRAVA_REQUIRED_SCOPES = ['read', 'read_all', 'profile:read_all', 'activity:read_all']
+    STRAVA_REQUIRED_SCOPES = ['read', 'read_all', 'profile:read_all', 'activity:read_all', 'activity:write']
 
     PRIORITIZED_STREAMS: dict[str:int] = {
         'watts': 0,

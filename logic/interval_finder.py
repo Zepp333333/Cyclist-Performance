@@ -44,14 +44,13 @@ class IntervalFinder:
     def _remove_overlapping_candidates(self, candidates: pd.DataFrame, duration: int) -> pd.DataFrame:
 
         def _pick_interval_with_max_mean(_intervals):
-            return _intervals.loc[_intervals['mean'] == _intervals['mean'].max()].iloc[
-                0]
+            return _intervals.loc[_intervals['mean'] == _intervals['mean'].max()].iloc[0]
 
         def _make_tuple(_interval) -> tuple[int, int]:
             return int(_interval['start']), int(_interval['end'])
 
         df = candidates.reset_index()
-        df.rename(columns={'index': 'end', 'watts': 'mean'}, inplace=True)
+        df.rename(columns={'index': 'end', 'watts30': 'mean'}, inplace=True)
         df['start'] = df['end'] - duration
 
         intervals = pd.arrays.IntervalArray.from_arrays(df.start, df.end, closed='both')

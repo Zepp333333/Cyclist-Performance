@@ -89,7 +89,7 @@ class Activity(ABC):
         found = self.interval_finder.find_manual(duration=duration,
                                                  count=count,
                                                  tolerance=tolerance,
-                                                 dataframe=self.dataframe.watts,
+                                                 dataframe=self.dataframe.watts30,
                                                  power=power)
         intervals = []
         i = 1
