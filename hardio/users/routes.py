@@ -17,6 +17,8 @@ from hardio.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
 from hardio.users.utils import save_picture, send_reset_email
 from iobrocker import strava_auth
 
+from config import Config
+
 users = Blueprint('users', __name__)
 
 
@@ -57,6 +59,23 @@ def login() -> Union[str, redirect]:
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+
+@users.route("/test_login", methods=['GET', 'POST'])
+def test_login() -> redirect:
+    """
+    Login route for user how doesn't have an account while wants to try out app with
+    test-data.
+    :return: logs test user in and redirects to application
+    """
+    user = Users.query.filter_by(id=Config.TEST_USER_ID).first()
+    print(user)
+    if user:
+        login_user(user, remember=True)
+        return redirect(url_for('/application/'))
+    else:
+        flash('Something went wrong on our side... Please try again later')
+    return redirect(url_for('main.home'))
 
 
 @users.route("/logout")

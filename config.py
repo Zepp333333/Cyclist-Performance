@@ -39,6 +39,8 @@ class Config:
         'time': 50
     }
 
+    TEST_USER_ID = 1
+
 class ConfigTest:
     TEST_DB_NAME = 'hardio_test_db'
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -70,3 +72,5 @@ class ConfigTest:
     STRAVA_TOKEN_EXCHANGE_URL = "https://www.strava.com/oauth/token"
 
     STRAVA_REQUIRED_SCOPES = ['read', 'activity:read_all', 'profile:read_all']
+
+    TEST_USER_ID = 1

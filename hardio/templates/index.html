@@ -37,11 +37,8 @@
                             {% else %}
                                 <p class="lead pb-4">Please <a href="{{ url_for('users.login') }}">login</a>
                             or <a href="{{ url_for('users.register') }}">register</a> to start.</p>
+                            <p><a href="{{ url_for('users.test_login') }}" class="btn btn-primary btn-lg" role="button">Test Login</a></p>
                             {% endif %}
-
-
-
-                        <p><a href="#" class="btn btn-primary btn-lg" role="button">Learn More</a></p>
                     </div>
                 </header>
             </div>
