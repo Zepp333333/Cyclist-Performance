@@ -18,7 +18,7 @@ class ActivityFactory(ABC):
             "Run": RunningActivityFactory
         }
 
-        if 'type' in details:
+        if 'type' in details and details['type'] in factories:
             factory = factories[details['type']]
             return factory()
         else:
