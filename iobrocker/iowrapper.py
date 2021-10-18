@@ -215,6 +215,8 @@ class IO:
     def save_user_config(self, user_config: UserConfig) -> None:
         dbutil.save_user_config(user_id=self.user_id, config=user_config.to_json())
 
+    def get_user_activity_date_range(self) -> tuple[datetime, datetime]:
+        return dbutil. get_user_activity_date_range(user_id=self.user_id)
 
 
 def _make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:

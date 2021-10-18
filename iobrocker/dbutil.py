@@ -4,11 +4,12 @@ Database utilities module for HARDIO application
 Provides lower level interface to data manipulation in database (and file system for test purposes)
 """
 import pathlib
-import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 import pandas as pd
 import sqlalchemy.exc
+from sqlalchemy import desc
 
 from hardio import db
 from hardio.models import Users, DBActivity, UserConfig
@@ -96,7 +97,7 @@ def get_activity_from_db(user_id, activity_id: int) -> Optional[DBActivity]:
     try:
         db_activity = DBActivity.query.filter_by(user_id=user_id, activity_id=activity_id).first()
         return db_activity
-    except Exception as e:
+    except Exception as _:
         # todo implement SQLAlchemy error handling
         return None
 
@@ -104,7 +105,7 @@ def get_activity_from_db(user_id, activity_id: int) -> Optional[DBActivity]:
 def _store_new_activity(user_id: int,
                         athlete_id: int,
                         activity_id: int,
-                        date: datetime.datetime,
+                        date: datetime,
                         details: str,
                         name: str,
                         dataframe: str,
@@ -146,7 +147,7 @@ def _store_new_activity(user_id: int,
 def store_activity(user_id: int,
                    athlete_id: int,
                    activity_id: int,
-                   date: datetime.datetime,
+                   date: datetime,
                    details: str,
                    name: str,
                    dataframe: str,
@@ -232,7 +233,8 @@ def get_list_of_activities_in_range(user_id, start_date, end_date) -> list[DBAct
     :param end_date: datetime
     :return: list of activity id's within given date range
     """
-    query = db.session.query(DBActivity).filter(DBActivity.user_id == user_id, DBActivity.date.between(start_date, end_date)).all()
+    query = db.session.query(DBActivity).filter(DBActivity.user_id == user_id,
+                                                DBActivity.date.between(start_date, end_date)).all()
     return query
 
 
@@ -256,3 +258,12 @@ def save_user_config(user_id: int, config: str) -> None:
         db_config = UserConfig(user_id=user_id, config=config)
         db.session.add(db_config)
     db.session.commit()
+
+
+def get_user_activity_date_range(user_id: int) -> tuple[datetime, datetime]:
+    try:
+        latest = DBActivity.query.filter_by(user_id=user_id).order_by(desc('date')).first()
+        earliest = DBActivity.query.filter_by(user_id=user_id).order_by(desc('date')).last()
+        return earliest.date, latest.date
+    except Exception as _:
+        return datetime.now() - timedelta(days=365), datetime.now() + timedelta(days=365)

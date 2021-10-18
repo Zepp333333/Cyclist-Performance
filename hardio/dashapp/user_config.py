@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Optional
 from config import Config
 
 
@@ -47,6 +47,8 @@ class ZonesConfig:
 class UserConfig:
     activity_config: ActivityConfig = ActivityConfig()
     zones: ZonesConfig = ZonesConfig()
+    user_calendar_date_preference: Optional[tuple[int, int]] = None  # Month, Year
+
 
     def to_json(self) -> str:
         def _interval_encoder(obj: Any) -> Any:

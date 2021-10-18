@@ -4,6 +4,8 @@ import calendar
 from datetime import datetime
 
 from dash_table import DataTable
+import dash_html_components as html
+import dash_bootstrap_components as dbc
 
 from hardio.dashapp import UserConfig
 from iobrocker import IO
@@ -18,38 +20,97 @@ class HardioCalendar(calendar.Calendar):
         self.month = month
         super().__init__()
 
-    def format_day(self, day: datetime.date, activities: list[PresentationActivity]):
-        if day != 0:
-            activities_of_day = list(filter(lambda x: x.date.date() == day, activities))
-            d = f"{day.day}"
-            if activities_of_day:
-                links = []
-                for activity in activities_of_day:
-                    links.append(f"[{activity.name}](/application/activity/{activity.id}) \n")
-                d = links
-            return d
-        return {}
-
-    def format_week(self, week: list[datetime.date], activities: list[PresentationActivity]):
-        w = {}
-        for day in week:
-            w[day_of_week_to_str(day.weekday())] = self.format_day(day, activities)
-        return w
-
     def format_month(self, month: list[list[datetime.date]], activities: list[PresentationActivity]):
         m = []
         for week in month:
             m.append(self.format_week(week, activities))
         return m
 
+    def format_week(self, week: list[datetime.date], activities: list[PresentationActivity]):
+        w = {}
+        for day in week:
+            w[self.day_of_week_to_str(day.weekday())] = self.format_day(day, activities)
+        return w
 
-def day_of_week_to_str(day_of_week: int) -> str:
-    return WEEK_DAYS[day_of_week]
+    def format_day(self, day: datetime.date, activities: list[PresentationActivity]):
+        if day == 0:
+            return {}
+
+        activities_of_day = list(filter(lambda x: x.date.date() == day, activities))
+        d = f"{day.day}"
+        if activities_of_day:
+            links = []
+            for activity in activities_of_day:
+                links.append(f"[{activity.name}](/application/activity/{activity.id}) \n")
+            d = links
+        return d
+
+    def day_of_week_to_str(self, day_of_week: int) -> str:
+        return WEEK_DAYS[day_of_week]
 
 
-def make_layout(user_id: int, config: UserConfig):
-    cal = calendar.Calendar().monthdatescalendar(2021, 8)
+def _make_selector(options: dict, month: int, year: int) -> dbc.Select:
+    _this_year = datetime.now().year
+    c = calendar.month_name
+
+    next_year = [{"label": options['next_year'], "value": f"1 {options['next_year'][0]}"}]  # Jan (1) Year
+    next_months = [{"label": f"{c[m]} {_this_year}", "value": f"{m} {_this_year}"} for m in
+                   options['next_months']]  # Months Year
+    today = [{"label": "Today", "value": f"{options['today'][0]} {_this_year}", 'active': True}]  # Month Year
+    prev_months = [{"label": f"{c[m]} {_this_year}", "value": f"{m} {_this_year}"} for m in
+                   options['prev_months']]  # Months Year
+    prev_years = [{"label": y, "value": f"1 {y}"} for y in options['prev_years']]  # Jan (1) Year
+
+    selector = dbc.Select(
+        id="calendar_month_selector",
+        placeholder=f"{c[month]}, {year}",
+        options=(next_year + next_months + today + prev_months + prev_years),
+        # value=f"{month}, {year}"
+    )
+    return selector
+
+
+def make_month_selector(user_id: int, year: int, month: int) -> dbc.Select:
+    earliest, _ = IO(user_id).get_user_activity_date_range()
+    _today = datetime.now()
+
+    next_year = [_today.year + 1]
+    next_months = [d for d in range(_today.month + 1, 13)][::-1]
+    today = [_today.month]
+    prev_months = [d for d in range(1, _today.month)][::-1]
+    prev_years = list(range(earliest.year, _today.year))[::-1]
+
+    selector = _make_selector(
+        {
+            'next_year': next_year,
+            'next_months': next_months,
+            'today': today,
+            'prev_months': prev_months,
+            'prev_years': prev_years
+        },
+        year,
+        month
+    )
+    print(selector)
+    return selector
+
+
+def make_layout(user_id: int, calendar_preference: tuple[int, int] = None):
     io = IO(user_id)
+    config = io.read_user_config()
+    if calendar_preference:
+        config.user_calendar_date_preference = calendar_preference
+        io.save_user_config(config)
+        month, year = calendar_preference
+    elif config.user_calendar_date_preference:
+        month, year = config.user_calendar_date_preference
+    else:
+        month: int = datetime.now().month
+        year: int = datetime.now().year
+
+    print(month, year)
+
+    cal = calendar.Calendar().monthdatescalendar(year, month)
     activities_list = io.get_list_of_activities_in_range(cal[0][0], cal[-1][-1])
     formatted_cal = HardioCalendar().format_month(cal, activities_list)
 
@@ -61,7 +122,7 @@ def make_layout(user_id: int, config: UserConfig):
                 }
                for d in WEEK_DAYS]
 
-    layout = DataTable(
+    table = DataTable(
         id="calendar",
         data=formatted_cal,
         columns=columns,
@@ -96,12 +157,23 @@ def make_layout(user_id: int, config: UserConfig):
             # {"selector": ".dash-spreadsheet-container", "rule": "max-height: 1000px;"},
             # {"selector": "table", "rule": "width: 100%;"},
             # {"selector": "cell cell-1-1 dash-fixed-content", "rule": "height: 100px;"},
-            {"selector": "dash-spreadsheet-container dash-spreadsheet dash-virtualized dash-freeze-top dash-no-filter dash-fill-width", "rule": "max-height: 1200px; height: 1200px"},
+            {
+                "selector": "dash-spreadsheet-container dash-spreadsheet dash-virtualized dash-freeze-top dash-no-filter dash-fill-width",
+                "rule": "max-height: 1200px; height: 1200px"},
             # {"selector": ".dash-table-container tr", "rule": 'max-height: "150px"; height: "150px"; '},
             # {"selector": "dash-spreadsheet dash-freeze-top dash-spreadsheet dash-virtualized", "rule": "max-height: inherit !important;"},
             # {"selector": "dash-table-container", "rule": "max-height: calc(100vh - 225px);"}
 
         ],
+    )
+
+    layout = html.Div(
+        id="calendar_view",
+        children=[
+            html.Div(make_month_selector(user_id, month, year), style={'width': '10rem'}),
+            html.Br(),
+            table
+        ]
     )
 
     return layout
