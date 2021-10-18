@@ -31,7 +31,7 @@ def register_navigation_callbacks(dash_app: dash.Dash) -> None:
 
         if pathname == "/application/":
             return [
-                       calendar.make_layout(current_user.id, config),
+                       calendar.make_layout(current_user.id),
                    ], [current_user.username]
         elif pathname == "/application/activity":
             return [
@@ -48,12 +48,6 @@ def register_navigation_callbacks(dash_app: dash.Dash) -> None:
                        html.H2(f"Current user id: {current_user.id}"),
                        test_strava_methods_page.make_layout()
                    ], [current_user.username]
-        elif "/application/test" in pathname:
-            activity_id = pathname.split("/")[-1]
-            return [
-                       html.H1("test page", style={"textAlign": "center"}),
-                       html.H2(activity_id)
-                   ], [current_user.username]
 
         # If the user tries to reach a different page, return a 404 message
         return dbc.Jumbotron(
@@ -62,4 +56,4 @@ def register_navigation_callbacks(dash_app: dash.Dash) -> None:
                 html.Hr(),
                 html.P(f"The pathname {pathname} was not recognized...")
             ]
-        )
+        ), [current_user.username]

@@ -3,6 +3,7 @@
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
+from flask_login import current_user
 
 # Styling the navbar
 NAVBAR_STYLE = {
@@ -48,6 +49,7 @@ navbar = html.Div([
 
 )
 
+
 sidebar = html.Div(
     [
         html.H3(id="username_placeholder", children=[], className="display-5"),
@@ -55,9 +57,8 @@ sidebar = html.Div(
         dbc.Nav(
             [
                 dbc.NavLink("Calendar", href="/application/", active="exact"),
-                dbc.NavLink("Activity", href="/application/activity", active="exact"),
-                dbc.NavLink("test", href="/application/test/12", active="exact"),
-                dbc.NavLink("Test Strava Methods", href="/application/test_strava", active="exact")
+                # dbc.NavLink("Activity", href="/application/activity", active="exact"),
+                # dbc.NavLink("Test Strava Methods", href="/application/test_strava", active="exact")
             ],
             vertical=True,
             pills=True
