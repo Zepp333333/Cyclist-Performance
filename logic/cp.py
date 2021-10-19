@@ -76,7 +76,7 @@ def calculate_list_of_rides_cp(activities: list[Activity]) -> pd.DataFrame:
 #
 # with app.app_context():
 #     io = IO(1)
-#     l = io.get_list_of_activities_in_range(datetime(2021, 8, 1), datetime(2021, 8, 30))
+#     l = io.get_list_of_hardio_activities_in_range(datetime(2021, 8, 1), datetime(2021, 8, 30))
 #
 # activities = []
 # with app.app_context():

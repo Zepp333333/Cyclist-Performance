@@ -5,6 +5,7 @@ Provides High level interface to Strava API and Database requests
 # todo rename module
 
 import json
+from calendar import monthrange
 from datetime import datetime
 from typing import Optional
 
@@ -48,11 +49,21 @@ class IO:
     def get_athlete_info(self) -> json:
         raise NotImplemented
 
-    def get_list_of_activities_in_range(self, start_date: datetime, end_date: datetime) -> list[PresentationActivity]:
+    def get_list_of_hardio_activities_in_range(self, start_date: datetime, end_date: datetime) -> list[PresentationActivity]:
         activities = dbutil.get_list_of_activities_in_range(self.user_id, start_date, end_date)
         return [self._make_presentation_activity(a) for a in activities]
 
     def get_activities_from_strava(self, get_streams: bool = False, **kwargs) -> list[Activity]:
+        """
+        :param get_streams: Bool, default=False. Whether of not to retrieve activity streams from strava
+        :param kwargs: Possible kwargs and their defaults are:
+                           before: int = datetime.now().timestamp(),
+                           after: int = 0,
+                           page: int = 1,
+                           per_page: int = 30,
+                           async_req=True
+        :return: list of HARDIO Activity objects
+        """
         result = []
         strava_activities = strava_swagger.get_activities(self.user_id, **kwargs)
         for strava_activity in strava_activities:
@@ -218,6 +229,24 @@ class IO:
     def get_user_activity_date_range(self) -> tuple[datetime, datetime]:
         return dbutil. get_user_activity_date_range(user_id=self.user_id)
 
+    def refresh_user_activities_from_strava(self, month: int, year: int) -> None:
+        start_date, end_date = _make_start_end_date_of_month(month, year)
+        list_of_strava_activities = self.get_list_of_strava_activities_in_range(start_date, end_date)
+        list_of_new_strava_activities = self._filter_out_existing_activities(start_date, end_date, list_of_strava_activities)
+        activities = []
+        for activity_id in list_of_new_strava_activities:
+            activities.append(self.get_strava_activity_by_id(activity_id, get_streams=True))
+        self.save_activities(activities)
+
+    def get_list_of_strava_activities_in_range(self, start_date: datetime, end_date: datetime) -> list[int]:
+        activities = strava_swagger.get_activities(self.user_id, before=end_date.timestamp(), after=start_date.timestamp())
+        return [i.id for i in activities]
+
+    def _filter_out_existing_activities(self, start_date: datetime, end_date: datetime, list_of_strava_activities: list[int]) -> list[int]:
+        hardio_activities = self.get_list_of_hardio_activities_in_range(start_date, end_date)
+        hardio_activities_ids = [a.id for a in hardio_activities]
+        return list(set(list_of_strava_activities) - set(hardio_activities_ids))
+
 
 def _make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:
     """
@@ -231,3 +260,10 @@ def _make_df(streams: swagger_client.models.StreamSet) -> pd.DataFrame:
         if streams_dict[key]:
             df[key] = streams_dict[key]['data']
     return df
+
+
+def _make_start_end_date_of_month(month, year) -> tuple[datetime, datetime]:
+    _, last_day_of_month = monthrange(year, month)
+    start = datetime(year, month, 1)
+    end = datetime(year, month, last_day_of_month, 23, 59, 59)
+    return start, end
