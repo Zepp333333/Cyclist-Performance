@@ -48,7 +48,9 @@ class ActivityMetrics:
         self.max_hr = None
         self.average_cad = None
         self.work = None
-        self.populate()
+
+        if self.activity.type == ("VirtualRide" or "Ride"):
+            self.populate()
 
     def populate(self) -> None:
         for name, strategy in CALCULATORS.items():

@@ -15,7 +15,8 @@ class ActivityFactory(ABC):
         factories = {
             "Ride": CyclingActivityFactory,
             "VirtualRide": CyclingActivityFactory,
-            "Run": RunningActivityFactory
+            "Run": RunningActivityFactory,
+            "Walk": RunningActivityFactory,
         }
 
         if 'type' in details and details['type'] in factories:

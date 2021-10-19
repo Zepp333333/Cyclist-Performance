@@ -33,6 +33,14 @@ def register_navigation_callbacks(dash_app: dash.Dash) -> None:
             return [
                        calendar.make_layout(current_user.id),
                    ], [current_user.username]
+        elif pathname == "/power/":
+            return [
+                       html.H2(f"Not yet implemented")
+                   ], [current_user.username]
+        elif pathname == "/fitness/":
+            return [
+                       html.H2(f"Not yet implemented")
+                   ], [current_user.username]
         elif pathname == "/application/activity":
             return [
                        activity_main.make_layout(user_id=current_user.id, activity_id=None, config=config)

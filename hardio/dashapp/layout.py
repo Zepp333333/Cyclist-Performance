@@ -57,6 +57,8 @@ sidebar = html.Div(
         dbc.Nav(
             [
                 dbc.NavLink("Calendar", href="/application/", active="exact"),
+                dbc.NavLink("Power", href="/power/", active="exact"),
+                dbc.NavLink("Fitness", href="/fitness/", active="exact"),
                 # dbc.NavLink("Activity", href="/application/activity", active="exact"),
                 # dbc.NavLink("Test Strava Methods", href="/application/test_strava", active="exact")
             ],

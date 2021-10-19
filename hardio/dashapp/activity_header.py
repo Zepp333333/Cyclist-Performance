@@ -38,7 +38,7 @@ class ActivityHeader:
     @staticmethod
     def make_activity_info_header(activity: Activity):
         metrics = ActivityMetrics(activity=activity, config={'ftp': 290})
-        if activity.type == 'Run':
+        if activity.type == 'Run' or 'Walk':
             return html.Div(
                 [
 

@@ -46,19 +46,32 @@ def swagger_get_activities(token: str,
     configuration = swagger_client.Configuration()
     configuration.access_token = token
     api_instance = swagger_client.ActivitiesApi(swagger_client.ApiClient(configuration))
-    try:
-        # List Athlete Activities
-        thread = api_instance.get_logged_in_athlete_activities(
-            async_req=async_req,
-            before=before,
-            after=after,
-            page=page,
-            per_page=per_page
-        )
-        api_response = thread.get()
-        return api_response
-    except ApiException as e:
-        print("Exception when calling ActivitiesApi->getLoggedInAthleteActivities: %s\n" % e)
+
+    def _get_page_of_activities(current_page):
+        try:
+            # List Athlete Activities
+            thread = api_instance.get_logged_in_athlete_activities(
+                async_req=async_req,
+                before=before,
+                after=after,
+                page=current_page,
+                per_page=per_page
+            )
+            api_response = thread.get()
+            return api_response
+        except ApiException as e:
+            print("Exception when calling ActivitiesApi->getLoggedInAthleteActivities: %s\n" % e)
+
+    list_activities = []
+    while True:
+        page_of_activities = _get_page_of_activities(page)
+        if not page_of_activities:
+            break
+        list_activities.extend(page_of_activities)
+        if len(page_of_activities) < 30:
+            break
+        page += 1
+    return list_activities
 
 
 def swagger_get_activity_streams(token: str, activity_id: int) -> Optional[swagger_client.models.stream_set.StreamSet]:
@@ -92,6 +105,17 @@ def get_athlete(user_id: int = None) -> str:
 
 
 def get_activities(user_id: int = None, **kwargs) -> list[swagger_client.models.summary_activity.SummaryActivity]:
+    """
+
+    :param user_id: int = HARDIO User Id
+    :param kwargs: Possible kwargs and their defaults are:
+                           before: int = datetime.now().timestamp(),
+                           after: int = 0,
+                           page: int = 1,
+                           per_page: int = 30,
+                           async_req=True
+    :return: list of Swagger SummaryActivity
+    """
     user_id = user_id if user_id else current_user.id
     _, token = dbutil.get_strava_athlete_id_and_token(user_id)
     return swagger_get_activities(token=token, **kwargs)
@@ -104,7 +128,6 @@ def get_activity_by_id(activity_id: int, user_id: int = None) -> Optional[swagge
     if not athlete_id:
         return None
     strava_activity = swagger_get_activity(token, activity_id)
-    # dbutil.store_strava_activity(strava_activity=strava_activity, user_id=user_id, athlete_id=athlete_id)
     return strava_activity
 
 

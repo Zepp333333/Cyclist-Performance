@@ -3,6 +3,7 @@
 import calendar
 from datetime import datetime
 
+import dash
 from dash_table import DataTable
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -65,7 +66,7 @@ def _make_selector(options: dict, month: int, year: int) -> dbc.Select:
         id="calendar_month_selector",
         placeholder=f"{c[month]}, {year}",
         options=(next_year + next_months + today + prev_months + prev_years),
-        # value=f"{month}, {year}"
+        persistence=True,
     )
     return selector
 
@@ -91,27 +92,15 @@ def make_month_selector(user_id: int, year: int, month: int) -> dbc.Select:
         year,
         month
     )
-    print(selector)
     return selector
 
 
-def make_layout(user_id: int, calendar_preference: tuple[int, int] = None):
+def make_layout(user_id: int, user_selected_moth_year: str = None) -> dash.Dash.layout:
     io = IO(user_id)
-    config = io.read_user_config()
-    if calendar_preference:
-        config.user_calendar_date_preference = calendar_preference
-        io.save_user_config(config)
-        month, year = calendar_preference
-    elif config.user_calendar_date_preference:
-        month, year = config.user_calendar_date_preference
-    else:
-        month: int = datetime.now().month
-        year: int = datetime.now().year
-
-    print(month, year)
+    month, year = set_month_year(io, user_selected_moth_year)
 
     cal = calendar.Calendar().monthdatescalendar(year, month)
-    activities_list = io.get_list_of_activities_in_range(cal[0][0], cal[-1][-1])
+    activities_list = io.get_list_of_hardio_activities_in_range(cal[0][0], cal[-1][-1])
     formatted_cal = HardioCalendar().format_month(cal, activities_list)
 
     columns = [{'id': d,
@@ -167,13 +156,81 @@ def make_layout(user_id: int, calendar_preference: tuple[int, int] = None):
         ],
     )
 
+    alert = html.Div(
+        [
+            dbc.Alert(
+                "Refresh may take up to a minute or so, depending on number of activities",
+                id="alert-calendar-refresh",
+                is_open=False,
+                duration=4000,
+            ),
+        ]
+    )
+
     layout = html.Div(
         id="calendar_view",
         children=[
-            html.Div(make_month_selector(user_id, month, year), style={'width': '10rem'}),
+            html.Div(
+                [
+                    make_month_selector(user_id, month, year),
+                    dbc.Button('Refresh', id='btn_refresh_activities', n_clicks=0, color="link"),
+                ],
+                style={'width': '10rem'}),
             html.Br(),
+            alert,
+            dbc.Spinner(html.Div(id="refresh_spinner",
+                                 children='calendar')),
             table
         ]
     )
 
     return layout
+
+
+def set_month_year(io: IO, user_selected_moth_year: str) -> tuple[int, int]:
+    """
+    Produce Month/Year combination to filter calendar by
+    :param io: instance of IO object
+    :param user_selected_moth_year: string containig user-selected combination of Month/Year
+    :return: tuple[int, int] Month, Year
+    """
+    config = io.read_user_config()
+    if user_selected_moth_year:
+        month_year = _month_year_to_tuple(user_selected_moth_year)
+        update_user_config_in_db(config, io, month_year)
+        month, year = month_year
+    elif config.user_calendar_date_preference:
+        month, year = config.user_calendar_date_preference
+    else:
+        month: int = datetime.now().month
+        year: int = datetime.now().year
+    return month, year
+
+
+def update_user_config_in_db(config: UserConfig, io: IO, month_year: tuple[int, int]) -> None:
+    """
+    Updates UserConfig based on latest calendar Month/Year view preference. Saves UserConfig to db
+    :param config: instance of UserConfig
+    :param io: instance of IO object
+    :param month_year: tuple[int, int] Month, Year
+    :return: None
+    """
+    config.user_calendar_date_preference = month_year
+    io.save_user_config(config)
+
+
+def refresh_activities_from_strava(user_id: int, month_year: str) -> None:
+    month, year = _month_year_to_tuple(month_year)
+    io = IO(user_id)
+    io.refresh_user_activities_from_strava(month, year)
+
+
+
+def _month_year_to_tuple(month_year: str) -> tuple[int, int]:  # Month, Year
+    """
+    Parses user-preferred combination of Month/Year string and returns tuple
+    :param month_year: string Month/Year combination space separated (i.e. 10 2021)
+    :return: tuple[int, int] Month, Year
+    """
+    m, y = month_year.split(" ")
+    return int(m), int(y)  # Month, Year

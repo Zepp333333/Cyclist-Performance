@@ -17,6 +17,7 @@ class ActivityProcessor:
             "Ride": RideActivityProcessor,
             "VirtualRide": RideActivityProcessor,
             "Run": RunActivityProcessor,
+            "Walk": RunActivityProcessor,
         }
 
         if ('type' in details) and (details['type'] in processors):
