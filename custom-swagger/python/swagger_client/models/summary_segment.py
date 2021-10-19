@@ -196,7 +196,7 @@ class SummarySegment(object):
         :param activity_type: The activity_type of this SummarySegment.  # noqa: E501
         :type: str
         """
-        allowed_values = ["Ride", "Run"]  # noqa: E501
+        allowed_values = ["Ride", "Run", "VirtualRide"]  # noqa: E501
         if (self._configuration.client_side_validation and
                 activity_type not in allowed_values):
             raise ValueError(
