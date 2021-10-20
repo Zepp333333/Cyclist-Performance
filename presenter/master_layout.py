@@ -37,15 +37,17 @@ class MasterLayout:
                                     [
                                         html.A(Config.APP_NAME, href=Config.SITE_ROOT, className="navbar-brand mr-4")
                                     ],
-                                    "Navbar_Container", className="container"
+                                    id=IDs.navbar_container,
+                                    className="container"
                                 )
                             ],
-                            "Navbar",
+                            id=IDs.navbar,
                             className="navbar navbar-expand-md navbar-dark bg-steel fixed-top",
                             style=Config.NAVBAR_STYLE
                         ),
                     ],
-                    "Header", className="site-header",
+                    id=IDs.site_header,
+                    className="site-header",
                 ),
             ],
         )
