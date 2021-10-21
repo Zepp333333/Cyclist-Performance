@@ -64,34 +64,12 @@ def create_app(config_class=Config) -> Flask:
     return app
 
 
-# class CustomDash(DashProxy):
-#     def __init__(self, presenter: 'Presenter', *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.presenter = presenter(self)
-#         self._context: Optional[str] = None
-#
-#     @property
-#     def current_user(self):
-#         if current_user:
-#             return current_user.id
-#         return None
-#
-#     @property
-#     def context(self):
-#         return self._context
-#
-#     @context.setter
-#     def context(self, ctx):
-#         self._context = ctx
-
-
 def register_dash(app: Flask) -> None:
     """
     Registers Dash application under provided Flask app.
     :param app: Instance of Flask app
     :return: None
     """
-    # from hardio.dashapp.layout import layout
     from presenter import AppPresenter
     from hardio.dashapp.view import CustomDashView
     from hardio.dashapp.callbacks import register_callbacks
@@ -101,14 +79,6 @@ def register_dash(app: Flask) -> None:
 
     # Meta tags for viewport responsiveness
     meta_viewport = {"name": "viewport", "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
-
-    # dash_app = dash.Dash(__name__,
-    #                      server=app,
-    #                      title='HARDIO',
-    #                      url_base_pathname='/application/',
-    #                      external_stylesheets=[dbc.themes.BOOTSTRAP],
-    #                      assets_folder=get_root_path(__name__) + 'dashboard/assets/',
-    #                      meta_tags=[meta_viewport])
 
     dash_app = CustomDashView(name=__name__,
                               presenter=AppPresenter,
@@ -120,8 +90,8 @@ def register_dash(app: Flask) -> None:
                               meta_tags=[meta_viewport],
                               transforms=[MultiplexerTransform()])
 
-    dash_app.enable_dev_tools(dev_tools_ui=True,
-                              dev_tools_serve_dev_bundles=True, )
+    # dash_app.enable_dev_tools(dev_tools_ui=True,
+    #                           dev_tools_serve_dev_bundles=True, )
 
     with app.app_context():
         dash_app.layout = dash_app.presenter.get_master_layout()
