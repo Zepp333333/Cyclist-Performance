@@ -1,38 +1,32 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
-
-import dash
-from typing import Protocol, Optional
-from abc import abstractmethod
-
-
-
-
-class View(Protocol):
-    """Protocol representing View of MVP Pattern"""
-    presenter: object
-    user_id: Optional[int] = None
-
-    @abstractmethod
-    def render_main(self) -> dash.Dash.layout:
-        """Update main/home page view"""
-
-    @abstractmethod
-    def render_activity(self) -> dash.Dash.layout:
-        """Update Activity View"""
+from typing import Optional
+from abc import ABC
+from flask_login import current_user
+from dash_extensions.enrich import DashProxy
+from presenter import Presenter
 
 
-class AppView:
-    """Implement View Protocol"""
+class View(ABC):
+    """Base class representing View in MVP pattern"""
+    presenter: Presenter
+    _context: Optional[str] = None
 
-    def __init__(self, presenter_class):
-        self.presenter = presenter_class(self)
-        self.user_id: Optional[int] = None
+    @property
+    def current_user(self):
+        return current_user.id if current_user else None
 
-    def render_main(self) -> dash.Dash.layout:
-        """Update main/home page view"""
+    @property
+    def context(self):
+        return self._context
 
-    def render_activity(self) -> dash.Dash.layout:
-        """Update Activity View"""
+    @context.setter
+    def context(self, ctx):
+        self._context = ctx
 
-    def render_power(self) -> dash.Dash.layout:
-        """Update Power view"""
+
+class CustomDashView(DashProxy, View):
+    def __init__(self, presenter: Presenter, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # noinspection PyCallingNonCallable
+        self.presenter = presenter(self)
+        self._context: Optional[str] = None
