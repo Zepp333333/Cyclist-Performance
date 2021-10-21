@@ -8,6 +8,15 @@ class AppModule:
     display_name: str
     route: str
 
+@dataclass
+class Button:
+    name: str
+    id: str
+
+
+class Buttons:
+    refresh_activities = Button("Refresh", "btn_refresh_activities")
+
 
 class AppDashIDs:
     user_name_placeholder = "username_placeholder"
@@ -15,9 +24,14 @@ class AppDashIDs:
     url = "url"
     activity_store = "current_activity_store"
     user_config_store = "user_config_store"
-    navbar_container = "navbar_Container"
+    navbar_container = "navbar_container"
     navbar = "navbar"
-    site_header = 'site_header'
+    site_header = "site_header"
+    calendar = "calendar"
+    spinner = "refresh_spinner"
+    calendar_refresh_alert = "calendar_refresh_alert"
+    calendar_table = "calendar_table"
+    calendar_month_selector = "calendar_month_selector"
 
 class AppModules:
     calendar = AppModule("Calendar", "/application/")

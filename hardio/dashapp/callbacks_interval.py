@@ -22,7 +22,7 @@ def register_interval_callbacks(dash_app: dash.Dash) -> None:
          Input(component_id='interval_tolerance', component_property='value'),
          Input(component_id='current_activity', component_property='data')],
         [State(component_id='activity-main-chart', component_property='relayoutData'),
-         State(component_id='user_config', component_property='data')],
+         State(component_id='user_config_store', component_property='data')],
         prevent_initial_call=True
     )
     def manage_intervals(_: int,

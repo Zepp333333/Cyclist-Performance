@@ -7,16 +7,17 @@ from dash.dependencies import Input, Output, State
 from flask_login import current_user
 
 from hardio.dashapp import UserConfig, activity_main, calendar, test_strava_methods_page
+from hardio.dashapp.view import CustomDashView
 
 from iobrocker import IO
 
 
-def register_navigation_callbacks(dash_app: dash.Dash) -> None:
+def register_navigation_callbacks(dash_app: CustomDashView) -> None:
     @dash_app.callback(
-        Output(component_id="page-content", component_property="children"),
+        Output(component_id="page_content", component_property="children"),
         Output(component_id="username_placeholder", component_property="children"),
         Input(component_id="url", component_property="pathname"),
-        State(component_id="user_config", component_property="data"),
+        State(component_id="user_config_store", component_property="data"),
     )
     def render_page_content(pathname, user_config) -> dash.Dash.layout:
         """
@@ -31,7 +32,8 @@ def register_navigation_callbacks(dash_app: dash.Dash) -> None:
 
         if pathname == "/application/":
             return [
-                       calendar.make_layout(current_user.id),
+                       dash_app.presenter.get_calendar()
+                       # calendar.make_layout(current_user.id),
                    ], [current_user.username]
         elif pathname == "/power/":
             return [
