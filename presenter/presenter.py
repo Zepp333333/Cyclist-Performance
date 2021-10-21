@@ -1,19 +1,19 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-from abc import ABC
+from abc import ABC, abstractmethod
 
-from hardio.dashapp.activity_main_new import ActivityView
+import dash
 
 
+class CalendarView:
+    pass
 
-class ActivityPresenter:
-    def __init__(self, view: ActivityView, user_id: int, activity_id: int):
-        self.view = view
 
-    def page(self):
-        tabs = {
-            'Activity': self.view.make_activity_tab(),
-            'Power': self.view.make_power_tab()
-        }
-        self.view.page_tabs = self.view.make_page_tabs(tabs)
-        return self.view.page()
+class Presenter(ABC):
+    """Base Presenter class"""
+    def __init__(self):
+        """"""
+
+    @abstractmethod
+    def get_master_layout(self) -> dash.Dash.layout:
+        """"""

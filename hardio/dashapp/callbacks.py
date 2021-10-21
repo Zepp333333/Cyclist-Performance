@@ -26,7 +26,7 @@ def register_callbacks(dash_app):
     @dash_app.callback(
         [Output(component_id="page-content", component_property="children"),
          Output(component_id="configuration-modal-centered", component_property="is_open"),
-         Output(component_id="user_config", component_property="data")],
+         Output(component_id="user_config_store", component_property="data")],
         [Input(component_id="btn-configuration", component_property="n_clicks"),
          Input(component_id="btn-save-configuration", component_property="n_clicks"),
          Input(component_id="btn-close-configuration", component_property="n_clicks"), ],
