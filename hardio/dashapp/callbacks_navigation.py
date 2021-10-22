@@ -6,17 +6,17 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from flask_login import current_user
 
-from hardio.dashapp import UserConfig, activity_main, calendar, test_strava_methods_page
+from hardio.dashapp import test_strava_methods_page
 from hardio.dashapp.view import CustomDashView
-
 from iobrocker import IO
 
+from presenter import AppDashIDs as ids
 
 def register_navigation_callbacks(dash_app: CustomDashView) -> None:
     @dash_app.callback(
-        Output(component_id="page_content", component_property="children"),
-        Output(component_id="username_placeholder", component_property="children"),
-        Input(component_id="url", component_property="pathname"),
+        Output(component_id=ids.page_content, component_property="children"),
+        Output(component_id=ids.user_name_placeholder, component_property="children"),
+        Input(component_id=ids.url, component_property="pathname"),
         State(component_id="user_config_store", component_property="data"),
     )
     def render_page_content(pathname, user_config) -> dash.Dash.layout:
@@ -31,10 +31,7 @@ def register_navigation_callbacks(dash_app: CustomDashView) -> None:
         config = io.read_user_config()
 
         if pathname == "/application/":
-            return [
-                       dash_app.presenter.get_calendar()
-                       # calendar.make_layout(current_user.id),
-                   ], [current_user.username]
+            return [dash_app.presenter.get_calendar()], [current_user.username]
         elif pathname == "/power/":
             return [
                        html.H2(f"Not yet implemented")
@@ -44,14 +41,12 @@ def register_navigation_callbacks(dash_app: CustomDashView) -> None:
                        html.H2(f"Not yet implemented")
                    ], [current_user.username]
         elif pathname == "/application/activity":
-            return [
-                       activity_main.make_layout(user_id=current_user.id, activity_id=None, config=config)
-                   ], [current_user.username]
+            dash_app.context = {'activity': None}
+            return [dash_app.presenter.get_activity()], [current_user.username]
         elif "/application/activity/" in pathname:
             activity_id = pathname.split("/")[-1]
-            return [
-                       activity_main.make_layout(user_id=current_user.id, activity_id=activity_id, config=config)
-                   ], [current_user.username]
+            dash_app.context = {'activity': activity_id}
+            return [dash_app.presenter.get_activity()], [current_user.username]
         elif pathname == "/application/test_strava":
             return [
                        html.H1("Activity", style={"textAlign": "center"}),

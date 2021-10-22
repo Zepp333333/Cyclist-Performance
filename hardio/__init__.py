@@ -11,11 +11,11 @@ app authorization with Strava. Plotly/Dash is run under Flask to enable authoriz
 
 import dash
 import dash_bootstrap_components as dbc
-from dash_extensions.enrich import DashProxy, MultiplexerTransform
+from dash_extensions.enrich import MultiplexerTransform
 from flask import Flask
 from flask.helpers import get_root_path
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, login_required, current_user
+from flask_login import LoginManager, login_required
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -70,7 +70,7 @@ def register_dash(app: Flask) -> None:
     :param app: Instance of Flask app
     :return: None
     """
-    from presenter import AppPresenter
+    from presenter import Presenter
     from hardio.dashapp.view import CustomDashView
     from hardio.dashapp.callbacks import register_callbacks
     from hardio.dashapp.callbacks_interval import register_interval_callbacks
@@ -81,7 +81,7 @@ def register_dash(app: Flask) -> None:
     meta_viewport = {"name": "viewport", "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
 
     dash_app = CustomDashView(name=__name__,
-                              presenter=AppPresenter,
+                              presenter=Presenter,
                               server=app,
                               title='HARDIO',
                               url_base_pathname='/application/',

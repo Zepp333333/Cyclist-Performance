@@ -13,9 +13,36 @@ class Button:
     name: str
     id: str
 
+@dataclass
+class Input:
+    id: str
+    type: str = "number"
+    placeholder: str = ""
+
+    def expand(self):
+        return f"id={self.id}, type={self.type}, placeholder={self.placeholder}"
+
+@dataclass
+class Tab:
+    label: str
+    tab_id: str
+
+
+class Tabs:
+    activity_tab = Tab("Activity", "activity_tab")
+    power_tab = Tab("Power", "power_tab")
+
+class Inputs:
+    interval_duration = Input("interval_duration", "number", "Set interval length")
+    how_many_to_find = Input("how_many_to_find", "number", "How many to find")
+    interval_power = Input("interval_power", "number", "Interval Power, wt")
+    interval_tolerance = Input("interval_tolerance", "number", "Tolerance %")
 
 class Buttons:
     refresh_activities = Button("Refresh", "btn_refresh_activities")
+    create_interval = Button("Create Interval", "btn_create_interval")
+    find_intervals = Button("Find Intervals", "btn_find_intervals")
+    delete_intervals = Button("Delete Intervals", "btn_delete_intervals")
 
 
 class AppDashIDs:
@@ -32,9 +59,14 @@ class AppDashIDs:
     calendar_refresh_alert = "calendar_refresh_alert"
     calendar_table = "calendar_table"
     calendar_month_selector = "calendar_month_selector"
+    activity_main_chart = "activity_main_chart"
+    activity_cp_chart = "activity_cp_chart"
+    activity_tabs = "activity_tabs"
+
 
 class AppModules:
     calendar = AppModule("Calendar", "/application/")
+    activity = AppModule("Activity", "/application/activity/")
     power = AppModule("Power", "/application/power/")
     fitness = AppModule("Fitness", "/application/fitness/")
     config = AppModule("Config", "/config/")

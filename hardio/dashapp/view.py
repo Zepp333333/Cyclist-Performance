@@ -1,14 +1,16 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
-from typing import Optional
 from abc import ABC
-from flask_login import current_user
+from typing import Optional
+
 from dash_extensions.enrich import DashProxy
-from presenter import Presenter
+from flask_login import current_user
+
+from presenter import BasePresenter
 
 
 class View(ABC):
     """Base class representing View in MVP pattern"""
-    presenter: Presenter
+    presenter: BasePresenter
     _context: Optional[str] = None
 
     @property
@@ -25,7 +27,7 @@ class View(ABC):
 
 
 class CustomDashView(DashProxy, View):
-    def __init__(self, presenter: Presenter, *args, **kwargs):
+    def __init__(self, presenter: BasePresenter, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # noinspection PyCallingNonCallable
         self.presenter = presenter(self)

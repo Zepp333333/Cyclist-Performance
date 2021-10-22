@@ -7,6 +7,7 @@ from flask_login import current_user
 from hardio.dashapp import test_strava_methods_page, dash_external_redirect, activity_main, UserConfig
 from iobrocker import IO, strava_swagger
 
+from presenter import AppDashIDs as ids
 
 def register_callbacks(dash_app):
     @dash_app.callback(
@@ -24,15 +25,16 @@ def register_callbacks(dash_app):
             return dash_external_redirect.redirect(url_for('users.strava_login')), True
 
     @dash_app.callback(
-        [Output(component_id="page-content", component_property="children"),
+        [Output(component_id=ids.page_content, component_property="children"),
          Output(component_id="configuration-modal-centered", component_property="is_open"),
-         Output(component_id="user_config_store", component_property="data")],
+         Output(component_id="user_config_store", component_property="data")
+         ],
         [Input(component_id="btn-configuration", component_property="n_clicks"),
          Input(component_id="btn-save-configuration", component_property="n_clicks"),
          Input(component_id="btn-close-configuration", component_property="n_clicks"), ],
         [State(component_id="charts_config_switches", component_property="value"),
          State(component_id="configuration-modal-centered", component_property="is_open"),
-         State(component_id="current_activity", component_property="data")]
+         State(component_id="current_activity_store", component_property="data")]
     )
     def toggle_configuration_modal(btn_open_config, btn_save_config, btn_close_config, switches_value, is_open, current_activity):
         if btn_save_config:

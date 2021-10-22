@@ -9,3 +9,4 @@ from .derivatives import Derivative, MovingAverage, RunningPace
 from .activity_processor import ActivityProcessor
 from .cp import calculate_cp
 from .metrics import Metric, ActivityMetrics
+from .user_config import UserConfig

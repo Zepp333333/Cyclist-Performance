@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from .presenter_config import AppConfig as Config
-from .presenter_config import AppDashIDs as IDs
+from .presenter_config import AppDashIDs as ids
 
 
 class MasterLayout:
@@ -17,12 +17,12 @@ class MasterLayout:
         content = self.make_content()
         return html.Div(
             [
-                dcc.Location(id=IDs.url),
+                dcc.Location(id=ids.url),
                 navbar,
                 sidebar,
                 content,
-                dcc.Store(id=IDs.activity_store),
-                dcc.Store(id=IDs.user_config_store, storage_type='session'),
+                dcc.Store(id=ids.activity_store),
+                dcc.Store(id="user_config_store", storage_type='session'),
             ]
         )
 
@@ -37,16 +37,16 @@ class MasterLayout:
                                     [
                                         html.A(Config.APP_NAME, href=Config.SITE_ROOT, className="navbar-brand mr-4")
                                     ],
-                                    id=IDs.navbar_container,
+                                    id=ids.navbar_container,
                                     className="container"
                                 )
                             ],
-                            id=IDs.navbar,
+                            id=ids.navbar,
                             className="navbar navbar-expand-md navbar-dark bg-steel fixed-top",
                             style=Config.NAVBAR_STYLE
                         ),
                     ],
-                    id=IDs.site_header,
+                    id=ids.site_header,
                     className="site-header",
                 ),
             ],
@@ -56,7 +56,7 @@ class MasterLayout:
         sidebar_links = [dbc.NavLink(o.display_name, href=o.route, active="exact") for o in Config.SIDEBAR_OPTIONS]
         return html.Div(
             [
-                html.H3(id=IDs.user_name_placeholder, children=[], className="display-5"),
+                html.H3(id=ids.user_name_placeholder, children=[], className="display-5"),
                 html.Hr(),
                 dbc.Nav(
                     sidebar_links,
@@ -68,4 +68,4 @@ class MasterLayout:
         )
 
     def make_content(self):
-        return html.Div(id=IDs.page_content, children=[], style=Config.CONTENT_STYLE)
+        return html.Div(id=ids.page_content, children=[], style=Config.CONTENT_STYLE)

@@ -9,19 +9,21 @@ from . import UserConfig
 
 from .activity_main import make_figure
 
+from presenter import AppDashIDs as ids, Buttons as btn, Inputs as inpt
+
 
 def register_interval_callbacks(dash_app: dash.Dash) -> None:
     @dash_app.callback(
-        Output(component_id='activity-main-chart', component_property='figure'),
-        [Input(component_id='create_interval', component_property='n_clicks'),
-         Input(component_id='find_intervals', component_property='n_clicks'),
-         Input(component_id='delete_intervals', component_property='n_clicks'),
+        Output(component_id='activity_main_chart', component_property='figure'),
+        [Input(component_id='btn_create_interval', component_property='n_clicks'),
+         Input(component_id='btn_find_intervals', component_property='n_clicks'),
+         Input(component_id='btn_delete_intervals', component_property='n_clicks'),
          Input(component_id='interval_duration', component_property='value'),
          Input(component_id='how_many_to_find', component_property='value'),
          Input(component_id='interval_power', component_property='value'),
          Input(component_id='interval_tolerance', component_property='value'),
-         Input(component_id='current_activity', component_property='data')],
-        [State(component_id='activity-main-chart', component_property='relayoutData'),
+         Input(component_id='current_activity_store', component_property='data')],
+        [State(component_id='activity_main_chart', component_property='relayoutData'),
          State(component_id='user_config_store', component_property='data')],
         prevent_initial_call=True
     )
@@ -51,7 +53,7 @@ def register_interval_callbacks(dash_app: dash.Dash) -> None:
         config = UserConfig.from_json(user_config)
 
         ctx = dash.callback_context
-        if ctx.triggered[0]['prop_id'] == 'create_interval.n_clicks':
+        if ctx.triggered[0]['prop_id'] == "btn_create_interval.n_clicks":
             interval_range = _relayout_data_to_range(relayout_data)
             if interval_range:
                 io = IO(current_user.id)
@@ -60,14 +62,14 @@ def register_interval_callbacks(dash_app: dash.Dash) -> None:
                 io.save_activity(activity)
                 return make_figure(activity, config=config)
 
-        elif ctx.triggered[0]['prop_id'] == 'delete_intervals.n_clicks':
+        elif ctx.triggered[0]['prop_id'] == "btn_delete_intervals.n_clicks":
             io = IO(current_user.id)
             activity = io.get_hardio_activity_by_id(int(activity_id))
             activity.delete_intervals()
             io.save_activity(activity)
             return make_figure(activity, config=config)
 
-        elif ctx.triggered[0]['prop_id'] == 'find_intervals.n_clicks':
+        elif ctx.triggered[0]['prop_id'] == "btn_find_intervals.n_clicks":
 
             io = IO(current_user.id)
             activity = io.get_hardio_activity_by_id(int(activity_id))

@@ -49,8 +49,9 @@ class ActivityMetrics:
         self.average_cad = None
         self.work = None
 
-        if self.activity.type == ("VirtualRide" or "Ride"):
+        if self.activity.type == "VirtualRide" or "Ride":
             self.populate()
+
 
     def populate(self) -> None:
         for name, strategy in CALCULATORS.items():
