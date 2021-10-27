@@ -12,7 +12,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 
-from .utils.scatter_drawer2 import ScatterDrawer
+from .utils.cyclometry_drawer import CyclometryDrawer
 
 
 @dataclass
@@ -190,8 +190,8 @@ class Cyclometry:
         row = [dbc.Col(card, width='auto') for card in cards]
         return dbc.Row(row, no_gutters=True)
 
-    def make_fig(self, c_activity) -> ScatterDrawer.get_fig:
-        drawer = ScatterDrawer(df=c_activity.df, index_col='secs',
-                               series_to_plot=[s for s in c_activity.df.columns if s != 'secs'])
+    def make_fig(self, c_activity) -> CyclometryDrawer.get_fig:
+        drawer = CyclometryDrawer(df=c_activity.df, index_col='secs',
+                                  series_to_plot=[s for s in c_activity.df.columns if s != 'secs'])
         fig = drawer.get_fig()
         return fig

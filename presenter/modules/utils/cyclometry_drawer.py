@@ -1,12 +1,10 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
 from plotly.subplots import make_subplots
-from logic import Activity
 
 
-class ScatterDrawer:
+class CyclometryDrawer:
     """
     Utility class holding methods simplifying creation of set of scatter/line charts incl. rangeslider
     """
