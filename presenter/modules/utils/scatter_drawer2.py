@@ -19,6 +19,8 @@ class ScatterDrawer:
         :param series_to_plot: list[str] - name(s) of DataFrame columns to plot in order of plotting
         """
         self.data_frame = df
+
+        self.data_frame['time'] = pd.to_datetime(self.data_frame['secs'], unit='s')
         self.index_col = index_col
         self.series_to_plot = [series for series in series_to_plot if series in self.data_frame.columns]
         self.series_to_plot.reverse()  # reverse as plotly would render traces in reverse order
@@ -29,24 +31,23 @@ class ScatterDrawer:
 
         self.figure = go.Figure()
 
-
-
     def get_fig(self):
         fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-        for chart in [ 'cad', 'hr', 'watts']:
+        for chart in ['cad', 'hr', 'watts']:
             fig.add_trace(
-                go.Scatter(x=self.data_frame['secs'], y=self.data_frame[chart], name=chart,  line={"width": 0.5},),
+                go.Scatter(x=self.data_frame['time'], y=self.data_frame[chart], name=chart, line={"width": 0.5}, ),
                 secondary_y=False
             )
 
         for chart in ['awcstate', 'swcstate', 'totalWork', 'pressure']:
             fig.add_trace(
-                go.Scatter(x=self.data_frame['secs'], y=self.data_frame[chart], name=chart,  line={"width": 0.5}),
+                go.Scatter(x=self.data_frame['time'], y=self.data_frame[chart], name=chart, line={"width": 0.5}),
                 secondary_y=True
             )
 
         fig.update_layout(
             template="simple_white",
-        )
+            xaxis_tickformat="%H:%M",
+            )
         return fig
