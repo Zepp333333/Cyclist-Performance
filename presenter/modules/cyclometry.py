@@ -12,6 +12,7 @@ import dash_html_components as html
 import pandas as pd
 from pydantic import BaseModel
 
+from iobrocker import IO
 from .utils.cyclometry_drawer import CyclometryDrawer
 
 
@@ -124,6 +125,10 @@ class CActivity(Model):
 
 
 class Cyclometry:
+
+    def __init__(self, io: IO, context: dict) -> None:
+        self.io = io
+        self.context = context
 
     def make_layout(self):
         layout = dbc.Card(dbc.CardBody(

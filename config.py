@@ -8,7 +8,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    FEATURE_FLAGS = os.environ.get('FEATURE_FLAGS')
+    FEATURE_FLAGS = os.environ.get('FEATURE_FLAGS') or ''
+    CYCLOMETRY = True if 'cyclometry' in FEATURE_FLAGS.lower() else False
 
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 587

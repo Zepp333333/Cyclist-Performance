@@ -12,25 +12,29 @@ from . import ConfigForm, ActivityHeader
 from .cyclometry import Cyclometry
 from .utils import ScatterDrawer, CPPlotter
 
-from ..presenter_config import Tabs as tbs, AppDashIDs as ids, Buttons as btn, Inputs as inpt
+from ..presenter_config import Tabs as tbs, AppDashIDs as ids, Buttons as btn
 
 
 class ActivityPresenter:
-    def make_layout(self, io: IO, context: dict) -> dash.Dash.layout:
-        if 'activity' not in context:
+    def __init__(self, io: IO, context: dict) -> None:
+        self.io = io
+        self.context = context
+
+    def make_layout(self) -> dash.Dash.layout:
+        if 'activity' not in self.context:
             raise Exception
 
-        if ('config' in context) and (context['config']):
-            config = context['config']
+        if ('config' in self.context) and (self.context['config']):
+            config = self.context['config']
         else:
-            config = self.read_config_from_db(io)
+            config = self.read_config_from_db(self.io)
 
-        activity_id = context['activity']
+        activity_id = self.context['activity']
         if not activity_id:
-            last_activity = io.get_last_activity()
-            io.save_activity(last_activity)
+            last_activity = self.io.get_last_activity()
+            self.io.save_activity(last_activity)
             return self._make_layout(last_activity, config)
-        return self._make_layout(io.get_hardio_activity_by_id(int(activity_id)), config)
+        return self._make_layout(self.io.get_hardio_activity_by_id(int(activity_id)), config)
 
     def _make_layout(self, activity: Activity, config: UserConfig = None) -> dash.Dash.layout:
         fig = self.make_figure(activity, config)
@@ -55,7 +59,7 @@ class ActivityPresenter:
             ]
         ), className="mt-3")
 
-        cyclometry_tab = dbc.Card(dbc.CardBody(Cyclometry().make_layout()), className="mt-3")
+        cyclometry_tab = dbc.Card(dbc.CardBody(Cyclometry(self.io, self.context).make_layout()), className="mt-3")
 
         page_tabs = dbc.Tabs(
             [

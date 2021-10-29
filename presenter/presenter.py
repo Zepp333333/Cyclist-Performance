@@ -7,6 +7,7 @@ from iobrocker import IO
 from .master_layout import MasterLayout
 from .modules import AppCalendar, CalendarFormatter, ActivityPresenter, Cyclometry
 from .base_presenter import BasePresenter
+from config import Config
 
 
 class Presenter(BasePresenter):
@@ -30,4 +31,6 @@ class Presenter(BasePresenter):
     def get_activity(self) -> dash.Dash.layout:
         context = self.view.context
         io = IO(self.view.current_user)
-        return ActivityPresenter().make_layout(io, context)
+        if Config.CYCLOMETRY:
+            return Cyclometry(io, context).make_layout()
+        return ActivityPresenter(io, context).make_layout()
