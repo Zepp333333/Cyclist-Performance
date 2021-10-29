@@ -3,79 +3,104 @@ from __future__ import annotations
 
 import gzip
 import json
-from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import List, Optional
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
+from pydantic import BaseModel
 
 from .utils.cyclometry_drawer import CyclometryDrawer
 
 
-@dataclass
-class CActivity:
+class Sample(BaseModel):
+    awcstate: int
+    cad: int
+    hr: int
+    pressure: int
+    secs: int
+    swcstate: int
+    totalWork: int
+    watts: int
+
+
+class Model(BaseModel):
+    """
+    Pydantic model for Json. To rebuild:
+    pip install datamodel-code-generator
+    datamodel-codegen  --input <filename.json> --input-file-type json --output model.py
+
+    """
+
+    athlete: str
+    avgHr: int
+    avgPower: int
+    awc: int
+    awcMinValue: int
+    awcs: float
+    calendarText: str
+    cho: int
+    cp: int
+    cps: float
+    data: str
+    device: str
+    deviceInfo: str
+    devicetype: str
+    fat: int
+    fileFormat: str
+    filename: str
+    gp: int
+    gps: float
+    id: int
+    identifier: str
+    maxHr: int
+    maxPower: int
+    notes: str
+    objective: str
+    recintsecs: int
+    samples: List[Sample]
+    secBelowZeroAwc: int
+    secBelowZeroSwc: int
+    sport: str
+    starttime: str
+    swc: int
+    swcMinValue: int
+    swcs: float
+    weekday: str
+    workoutCode: str
+    year: str
+
+class CActivity(Model):
     """
     Represents Cyclometry Activity
     """
 
-    activity_json: dict
-    samples_key: str = 'samples'
-    time_key: str = 'secs'
-    df: pd.DataFrame = pd.DataFrame()
+    class Config:
+        extra = 'allow'
 
-    athlete: Optional[str] = None
-    avgHr: Optional[int] = None
-    avgPower: Optional[int] = None
-    awc: Optional[int] = None
-    awcMinValue: Optional[int] = None
-    awcs: Optional[float] = None
-    calendarText: Optional[str] = None
-    cho: Optional[int] = None
-    cp: Optional[int] = None
-    cps: Optional[float] = None
-    data: Optional[str] = None
-    device: Optional[str] = None
-    deviceInfo: Optional[str] = None
-    devicetype: Optional[str] = None
-    fat: Optional[int] = None
-    fileFormat: Optional[str] = None
-    filename: Optional[str] = None
-    gp: Optional[int] = None
-    gps: Optional[float] = None
-    id: Optional[int] = None
-    identifier: Optional[str] = None
-    maxHr: Optional[int] = None
-    maxPower: Optional[int] = None
-    notes: Optional[str] = None
-    objective: Optional[str] = None
-    recintsecs: Optional[int] = None
-    secBelowZeroAwc: Optional[int] = None
-    secBelowZeroSwc: Optional[int] = None
-    sport: Optional[str] = None
-    starttime: Optional[str] = None
-    swc: Optional[int] = None
-    swcMinValue: Optional[int] = None
-    swcs: Optional[float] = None
-    weekday: Optional[str] = None
-    workoutCode: Optional[str] = None
-    year: Optional[str] = None
-
-    def __post_init__(self):
-        self.df = self.samples_to_df(self.activity_json[self.samples_key])
-        self.populate_fields()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.df = self.samples_to_df(self.samples)
 
     def samples_to_df(self, samples):
-        return pd.DataFrame(samples)
+        flat_samples = [d.__dict__ for d in samples]
+        return pd.DataFrame(flat_samples)
 
-    def populate_fields(self):
-        for field_name, value in self.activity_json.items():
-            if field_name != 'samples_key':
-                self.__setattr__(field_name, value)
+    @property
+    def date(self):
+        return self._get_activity_date_time().strftime('%b %d, %Y')
 
-    def get_activity_date_time(self):
+    @property
+    def duration(self):
+        return timedelta(seconds=int(self.df['secs'].max()))
+
+    @property
+    def total_work(self):
+        return self.df['totalWork'].max()
+
+    def _get_activity_date_time(self):
         try:
             return datetime.strptime(self.starttime, '%Y/%m/%d %H:%M:%S %Z')
         except ValueError as e:
@@ -85,31 +110,17 @@ class CActivity:
         date = self.identifier.split(': ')[-1]
         return datetime.strptime(date, '%d.%m.%Y')
 
-    def normalize_samples(self, samples):
+    def _normalize_samples(self, samples):
         for s, i in zip(samples, range(len(samples))):
             s['SECS'] = i
         return samples
 
-    def _list_json_fields(self):
-        s = "\'\'"
-        for k, v in self.activity_json.items():
-            if k != 'samples':
-                type_string = {type(v).__name__}
-                print(f"{k}: Optional[{type_string}] = None")
 
-    def get_activity_date_string(self):
-        return self.get_activity_date_time().strftime('%b %d, %Y')
-
-    def get_activity_duration(self):
-        return timedelta(seconds=int(self.df[self.time_key].max()))
-
-    def get_total_work(self):
-        return self.df['totalWork'].max()
 
     @classmethod
     def from_file(cls, path: str) -> CActivity:
         with gzip.open(path, 'r') as f:
-            return cls(json.load(f))
+            return cls(**json.load(f))
 
 
 class Cyclometry:
@@ -145,8 +156,8 @@ class Cyclometry:
     def make_header(self, c_activity: CActivity) -> html.Div:
         elements = [
             f"Activity: {c_activity.identifier}",
-            f"Date: {c_activity.get_activity_date_string()}",
-            f"Duration: {c_activity.get_activity_duration()}",
+            f"Date: {c_activity.date}",
+            f"Duration: {c_activity.duration}",
             f"AVG Power: {c_activity.avgPower} W",
             f"MAX Power: {c_activity.maxPower} W",
             f"AVG HR: {c_activity.avgHr} bpm",
@@ -155,7 +166,7 @@ class Cyclometry:
             f"SWC below Zero: {c_activity.secBelowZeroSwc}s | {c_activity.swcMinValue}J",
             f"CP and AWC Stress: {c_activity.cps} - {c_activity.awcs}",
             f"GP and SWC Stress: {c_activity.gps} - {c_activity.swcs}",
-            f"Total Work: {c_activity.get_total_work()} J",
+            f"Total Work: {c_activity.total_work} J",
             f"CH and Fat: {c_activity.cho}g {c_activity.fat}g",
         ]
         first_row = html.H6(elements[0])  # style={'font-size': '0.7rem'}),

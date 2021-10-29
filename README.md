@@ -22,6 +22,7 @@ different concepts, techniques and  frameworks. Here is the ever-growing list of
    - OOP
    - Abstract Classes / Interfaces
    - Dataclasses
+   - Pydantic
    - Type hinting
    - Pandas basics
    - Package and requirements management
