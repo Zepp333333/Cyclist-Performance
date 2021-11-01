@@ -1,9 +1,6 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 
-import dash_core_components as dcc
-import dash_html_components as html
-import pandas as pd
-from dash_table import DataTable
+from dash import dcc, html, dash_table
 
 
 def make_layout():
@@ -84,7 +81,7 @@ def json_to_list(json):
 
 
 def make_table(data):
-    table = DataTable(
+    table = dash_table.DataTable(
         id="data",
         columns=[{'id': 'activity', 'name': 'name'}],
         data=json_to_list(data),
@@ -96,5 +93,3 @@ def make_table(data):
         style_table={'height': 300},  # default is 500,
     )
     return table
-
-

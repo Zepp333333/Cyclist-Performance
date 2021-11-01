@@ -2,8 +2,8 @@
 
 from dataclasses import dataclass, field
 from logic import Activity, ActivityMetrics
-import dash_html_components as html
 import dash_bootstrap_components as dbc
+from dash import html
 
 
 @dataclass
@@ -37,7 +37,6 @@ class ActivityHeader:
 
     @staticmethod
     def make_activity_info_header(activity: Activity):
-
         if activity.type == ('Run' or 'Walk'):
             return html.Div(
                 [
@@ -49,45 +48,47 @@ class ActivityHeader:
             [
                 dbc.ListGroupItem(
                     [
-                        dbc.ListGroupItemHeading(activity.name, style={'font-size': '0.7rem'}),
-                        dbc.ListGroupItemText(activity.date),
-                        dbc.ListGroupItemText(""),
+                        dbc.ListGroupItem(activity.name, style={'font-size': '0.7rem'}),
+                        dbc.ListGroupItem(activity.date),
+                        dbc.ListGroupItem(""),
                     ],
                     style={'font-size': '0.6rem', 'line-height': '0.1em'}
                 ),
                 dbc.ListGroupItem(
                     [
-                        dbc.ListGroupItemHeading("Power", style={'font-size': '0.7rem'}),
-                        dbc.ListGroupItemText(f"{metrics.average_power}"),
-                        dbc.ListGroupItemText(f"{metrics.normalized}"),
-                        dbc.ListGroupItemText(f"{metrics.work}"),
+                        dbc.ListGroupItem("Power", style={'font-size': '0.7rem'}),
+                        dbc.ListGroupItem(f"{metrics.average_power}"),
+                        dbc.ListGroupItem(f"{metrics.normalized}"),
+                        dbc.ListGroupItem(f"{metrics.work}"),
                     ],
                     style={'font-size': '0.6rem', 'line-height': '0.1em'}
                 ),
                 dbc.ListGroupItem(
                     [
-                        dbc.ListGroupItemHeading("HR", style={'font-size': '0.7rem'}),
-                        dbc.ListGroupItemText(f"{metrics.average_hr}"),
-                        dbc.ListGroupItemText(f"{metrics.max_hr}"),
+                        dbc.ListGroupItem("HR", style={'font-size': '0.7rem'}),
+                        dbc.ListGroupItem(f"{metrics.average_hr}"),
+                        dbc.ListGroupItem(f"{metrics.max_hr}"),
                     ],
                     style={'font-size': '0.6rem', 'line-height': '0.1em'}
                 ),
             ],
+            flush=True,
             horizontal=True,
             className="mb-1",
             style={'font-size': '0.8rem'},
         )
 
-        line2 = dbc.ListGroup(
-            [
-
-            ]
-        )
+        # line2 = dbc.ListGroup(
+        #     [
+        #
+        #     ],
+        #     flush=True,
+        # )
 
         list_group = html.Div(
             [
                 line1,
-                line2,
-            ]
+                # line2,
+            ],
         )
         return list_group

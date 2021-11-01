@@ -3,9 +3,7 @@
 import calendar
 from datetime import datetime
 
-import dash
-from dash_table import DataTable
-import dash_html_components as html
+from dash import Dash, dash_table, html
 import dash_bootstrap_components as dbc
 
 from hardio.dashapp import UserConfig
@@ -95,7 +93,7 @@ def make_month_selector(user_id: int, year: int, month: int) -> dbc.Select:
     return selector
 
 
-def make_layout(user_id: int, user_selected_moth_year: str = None) -> dash.Dash.layout:
+def make_layout(user_id: int, user_selected_moth_year: str = None) -> Dash.layout:
     io = IO(user_id)
     month, year = set_month_year(io, user_selected_moth_year)
 
@@ -111,7 +109,7 @@ def make_layout(user_id: int, user_selected_moth_year: str = None) -> dash.Dash.
                 }
                for d in WEEK_DAYS]
 
-    table = DataTable(
+    table = dash_table.DataTable(
         id="calendar",
         data=formatted_cal,
         columns=columns,
@@ -191,7 +189,7 @@ def set_month_year(io: IO, user_selected_moth_year: str) -> tuple[int, int]:
     """
     Produce Month/Year combination to filter calendar by
     :param io: instance of IO object
-    :param user_selected_moth_year: string containig user-selected combination of Month/Year
+    :param user_selected_moth_year: string containing user-selected combination of Month/Year
     :return: tuple[int, int] Month, Year
     """
     config = io.read_user_config()
@@ -223,7 +221,6 @@ def refresh_activities_from_strava(user_id: int, month_year: str) -> None:
     month, year = _month_year_to_tuple(month_year)
     io = IO(user_id)
     io.refresh_user_activities_from_strava(month, year)
-
 
 
 def _month_year_to_tuple(month_year: str) -> tuple[int, int]:  # Month, Year

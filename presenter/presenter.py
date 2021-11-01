@@ -1,13 +1,11 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import dash
 
-import dash_html_components as html
-
+from config import Config
 from iobrocker import IO
+from .base_presenter import BasePresenter
 from .master_layout import MasterLayout
 from .modules import AppCalendar, CalendarFormatter, ActivityPresenter, Cyclometry
-from .base_presenter import BasePresenter
-from config import Config
 
 
 class Presenter(BasePresenter):
@@ -34,3 +32,11 @@ class Presenter(BasePresenter):
         if Config.CYCLOMETRY:
             return Cyclometry(io, context).make_layout()
         return ActivityPresenter(io, context).make_layout()
+
+    def save_config_and_update_page(self):
+        context = self.view.context
+        io = IO(self.view.current_user)
+        config = io.read_user_config()
+        config.activity_config.charts_to_plot = context['switches']
+        io.save_user_config(config)
+        return ActivityPresenter(io, context).make_layout(), config

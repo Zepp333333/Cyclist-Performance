@@ -3,10 +3,8 @@
 import calendar
 from datetime import datetime
 
-import dash
+from dash import Dash, html, dash_table
 import dash_bootstrap_components as dbc
-import dash_html_components as html
-from dash_table import DataTable
 
 from hardio.dashapp import UserConfig
 from iobrocker import IO
@@ -19,7 +17,7 @@ class AppCalendar:
         self.io = io
         self.formatter = formatter
 
-    def make_layout(self, context: dict = None) -> dash.Dash.layout:
+    def make_layout(self, context: dict = None) -> Dash.layout:
         if (not context) or ('month_year' not in context):
             month_year = None
         elif 'action' in context and context['action'] == 'refresh':
@@ -81,7 +79,7 @@ class AppCalendar:
         return columns
 
     def _build_cells(self, columns, formatted_cal):
-        return DataTable(
+        return dash_table.DataTable(
             id=ids.calendar_table,
             data=formatted_cal,
             columns=columns,

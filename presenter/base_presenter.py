@@ -21,3 +21,7 @@ class BasePresenter(ABC):
     @abstractmethod
     def get_activity(self) -> dash.Dash.layout:
         """Produce Activity view"""
+
+    @abstractmethod
+    def save_config_and_update_page(self):
+        """save user_config and refresh an activity page"""

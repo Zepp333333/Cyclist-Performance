@@ -4,7 +4,7 @@ from __future__ import annotations
 import gzip
 import json
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -145,10 +145,12 @@ class Cyclometry:
     def make_cyclometry_page(self):
         c_activity = self.get_c_activity()
         header = self.make_header(c_activity)
+        config_offcanvas = self.make_cyclometry_config(c_activity)
         fig = self.make_fig(c_activity)
         page = html.Div(
             [
                 header,
+                config_offcanvas,
                 html.Br(),
                 dcc.Graph(id='cyclometry_chart', figure=fig)
             ]
@@ -179,7 +181,7 @@ class Cyclometry:
         header = html.Div(
             [
                 first_row,
-                self.make_row(self.make_cards(elements)),
+                self.make_row(self.make_cards(elements[1:])),
             ],
             style={'font-size': '0.7rem'}
         )
@@ -188,7 +190,7 @@ class Cyclometry:
     def make_cards(self, elements: list) -> list[dbc.Card]:
         cards = []
 
-        it = iter(elements[1:])
+        it = iter(elements)
         pairs = list(zip(it, it))
         for pair in pairs:
             card = dbc.Card(
@@ -204,10 +206,45 @@ class Cyclometry:
 
     def make_row(self, cards: list[dbc.Card]):
         row = [dbc.Col(card, width='auto') for card in cards]
-        return dbc.Row(row, no_gutters=True)
+        return dbc.Row(row, className="g-0")
 
     def make_fig(self, c_activity) -> CyclometryDrawer.get_fig:
         drawer = CyclometryDrawer(df=c_activity.df, index_col='secs',
                                   series_to_plot=[s for s in c_activity.df.columns if s != 'secs'])
         fig = drawer.get_fig()
         return fig
+
+    def make_cyclometry_config(self, c_activity: CActivity) -> html.Div:
+        config_view = html.Div(
+            [
+                dbc.Card(
+                    dbc.CardBody(
+                        [
+                            html.H6(f"CP {c_activity.cp} W" ,className="card-text"),
+                            html.H6(f"GP {c_activity.gp} W" ,className="card-text"),
+                            html.H6(f"AWC {c_activity.awc} J" ,className="card-text"),
+                            html.H6(f"SWC {c_activity.swc} J" ,className="card-text"),
+                            dbc.Button("✎", color="secondary", className="me-1", n_clicks=0),
+                        ]
+                    )
+                )
+
+            ],
+            className="mb-2",
+        )
+
+        offcanvas = html.Div(
+            [
+                config_view,
+                dbc.Offcanvas(
+                    html.P("This is configuration offcanvas"),
+                    id="cyclometry_config_offcanvas",
+                    title="Configuration",
+                    is_open=False,
+                )
+
+
+
+            ]
+        )
+        return offcanvas
