@@ -18,7 +18,8 @@ class ScatterDrawer:
         :param series_to_plot: list[str] - name(s) of DataFrame columns to plot in order of plotting
         """
         self.data_frame = activity.dataframe
-        self.index_col = index_col
+        self.data_frame['time_stamp'] = pd.to_datetime(self.data_frame['time'], unit='s')
+        self.index_col = 'time_stamp'
         self.series_to_plot = [series for series in series_to_plot if series in activity.dataframe.columns]
         self.series_to_plot.reverse()  # reverse as plotly would render traces in reverse order
         self.intervals = activity.intervals[1:]
@@ -42,7 +43,7 @@ class ScatterDrawer:
         self.configure_layouts()
         self.update_yaxis()
 
-        self.draw_intervals()
+        # self.draw_intervals()
 
         # print(self.figure)
         return self.figure
@@ -86,16 +87,10 @@ class ScatterDrawer:
         self.figure.update_layout(
             xaxis=dict(
                 autorange=True,
-                # range=[self.data_frame.index.start, self.data_frame.index.stop],
-                rangeslider=dict(
-                    autorange=True,
-                    # range=[self.data_frame.index.start, self.data_frame.index.stop],
-                ),
-                rangeselector=dict(
-                    visible=True,
-                ),
-                type="linear"
+                rangeslider=dict(autorange=True),
+                rangeselector=dict(visible=True),
             ),
+            xaxis_tickformat="%H:%M",
             dragmode="zoom",
             hovermode="x",
             legend=dict(traceorder="reversed"),
