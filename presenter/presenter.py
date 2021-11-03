@@ -40,3 +40,9 @@ class Presenter(BasePresenter):
         config.activity_config.charts_to_plot = context['switches']
         io.save_user_config(config)
         return ActivityPresenter(io, context).make_layout(), config
+
+    def update_cyclometry_view(self):
+        context = self.view.context
+        io = IO(self.view.current_user)
+        c = Cyclometry(io, context)
+        c.api_request_update()

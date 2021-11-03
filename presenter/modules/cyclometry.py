@@ -299,3 +299,6 @@ class Cyclometry:
             ]
         )
         return offcanvas
+
+    def api_request_update(self):
+        pass

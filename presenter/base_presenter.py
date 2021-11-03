@@ -25,3 +25,6 @@ class BasePresenter(ABC):
     @abstractmethod
     def save_config_and_update_page(self):
         """save user_config and refresh an activity page"""
+
+    def update_cyclometry_view(self):
+        pass
