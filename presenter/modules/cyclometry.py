@@ -73,6 +73,7 @@ class Model(BaseModel):
     workoutCode: str
     year: str
 
+
 class CActivity(Model):
     """
     Represents Cyclometry Activity
@@ -116,8 +117,6 @@ class CActivity(Model):
             s['SECS'] = i
         return samples
 
-
-
     @classmethod
     def from_file(cls, path: str) -> CActivity:
         with gzip.open(path, 'r') as f:
@@ -133,11 +132,11 @@ class Cyclometry:
     def make_layout(self):
         layout = dbc.Card(dbc.CardBody(
             [
-                html.Div(
-                    [
-                        self.make_cyclometry_page()
-                    ]
-                )
+                # html.Div(
+                #     [
+                self.make_cyclometry_page()
+                #     ]
+                # )
             ]
         ), className="mt-3")
         return layout
@@ -145,15 +144,14 @@ class Cyclometry:
     def make_cyclometry_page(self):
         c_activity = self.get_c_activity()
         header = self.make_header(c_activity)
-        config_offcanvas = self.make_cyclometry_config(c_activity)
         fig = self.make_fig(c_activity)
         page = html.Div(
             [
                 header,
-                config_offcanvas,
                 html.Br(),
                 dcc.Graph(id='cyclometry_chart', figure=fig)
-            ]
+            ],
+            id='cyclometry_page'
         )
         return page
 
@@ -176,7 +174,14 @@ class Cyclometry:
             f"Total Work: {c_activity.total_work} J",
             f"CH and Fat: {c_activity.cho}g {c_activity.fat}g",
         ]
-        first_row = html.H6(elements[0])  # style={'font-size': '0.7rem'}),
+
+        first_row = dbc.Row(
+            [
+                dbc.Col(html.H6(elements[0])),
+                dbc.Col(self.make_cyclometry_config(c_activity), width={'size': 3, 'offset': 0})
+            ],
+            justify='start',
+        )
 
         header = html.Div(
             [
@@ -215,35 +220,81 @@ class Cyclometry:
         return fig
 
     def make_cyclometry_config(self, c_activity: CActivity) -> html.Div:
-        config_view = html.Div(
+        # config_view = dbc.Col(
+        #     dbc.Card(
+        #             dbc.CardBody(
+        #                 [
+        #                     # html.P(f"CP {c_activity.cp} W | GP {c_activity.gp} W", className="card-text"),
+        #                     # html.P(f"AWC {c_activity.awc} J | SWC {c_activity.swc} J", className="card-text"),
+        #                     # html.H6(f"CP {c_activity.cp} W", className="card-text"),
+        #                     # html.H6(f"GP {c_activity.gp} W", className="card-text"),
+        #                     # html.H6(f"AWC {c_activity.awc} J", className="card-text"),
+        #                     # html.H6(f"SWC {c_activity.swc} J", className="card-text"),
+        #                     # dbc.Button("✎", id="btn_open_cyclometry_config_offcanvas", color="secondary", className="me-1", n_clicks=0),
+        #                     dbc.Table(
+        #                         [
+        #                             html.Tr([html.Td(f"CP {c_activity.cp} W"), html.Td(f"GP {c_activity.gp} W")]),
+        #                             html.Tr([html.Td(f"CP {c_activity.cp} W"), html.Td(f"GP {c_activity.gp} W")]),
+        #
+        #                         ],
+        #                         bordered=False,
+        #                         size='sm',
+        #                     )
+        #                 ]
+        #             ),
+        #             outline=False,
+        #         ),
+        #     width=2,
+        # )
+        button = dbc.Button("✎", id="btn_open_cyclometry_config_offcanvas", size='sm', color='secondary', n_clicks=0)
+        config_view = dbc.Table(
             [
-                dbc.Card(
-                    dbc.CardBody(
-                        [
-                            html.H6(f"CP {c_activity.cp} W" ,className="card-text"),
-                            html.H6(f"GP {c_activity.gp} W" ,className="card-text"),
-                            html.H6(f"AWC {c_activity.awc} J" ,className="card-text"),
-                            html.H6(f"SWC {c_activity.swc} J" ,className="card-text"),
-                            dbc.Button("✎", color="secondary", className="me-1", n_clicks=0),
-                        ]
-                    )
-                )
-
+                html.Tr(
+                    [
+                        html.Td(f"AWC {c_activity.awc} J"),
+                        html.Td(f"SWC {c_activity.swc} J"),
+                        html.Td(dbc.Badge(button, color="secondary", ), rowSpan=2)
+                    ]
+                ),
+                html.Tr(
+                    [
+                        html.Td(f"CP {c_activity.cp} W"),
+                        html.Td(f"GP {c_activity.gp} W"),
+                    ]
+                ),
             ],
-            className="mb-2",
+            bordered=False,
+            size='sm',
         )
+
+        def make_inputs() -> dbc.Form:
+            inputs = []
+            for k, v in {'AWC': c_activity.awc, 'SWC': c_activity.swc, 'CP': c_activity.cp, 'GP': c_activity.gp}.items():
+                input = html.Div(
+                    [
+                        dbc.Label(k),
+                        dbc.Input(type="number", id=f"inpt_{k}", placeholder=v),
+                        # dbc.FormText(k, color="secondary", ),
+                    ]
+                )
+                inputs.append(input)
+            return dbc.Form(inputs, id="cyclometry_config_form")
 
         offcanvas = html.Div(
             [
                 config_view,
                 dbc.Offcanvas(
-                    html.P("This is configuration offcanvas"),
+                    [
+                        html.P("This is configuration offcanvas"),
+                        make_inputs(),
+                        html.Br(),
+                        dbc.Button("Save", id="btn_save_cyclometry_config_offcanvas", n_clicks=0)
+                    ],
                     id="cyclometry_config_offcanvas",
+                    placement='end',
                     title="Configuration",
                     is_open=False,
                 )
-
-
 
             ]
         )

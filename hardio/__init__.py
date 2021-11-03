@@ -76,6 +76,8 @@ def register_dash(app: Flask) -> None:
     from hardio.dashapp.callbacks_interval import register_interval_callbacks
     from hardio.dashapp.callbacks_navigation import register_navigation_callbacks
     from hardio.dashapp.callbacks_calendar import register_calendar_callbacks
+    from hardio.dashapp.callbacks_cyclometry import register_cyclometry_callbacks
+
 
     # Meta tags for viewport responsiveness
     meta_viewport = {"name": "viewport", "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
@@ -99,6 +101,7 @@ def register_dash(app: Flask) -> None:
         register_callbacks(dash_app)
         register_interval_callbacks(dash_app)
         register_calendar_callbacks(dash_app)
+        register_cyclometry_callbacks(dash_app)
 
     _protect_dash_views(dash_app)
 
