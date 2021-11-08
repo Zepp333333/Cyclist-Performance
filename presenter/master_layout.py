@@ -62,7 +62,19 @@ class MasterLayout:
                     sidebar_links,
                     vertical=True,
                     pills=True
-                )
+                ),
+                html.Button(
+                    # use the Bootstrap navbar-toggler classes to style
+                    html.Span(className="navbar-toggler-icon"),
+                    className="navbar-toggler",
+                    # the navbar-toggler classes don't set color
+                    style={
+                        "color": "rgba(0,0,0,.5)",
+                        "border-color": "rgba(0,0,0,.1)",
+                    },
+                    id="sidebar-toggle",
+                ),
+
             ],
             style=Config.SIDEBAR_STYLE
         )

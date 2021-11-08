@@ -55,7 +55,7 @@ def register_navigation_callbacks(dash_app: CustomDashView) -> None:
                    ], [current_user.username]
 
         # If the user tries to reach a different page, return a 404 message
-        return dbc.Jumbotron(
+        return dbc.Card(
             [
                 html.H1("404: Not Found", className="text-danger"),
                 html.Hr(),

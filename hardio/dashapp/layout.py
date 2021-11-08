@@ -60,6 +60,7 @@ sidebar = html.Div(
                 dbc.NavLink("Fitness", href="/fitness/", active="exact"),
                 # dbc.NavLink("Activity", href="/application/activity", active="exact"),
                 # dbc.NavLink("Test Strava Methods", href="/application/test_strava", active="exact")
+
             ],
             vertical=True,
             pills=True

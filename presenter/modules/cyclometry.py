@@ -220,32 +220,7 @@ class Cyclometry:
         return fig
 
     def make_cyclometry_config(self, c_activity: CActivity) -> html.Div:
-        # config_view = dbc.Col(
-        #     dbc.Card(
-        #             dbc.CardBody(
-        #                 [
-        #                     # html.P(f"CP {c_activity.cp} W | GP {c_activity.gp} W", className="card-text"),
-        #                     # html.P(f"AWC {c_activity.awc} J | SWC {c_activity.swc} J", className="card-text"),
-        #                     # html.H6(f"CP {c_activity.cp} W", className="card-text"),
-        #                     # html.H6(f"GP {c_activity.gp} W", className="card-text"),
-        #                     # html.H6(f"AWC {c_activity.awc} J", className="card-text"),
-        #                     # html.H6(f"SWC {c_activity.swc} J", className="card-text"),
-        #                     # dbc.Button("✎", id="btn_open_cyclometry_config_offcanvas", color="secondary", className="me-1", n_clicks=0),
-        #                     dbc.Table(
-        #                         [
-        #                             html.Tr([html.Td(f"CP {c_activity.cp} W"), html.Td(f"GP {c_activity.gp} W")]),
-        #                             html.Tr([html.Td(f"CP {c_activity.cp} W"), html.Td(f"GP {c_activity.gp} W")]),
-        #
-        #                         ],
-        #                         bordered=False,
-        #                         size='sm',
-        #                     )
-        #                 ]
-        #             ),
-        #             outline=False,
-        #         ),
-        #     width=2,
-        # )
+
         button = dbc.Button("✎", id="btn_open_cyclometry_config_offcanvas", size='sm', color='secondary', n_clicks=0)
         config_view = dbc.Table(
             [
@@ -274,7 +249,6 @@ class Cyclometry:
                     [
                         dbc.Label(k),
                         dbc.Input(type="number", id=f"inpt_{k}", placeholder=v),
-                        # dbc.FormText(k, color="secondary", ),
                     ]
                 )
                 inputs.append(input)
@@ -285,7 +259,7 @@ class Cyclometry:
                 config_view,
                 dbc.Offcanvas(
                     [
-                        html.P("This is configuration offcanvas"),
+                        html.P("Set Cyclometry parameters in order to request activity recalculation"),
                         make_inputs(),
                         html.Br(),
                         dbc.Button("Save", id="btn_save_cyclometry_config_offcanvas", n_clicks=0)
