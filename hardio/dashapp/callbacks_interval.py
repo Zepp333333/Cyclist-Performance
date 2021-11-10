@@ -4,15 +4,15 @@ import dash
 from dash.dependencies import Input, Output, State
 from flask_login import current_user
 
+from hardio.dashapp.view import CustomDashView
+
 from iobrocker import IO
 from . import UserConfig
 
 from .activity_main import make_figure
 
-from presenter import AppDashIDs as ids, Buttons as btn, Inputs as inpt
 
-
-def register_interval_callbacks(dash_app: dash.Dash) -> None:
+def register_interval_callbacks(dash_app: CustomDashView) -> None:
     @dash_app.callback(
         Output(component_id='activity_main_chart', component_property='figure'),
         [Input(component_id='btn_create_interval', component_property='n_clicks'),
@@ -54,42 +54,35 @@ def register_interval_callbacks(dash_app: dash.Dash) -> None:
 
         ctx = dash.callback_context
         if ctx.triggered[0]['prop_id'] == "btn_create_interval.n_clicks":
-            interval_range = _relayout_data_to_range(relayout_data)
-            if interval_range:
-                io = IO(current_user.id)
-                activity = io.get_hardio_activity_by_id(int(activity_id))
-                activity.add_interval(*interval_range)
-                io.save_activity(activity)
-                return make_figure(activity, config=config)
+            dash_app.context = {
+                'user': current_user.id,
+                'activity': activity_id,
+                'intervals_range': relayout_data,
+                'config': config
+            }
+            return dash_app.presenter.activity_create_intervals_and_refresh_view()
+
 
         elif ctx.triggered[0]['prop_id'] == "btn_delete_intervals.n_clicks":
-            io = IO(current_user.id)
-            activity = io.get_hardio_activity_by_id(int(activity_id))
-            activity.delete_intervals()
-            io.save_activity(activity)
-            return make_figure(activity, config=config)
+            dash_app.context = {
+                'user': current_user.id,
+                'activity': activity_id,
+                'config': config
+            }
+            return dash_app.presenter.activity_delete_intervals_and_refresh_view()
+
 
         elif ctx.triggered[0]['prop_id'] == "btn_find_intervals.n_clicks":
-
-            io = IO(current_user.id)
-            activity = io.get_hardio_activity_by_id(int(activity_id))
-            found_intervals = activity.find_intervals(duration=interval_duration,
-                                                      count=how_many_to_find,
-                                                      power=interval_power,
-                                                      tolerance=interval_tolerance)
-            activity.add_intervals(found_intervals)
-            io.save_activity(activity)
-
-            return make_figure(activity, config=config)
+            dash_app.context = {
+                'user': current_user.id,
+                'activity': activity_id,
+                'config': config,
+                'interval_finder_prams': {
+                    'duration': interval_duration,
+                    'count': how_many_to_find,
+                    'power': interval_power,
+                    'tolerance': interval_tolerance
+                }
+            }
+            return dash_app.presenter.activity_find_intervals_and_refresh_view()
         return dash.no_update
-
-    def _relayout_data_to_range(relayout_data: dict) -> tuple[int, int]:
-        """Helper fuction converting relaout_daya dict to tuple"""
-        try:
-            if len(relayout_data) == 1:
-                return int(relayout_data['xaxis.range'][0]), int(relayout_data['xaxis.range'][1])
-            else:
-                result = [int(v) for v in relayout_data.values()]
-                return result[0], result[1]
-        except KeyError:
-            return tuple()

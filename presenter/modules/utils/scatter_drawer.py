@@ -22,7 +22,7 @@ class ScatterDrawer:
         self.index_col = 'time_stamp'
         self.series_to_plot = [series for series in series_to_plot if series in activity.dataframe.columns]
         self.series_to_plot.reverse()  # reverse as plotly would render traces in reverse order
-        self.intervals = activity.intervals[1:]
+        self.intervals = activity.intervals
 
         self.number_of_charts = len(series_to_plot)
         self.num_columns = 1
@@ -43,9 +43,8 @@ class ScatterDrawer:
         self.configure_layouts()
         self.update_yaxis()
 
-        # self.draw_intervals()
+        self.draw_intervals()
 
-        # print(self.figure)
         return self.figure
 
     def make_traces(self) -> None:
@@ -158,8 +157,8 @@ class ScatterDrawer:
                 dict(fillcolor="rgba(63, 81, 181, 0.2)",
                      line={"width": 0},
                      type="rect",
-                     x0=interval.start,
-                     x1=interval.end,
+                     x0=interval.start_timestamp,
+                     x1=interval.end_timestamp,
                      xref="x",
                      y0=0,
                      y1=1,
@@ -168,7 +167,7 @@ class ScatterDrawer:
             )
             annotations.append(
                 dict(
-                    x=interval.start,
+                    x=interval.start_timestamp,
                     y=1,
                     # arrowcolor="rgba(63, 81, 181, 0.2)",
                     # arrowsize=0.3,

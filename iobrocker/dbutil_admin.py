@@ -64,6 +64,19 @@ def clen_user_config() -> None:
         connection.execute(f'TRUNCATE TABLE user_config')
 
 
+def get_all_users() -> list[Users]:
+    from hardio import create_app
+    app = create_app()
+    with app.app_context():
+        users = Users.query.all()
+    return users
+
+def get_all_activities_of_user(user_id) -> list[DBActivity]:
+    from hardio import create_app
+    app = create_app()
+    with app.app_context():
+        activities = DBActivity.query.filter_by(user_id=user_id).all()
+    return activities
 
 def clean_db_activity() -> None:
     raise NotImplemented

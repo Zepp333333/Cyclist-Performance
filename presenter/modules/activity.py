@@ -132,3 +132,6 @@ class ActivityPresenter:
 
     def read_config_from_db(self, io):
         return io.read_user_config()
+
+    def create_intervals(self):
+        pass

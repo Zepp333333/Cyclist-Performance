@@ -4,6 +4,8 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from datetime import datetime
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -36,7 +38,7 @@ class Interval(ABC):
         self.name = name
         self.start = start
         self.end = end
-        self.populate_metrics(dataframe)
+        # self.populate_metrics(dataframe)
         return self
 
     def populate_metrics(self, dataframe: pd.DataFrame) -> None:
@@ -76,6 +78,14 @@ class Interval(ABC):
         if new_name:
             self.name = new_name
         self.populate_metrics(dataframe)
+
+    @property
+    def start_timestamp(self) -> datetime:
+        return pd.to_datetime(self.start, unit='s')
+
+    @property
+    def end_timestamp(self) -> datetime:
+        return pd.to_datetime(self.end, unit='s')
 
     def __eq__(self, other):
         return self.name == other.name or (self.start == other.start and self.end == other.end)

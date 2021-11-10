@@ -40,9 +40,9 @@ class Activity(ABC):
     intervals: list[Interval] = field(default_factory=list[Interval])
     type: str = 'Ride'
 
-    def __post_init__(self) -> None:
-        if not self.dataframe.empty:
-            self.make_all_activity_interval()
+    # def __post_init__(self) -> None:
+    #     if not self.dataframe.empty:
+    #         self.make_all_activity_interval()
 
     def make_all_activity_interval(self) -> None:
         if 'All' not in [n.name for n in self.intervals]:
@@ -100,7 +100,7 @@ class Activity(ABC):
 
     def delete_intervals(self) -> None:
         self.intervals = []
-        self.make_all_activity_interval()
+        # self.make_all_activity_interval()
 
     def intervals_to_json(self) -> list[str]:
         return [i.to_json() for i in self.intervals]
