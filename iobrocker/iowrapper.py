@@ -2,7 +2,6 @@
 """
 Provides High level interface to Strava API and Database requests
 """
-# todo rename module
 
 import json
 from calendar import monthrange
@@ -23,7 +22,6 @@ from logic import ActivityFactory, PresentationActivity
 class ActivityNotFoundInDB(Exception):
     """Custom error in case activity not in DB"""
 
-    # todo consider moving to exceptions package
     def __init__(self, id: int, message: str) -> None:
         self.id = id
         self.message = message
@@ -159,7 +157,6 @@ class IO:
         return True if token else False
 
     def is_strava_token_expired(self) -> bool:
-        # todo refactor | simplify -> move out somewhere
         expiration = dbutil.get_user(self.user_id).strava_token_expires_at
         if expiration:
             return strava_auth.is_token_expired(expiration)

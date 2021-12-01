@@ -17,7 +17,6 @@ def register_callbacks(dash_app: CustomDashView):
         prevent_initial_call=True
     )
     def get_athlete(_):
-        # todo add docstrings
         athlete = strava_swagger.get_athlete()
         if athlete:
             return athlete, False
@@ -59,7 +58,6 @@ def register_callbacks(dash_app: CustomDashView):
         prevent_initial_call=True
     )
     def get_activities(_):
-        # todo add docstrings
         activities = IO(current_user.id).get_activities_from_strava()
 
         if activities:

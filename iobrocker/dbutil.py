@@ -18,7 +18,6 @@ from hardio.models import Users, DBActivity, UserConfig
 class DuplicateActivity(Exception):
     """Custom error in case of attempt to store duplicate activity """
 
-    # todo consider moving to exceptions package
     def __init__(self, id: int, message: str) -> None:
         self.id = id
         self.message = message
@@ -28,7 +27,6 @@ class DuplicateActivity(Exception):
 class UserDoesNotExist(Exception):
     """Custom error in case of attempt to store duplicate activity """
 
-    # todo consider moving to exceptions package
     def __init__(self, id: int, message: str) -> None:
         self.id = id
         self.message = message
@@ -166,7 +164,6 @@ def store_activity(user_id: int,
     :param details: activity details
     :return: None
     """
-    # todo rename
     db_activity = DBActivity.query.filter_by(user_id=user_id, activity_id=activity_id).first()
     if db_activity:
         db_activity.intervals = intervals
@@ -192,7 +189,6 @@ def delete_activity(user_id: int, activity_id: int) -> None:
     :param activity_id: strava activity id
     :return: None
     """
-    # todo implement: check if activity belongs to user_id
     db_activity = DBActivity.query.filter_by(user_id=user_id, activity_id=activity_id).first()
     db.session.delete(db_activity)
     db.session.commit()

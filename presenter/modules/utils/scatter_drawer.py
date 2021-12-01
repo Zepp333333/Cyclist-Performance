@@ -105,7 +105,6 @@ class ScatterDrawer:
         """
         Update all yaxis in self.figure.layout with provided optional update
         :param update_template: dict layout - optional.
-                If not provided - use hardcoded below todo push out to params
         :return: None
         """
         if not update_template:
@@ -169,10 +168,6 @@ class ScatterDrawer:
                 dict(
                     x=interval.start_timestamp,
                     y=1,
-                    # arrowcolor="rgba(63, 81, 181, 0.2)",
-                    # arrowsize=0.3,
-                    # ax=0,
-                    # ay=30,
                     showarrow=False,
                     text=interval.name,
                     xref="x",
@@ -189,27 +184,6 @@ class ScatterDrawer:
 
             self.figure.update_layout(shapes=shapes, annotations=annotations)
 
-            # self.figure.add_vrect(
-            #     x0=interval.start,
-            #     x1=interval.end,
-            #     row="all",
-            #     col="all",
-            #     fillcolor="green",
-            #     opacity=0.25,
-            #     line_width=0,
-            # editable=True,
-            # edits=edits,
-            # )
-            # self.figure.add_annotation(
-            #     x=interval.start,
-            #     y=4,
-            #     valign="top",
-            #     xanchor="left",
-            #     yanchor="top",
-            #     xref="x",
-            #     yref="y",
-            #     text=f"{interval.name} <br>string2 <br>string3  <br>string4  <br>string5",
-            #     showarrow=False)
 
     def check_fields_complete(self) -> bool:
         """

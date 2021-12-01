@@ -15,7 +15,8 @@ class IntervalFinder:
         params: {} = self.set_params(duration=duration, count=count, tolerance=tolerance, power=power)
         candidates = self._produce_candidates(dataframe, params['duration'])
         filtered_candidates = self._filter_candidates_by_power(candidates, params['power'],
-                                                               params['tolerance'])  # filter candidates by power, if provided
+                                                               params[
+                                                                   'tolerance'])  # filter candidates by power, if provided
         local_max_candidates = self._remove_non_local_max_candidates(filtered_candidates)
         non_overlapping_candidates = self._remove_overlapping_candidates(local_max_candidates, params['duration'])
         return self._make_intervals_list(params['duration'], non_overlapping_candidates.nlargest(params['count']))
@@ -68,7 +69,6 @@ class IntervalFinder:
                 result.append(interval_right)
         return candidates.loc[candidates.index.isin(result)]
 
-
         # intervals_df = pd.DataFrame(([f - duration, f] for f in candidates.index), columns=['start', 'end'])
         #
         # intervals = pd.arrays.IntervalArray.from_arrays(intervals_df.start, intervals_df.end, closed='both')
@@ -111,9 +111,6 @@ class IntervalFinder:
         return params
 
 
-
-
-# todo: remove test code below
 def read_dataframe_from_csv(filename: str = "ride.csv", data_path: str = None) -> pd.DataFrame:
     """
     Reads csv file containing activity streams and returns pd.DataFrame
@@ -160,12 +157,3 @@ def test():
     fig.add_scattergl(y=newdf.intervals, line={'color': 'red'})
 
     fig.show()
-
-
-# idf = pd.DataFrame(([s, f] for s, f in found), columns=['start', 'end'])
-# intervals = pd.arrays.IntervalArray.from_tuples(found)
-# for i in intervals:
-#     overlap = intervals.overlaps(i)
-#     if overlap.sum() > 1:
-#         print(intervals.overlaps(i))
-#         print(idf[overlap])

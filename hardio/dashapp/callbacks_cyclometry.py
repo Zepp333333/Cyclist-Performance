@@ -1,12 +1,9 @@
 #  Copyright (c) 2021. Sergei Sazonov. All Rights Reserved
 import dash
 from dash import Input, Output, State
-from flask import url_for
 from flask_login import current_user
 
-from hardio.dashapp import test_strava_methods_page, dash_external_redirect
 from hardio.dashapp.view import CustomDashView
-from iobrocker import IO, strava_swagger
 
 
 def register_cyclometry_callbacks(dash_app: CustomDashView):

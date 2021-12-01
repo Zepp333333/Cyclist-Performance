@@ -18,7 +18,6 @@ from .interval_finder import IntervalFinder
 class IntervalDoNotExit(Exception):
     """Custom error in case accessing non-existent interval"""
 
-    # todo consider moving to exceptions package
     def __init__(self, name: str, id: int, message: str) -> None:
         self.name = name
         self.id = id

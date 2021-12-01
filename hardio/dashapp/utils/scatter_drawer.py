@@ -45,7 +45,6 @@ class ScatterDrawer:
 
         self.draw_intervals()
 
-        # print(self.figure)
         return self.figure
 
     def make_traces(self) -> None:
@@ -87,10 +86,8 @@ class ScatterDrawer:
         self.figure.update_layout(
             xaxis=dict(
                 autorange=True,
-                # range=[self.data_frame.index.start, self.data_frame.index.stop],
                 rangeslider=dict(
                     autorange=True,
-                    # range=[self.data_frame.index.start, self.data_frame.index.stop],
                 ),
                 rangeselector=dict(
                     visible=True,
@@ -112,7 +109,6 @@ class ScatterDrawer:
         """
         Update all yaxis in self.figure.layout with provided optional update
         :param update_template: dict layout - optional.
-                If not provided - use hardcoded below todo push out to params
         :return: None
         """
         if not update_template:
@@ -196,27 +192,6 @@ class ScatterDrawer:
 
             self.figure.update_layout(shapes=shapes, annotations=annotations)
 
-            # self.figure.add_vrect(
-            #     x0=interval.start,
-            #     x1=interval.end,
-            #     row="all",
-            #     col="all",
-            #     fillcolor="green",
-            #     opacity=0.25,
-            #     line_width=0,
-            # editable=True,
-            # edits=edits,
-            # )
-            # self.figure.add_annotation(
-            #     x=interval.start,
-            #     y=4,
-            #     valign="top",
-            #     xanchor="left",
-            #     yanchor="top",
-            #     xref="x",
-            #     yref="y",
-            #     text=f"{interval.name} <br>string2 <br>string3  <br>string4  <br>string5",
-            #     showarrow=False)
 
     def check_fields_complete(self) -> bool:
         """
