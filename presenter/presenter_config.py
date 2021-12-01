@@ -77,9 +77,9 @@ class AppConfig:
     SITE_ROOT = "/"
     SIDEBAR_OPTIONS = [
         AppModules.calendar,
-        AppModules.power,
-        AppModules.fitness,
-        AppModules.config
+        # AppModules.power,
+        # AppModules.fitness,
+        # AppModules.config
     ]
 
     # Styling the navbar
