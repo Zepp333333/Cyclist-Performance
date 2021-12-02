@@ -3,6 +3,7 @@ import calendar
 from datetime import datetime
 from logic import PresentationActivity
 import dash_bootstrap_components as dbc
+from dash import html
 
 
 WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -31,33 +32,38 @@ class CalendarFormatter:
     def format_week(self, week: list[datetime.date], activities: list[PresentationActivity]):
         w = {}
         for day in week:
-            w[self.day_of_week_to_str(day.weekday())] = self.format_day_html(day, activities)
+            # w[self.day_of_week_to_str(day.weekday())] = self.format_day_html(day, activities)
+            w[self.date_to_str(day)] = self.format_day_html(day, activities)
         return w
-
-    def format_day(self, day: datetime.date, activities: list[PresentationActivity]):
-        if day == 0:
-            return {}
-        activities_of_day = list(filter(lambda x: x.date.date() == day, activities))
-        d = f"{day.day}"
-        if activities_of_day:
-            links = []
-            for activity in activities_of_day:
-                links.append(f"[{activity.name}](/application/activity/{activity.id}) \n")
-            d = links
-        return d
 
     def format_day_html(self, day: datetime.date, activities: list[PresentationActivity]):
         if day == 0:
             return {}
         activities_of_day = list(filter(lambda x: x.date.date() == day, activities))
         d = f"{day.day}"
+        d = {}
         if activities_of_day:
             links = []
             for activity in activities_of_day:
-                link = dbc.CardLink(activity.name, href=f"/application/activity/{activity.id}")
+                link = html.Div(dbc.CardLink(activity.name, href=f"/application/activity/{activity.id}", style={"font-size": "x-small"}))
                 links.append(link)
             d = links
         return d
 
-    def day_of_week_to_str(self, day_of_week: int) -> str:
-        return WEEK_DAYS[day_of_week]
+    # def format_day(self, day: datetime.date, activities: list[PresentationActivity]):
+    #     if day == 0:
+    #         return {}
+    #     activities_of_day = list(filter(lambda x: x.date.date() == day, activities))
+    #     d = f"{day.day}"
+    #     if activities_of_day:
+    #         links = []
+    #         for activity in activities_of_day:
+    #             links.append(f"[{activity.name}](/application/activity/{activity.id}) \n")
+    #         d = links
+    #     return d
+    #
+    # def day_of_week_to_str(self, day_of_week: int) -> str:
+    #     return WEEK_DAYS[day_of_week]
+
+    def date_to_str(self, d: datetime.date) -> str:
+        return d.strftime('%A  |  %b, %-d')

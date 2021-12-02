@@ -83,10 +83,13 @@ class AppCalendar:
 
     def _make_card(self, header: str, body: list, style: dict = None) -> dbc.Card:
         if style is None:
-            style = {"width": "14rem"}
+            style = {
+                "width": "14rem",
+                "font-size": "x-small",
+            }
         card = dbc.Card(
             [
-                dbc.CardHeader(header),
+                dbc.CardHeader(header, style={"font-size": "smaller"}),
                 dbc.CardBody(
                     [b for b in body]
                 ),
