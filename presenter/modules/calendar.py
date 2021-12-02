@@ -35,7 +35,8 @@ class AppCalendar:
         return self._make_layout(formatted_cal, month, year)
 
     def _make_layout(self, formatted_cal, month, year):
-        calendar_table = self._make_table(formatted_cal)
+        # calendar_table = self._make_table(formatted_cal)
+        calendar_table = self._make_card_table(formatted_cal)
         alert = self._make_alert()
         return html.Div(
             id=ids.calendar,
@@ -65,8 +66,34 @@ class AppCalendar:
         )
 
     def _make_table(self, formatted_cal):
+        print(formatted_cal)
         columns = self._build_columns()
         return self._build_cells(columns, formatted_cal)
+
+    def _make_card_table(self, formatted_cal: list[dict]) -> html.Div:
+        cols = 7
+        rows = len(formatted_cal)
+        cards = []
+        for week in formatted_cal:
+            week_cards = []
+            for day, val in week.items():
+                week_cards.append(self._make_card(day, val))
+            cards.append(dbc.CardGroup(week_cards))
+        return html.Div(cards)
+
+    def _make_card(self, header: str, body: list, style: dict = None) -> dbc.Card:
+        if style is None:
+            style = {"width": "14rem"}
+        card = dbc.Card(
+            [
+                dbc.CardHeader(header),
+                dbc.CardBody(
+                    [b for b in body]
+                ),
+            ],
+            style
+        )
+        return card
 
     def _build_columns(self):
         columns = [{'id': d,
