@@ -3,7 +3,7 @@
 import calendar
 from datetime import datetime
 
-from dash import Dash, html, dash_table
+from dash import Dash, html, dash_table, dcc
 import dash_bootstrap_components as dbc
 
 from hardio.dashapp import UserConfig
@@ -49,7 +49,8 @@ class AppCalendar:
                 html.Br(),
                 alert,
                 dbc.Spinner(html.Div(id=ids.spinner, children=ids.calendar)),
-                calendar_table
+                calendar_table,
+                dcc.Store(id="user_config_store", storage_type='session'),
             ]
         )
 

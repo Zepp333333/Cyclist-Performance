@@ -57,7 +57,7 @@ class ActivityPresenter:
             ]
         ), className="mt-3")
 
-        cyclometry_tab = dbc.Card(dbc.CardBody(Cyclometry(self.io, self.context).make_layout()), className="mt-3")
+        # cyclometry_tab = dbc.Card(dbc.CardBody(Cyclometry(self.io, self.context).make_layout()), className="mt-3")
 
         page_tabs = dbc.Tabs(
             [
@@ -65,7 +65,7 @@ class ActivityPresenter:
                 # dbc.Tab(power_tab, label="Power", tab_id=ids.power_tab),
                 dbc.Tab(activity_tab, label=tbs.activity_tab.label, tab_id=tbs.activity_tab.tab_id),
                 dbc.Tab(power_tab, label=tbs.power_tab.label, tab_id=tbs.power_tab.tab_id),
-                dbc.Tab(cyclometry_tab, label="Cyclometry", tab_id="cyclometry_tab"),
+                # dbc.Tab(cyclometry_tab, label="Cyclometry", tab_id="cyclometry_tab"),
 
             ],
             id=ids.activity_tabs,
