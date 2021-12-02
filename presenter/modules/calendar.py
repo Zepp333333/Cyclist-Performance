@@ -3,12 +3,12 @@
 import calendar
 from datetime import datetime
 
-from dash import Dash, html, dash_table, dcc
 import dash_bootstrap_components as dbc
+from dash import Dash, html, dcc
 
 from hardio.dashapp import UserConfig
 from iobrocker import IO
-from .utils import CalendarFormatter, WEEK_DAYS
+from .utils import CalendarFormatter
 from ..presenter_config import AppDashIDs as ids, Buttons as btn
 
 
@@ -35,11 +35,10 @@ class AppCalendar:
         return self._make_layout(formatted_cal, month, year)
 
     def _make_layout(self, formatted_cal, month, year):
-        # calendar_table = self._make_table(formatted_cal)
         calendar_table = self._make_card_table(formatted_cal)
         alert = self._make_alert()
         return html.Div(
-            id=ids.calendar,
+            id="calendar",
             children=[html.Div(
                 [
                     self.make_month_selector(month, year),
@@ -48,7 +47,7 @@ class AppCalendar:
                 style={'width': '10rem'}),
                 html.Br(),
                 alert,
-                dbc.Spinner(html.Div(id=ids.spinner, children=ids.calendar)),
+                html.Div(dbc.Spinner(html.Div(id="refresh_spinner"), size="sm")),
                 calendar_table,
                 dcc.Store(id="user_config_store", storage_type='session'),
             ]
@@ -66,14 +65,7 @@ class AppCalendar:
             ]
         )
 
-    def _make_table(self, formatted_cal):
-        print(formatted_cal)
-        columns = self._build_columns()
-        return self._build_cells(columns, formatted_cal)
-
     def _make_card_table(self, formatted_cal: list[dict]) -> html.Div:
-        cols = 7
-        rows = len(formatted_cal)
         cards = []
         for week in formatted_cal:
             week_cards = []
@@ -99,61 +91,7 @@ class AppCalendar:
         )
         return card
 
-    def _build_columns(self):
-        columns = [{'id': d,
-                    'name': d,
-                    'editable': False,
-                    'type': 'text',
-                    'presentation': 'markdown',
-                    }
-                   for d in WEEK_DAYS]
-        return columns
 
-    def _build_cells(self, columns, formatted_cal):
-        return dash_table.DataTable(
-            id=ids.calendar_table,
-            data=formatted_cal,
-            columns=columns,
-            # page_size=3,
-            # page_current=0,
-            # virtualization=True,
-            fixed_rows={'headers': True, 'data': 0},
-            style_cell={
-                'minWidth': 95,
-                'width': 95,
-                'maxWidth': 95,
-            },
-            style_data={
-                'font_family': 'cursive',
-                'font_size': '10px',
-                'text_align': 'center',
-                'white-space': 'normal',
-                'height': 'auto',
-                'overflow': 'hidden',
-                'textOverflow': 'ellipsis',
-                'maxWidth': 0,
-            },
-            # style_table={'height': '500px'},  # default is 500,
-            # style_table={
-            #     'minHeight': '100vh', 'height': '100vh', 'maxHeight': '100vh',
-            #     'minWidth': '900px', 'width': '900px', 'maxWidth': '900px'
-            # },
-            markdown_options={"link_target": "_self"},
-            css=[
-                {"selector": ".dash-spreadsheet tr th", "rule": "height: 15px;"},  # set height of header
-                # {"selector": ".dash-spreadsheet tr td", "rule": "height: 75px;"},  # set height of body rows
-                # {"selector": ".dash-spreadsheet-container", "rule": "max-height: 1000px;"},
-                # {"selector": "table", "rule": "width: 100%;"},
-                # {"selector": "cell cell-1-1 dash-fixed-content", "rule": "height: 100px;"},
-                {
-                    "selector": "dash-spreadsheet-container dash-spreadsheet dash-virtualized dash-freeze-top dash-no-filter dash-fill-width",
-                    "rule": "max-height: 1200px; height: 1200px"},
-                # {"selector": ".dash-table-container tr", "rule": 'max-height: "150px"; height: "150px"; '},
-                # {"selector": "dash-spreadsheet dash-freeze-top dash-spreadsheet dash-virtualized", "rule": "max-height: inherit !important;"},
-                # {"selector": "dash-table-container", "rule": "max-height: calc(100vh - 225px);"}
-
-            ],
-        )
 
     def make_month_selector(self, month: int, year: int) -> dbc.Select:
         earliest, _ = self.io.get_user_activity_date_range()
