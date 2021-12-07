@@ -45,6 +45,16 @@ different concepts, techniques and  frameworks. Here is the ever-growing list of
 
 
 
+Next Steps:
+
+- Design/implement automatic interval detection 
+- Implement post-interval recovery detection
+- Implement long-term analytics of post-interval recovery rate, HR, decoupling
+- Implement in-memory database (likely redis) to improve speed of stateless Plotly/Dash 
+- Implement async activities retrieval from Strava (most likely rabbitMQ brocker + async fastapi workers)
+- Reconsider storage strategy: store activity json objects on file-system instead of Postgress
+- Implement CTL and CTL Chart
+
 # Installation - Heroku:
 1. Set environment variables (`heroku config`):
 
